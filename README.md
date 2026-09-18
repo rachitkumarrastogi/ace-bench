@@ -12,9 +12,10 @@
 | Item | State |
 |------|--------|
 | **Django harvest** | Done — **6125** rows; frozen snapshot documented in [docs/CORPUS_DJANGO.md](docs/CORPUS_DJANGO.md) |
-| **Multi-repo batch** | Next — Flask / Express / Cobra / Clap (pre-AI, windowed) via `scripts/dgx_multi_harvest.sh` |
+| **Multi-repo batch** | In flight — Flask / Express / Cobra / Clap (pre-AI, windowed) via `scripts/dgx_multi_harvest.sh` |
+| **Curated Top ~100** | [docs/CORPUS_TOP100.md](docs/CORPUS_TOP100.md) + [`data/corpus_repos.json`](data/corpus_repos.json) — Tier A next after current batch |
 | Default repo | `django/django` (`2012-01-01` → `2021-01-01`, monthly windows) |
-| Linux kernel | Deferred (not default) |
+| Linux kernel | Deferred / excluded as primary (see corpus exclusions) |
 | Agent sandbox / ACE compare | Next — see [docs/EVAL_LOOP.md](docs/EVAL_LOOP.md) |
 
 DGX overnight how-to: [docs/DGX_FIRST_PASS.md](docs/DGX_FIRST_PASS.md).

@@ -1,0 +1,1164 @@
+{
+  "schema_version": 1,
+  "title": "ACE-Bench curated corpus (~100 repos)",
+  "default_cutoff": "merged:<2021-01-01",
+  "harvest_policy": {
+    "never_blast_all": true,
+    "order": [
+      "finish_in_harvest",
+      "tier_a_one_by_one",
+      "tier_b_sequential",
+      "tier_c_last_with_strict_filters"
+    ],
+    "tier_c_filters": [
+      "exclude_bot_authors",
+      "prefer_issue_linked",
+      "cap_changed_files",
+      "cap_net_lines",
+      "skip_docs_only_ci_only"
+    ]
+  },
+  "status": [
+    {
+      "repo": "django/django",
+      "status": "done_frozen",
+      "lang": "Python",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": 6125,
+      "prs_verified": true,
+      "why": "First frozen human-pattern corpus",
+      "notes": "See docs/CORPUS_DJANGO.md"
+    },
+    {
+      "repo": "pallets/flask",
+      "status": "in_harvest",
+      "lang": "Python",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": 1100,
+      "prs_verified": true,
+      "why": "Mid-size web framework; clean PR culture",
+      "notes": "Do not re-queue as next"
+    },
+    {
+      "repo": "expressjs/express",
+      "status": "in_harvest",
+      "lang": "JavaScript",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Classic Node HTTP framework",
+      "notes": "Do not re-queue as next"
+    },
+    {
+      "repo": "spf13/cobra",
+      "status": "in_harvest",
+      "lang": "Go",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "CLI library; tight PRs",
+      "notes": "Do not re-queue as next"
+    },
+    {
+      "repo": "clap-rs/clap",
+      "status": "in_harvest",
+      "lang": "Rust",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "CLI library; parse-friendly",
+      "notes": "Do not re-queue as next"
+    }
+  ],
+  "tier_a": [
+    {
+      "repo": "psf/requests",
+      "lang": "Python",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": 1349,
+      "prs_verified": true,
+      "why": "Canonical HTTP client; issue-linked PRs",
+      "notes": "Best first post-batch target"
+    },
+    {
+      "repo": "encode/httpx",
+      "lang": "Python",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": 688,
+      "prs_verified": true,
+      "why": "Modern async/sync HTTP; clean diffs",
+      "notes": "Complements Requests"
+    },
+    {
+      "repo": "pydantic/pydantic",
+      "lang": "Python",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": 707,
+      "prs_verified": true,
+      "why": "Validation core; typed PRs",
+      "notes": "v1-era pre-2021 useful"
+    },
+    {
+      "repo": "axios/axios",
+      "lang": "JavaScript",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Ubiquitous HTTP client",
+      "notes": "Browser+Node patterns"
+    },
+    {
+      "repo": "reduxjs/redux",
+      "lang": "JavaScript",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Small core; high review bar",
+      "notes": "Avoid redux-toolkit monorepo first"
+    },
+    {
+      "repo": "lodash/lodash",
+      "lang": "JavaScript",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Utility lib; many small PRs",
+      "notes": "Docs churn — filter path noise"
+    },
+    {
+      "repo": "gin-gonic/gin",
+      "lang": "Go",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Popular Go web framework",
+      "notes": "Strong PR culture"
+    },
+    {
+      "repo": "stretchr/testify",
+      "lang": "Go",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Test helpers; focused patches",
+      "notes": "High signal, low monorepo risk"
+    },
+    {
+      "repo": "sirupsen/logrus",
+      "lang": "Go",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Logging lib; mature history",
+      "notes": "Mid volume"
+    },
+    {
+      "repo": "serde-rs/serde",
+      "lang": "Rust",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Serialization ecosystem hub",
+      "notes": "Often multi-crate; still tractable"
+    },
+    {
+      "repo": "BurntSushi/ripgrep",
+      "lang": "Rust",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Search tool; excellent reviews",
+      "notes": "Single-purpose, testable"
+    },
+    {
+      "repo": "sinatra/sinatra",
+      "lang": "Ruby",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Micro-framework; classic PRs",
+      "notes": "Ruby without Rails weight"
+    },
+    {
+      "repo": "square/okhttp",
+      "lang": "Kotlin",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "HTTP client; strong review culture",
+      "notes": "JVM + Kotlin mix"
+    },
+    {
+      "repo": "fmtlib/fmt",
+      "lang": "C++",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Formatting library; GitHub-native",
+      "notes": "Prefer over mailing-list C++"
+    },
+    {
+      "repo": "jekyll/jekyll",
+      "lang": "Ruby",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "SSG; long PR history",
+      "notes": "Some docs-heavy PRs"
+    }
+  ],
+  "tier_b": [
+    {
+      "repo": "aio-libs/aiohttp",
+      "lang": "Python",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": 2354,
+      "prs_verified": true,
+      "why": "Async HTTP server/client",
+      "notes": "Larger than Tier A HTTP libs"
+    },
+    {
+      "repo": "scrapy/scrapy",
+      "lang": "Python",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": 1606,
+      "prs_verified": true,
+      "why": "Crawler framework",
+      "notes": "Good issue linkage"
+    },
+    {
+      "repo": "celery/celery",
+      "lang": "Python",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": 1398,
+      "prs_verified": true,
+      "why": "Task queue",
+      "notes": "Multi-package layout"
+    },
+    {
+      "repo": "pytest-dev/pytest",
+      "lang": "Python",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": 3194,
+      "prs_verified": true,
+      "why": "Test runner; dense PR culture",
+      "notes": "Plugin ecosystem noise"
+    },
+    {
+      "repo": "pallets/click",
+      "lang": "Python",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "CLI; pairs with Flask/Cobra/Clap",
+      "notes": "Small, high quality"
+    },
+    {
+      "repo": "encode/django-rest-framework",
+      "lang": "Python",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "DRF; Django-adjacent",
+      "notes": "Complements frozen Django"
+    },
+    {
+      "repo": "HypothesisWorks/hypothesis",
+      "lang": "Python",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Property-based testing",
+      "notes": "Niche but clean"
+    },
+    {
+      "repo": "psf/black",
+      "lang": "Python",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Formatter; many small PRs",
+      "notes": "Style-only PRs — filter carefully"
+    },
+    {
+      "repo": "eslint/eslint",
+      "lang": "JavaScript",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Linter platform",
+      "notes": "Rule churn; path filters help"
+    },
+    {
+      "repo": "prettier/prettier",
+      "lang": "JavaScript",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Formatter",
+      "notes": "Snapshot/fixture heavy"
+    },
+    {
+      "repo": "mochajs/mocha",
+      "lang": "JavaScript",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Classic test runner",
+      "notes": "Mid-size"
+    },
+    {
+      "repo": "jquery/jquery",
+      "lang": "JavaScript",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Long history, pre-AI era",
+      "notes": "Legacy + docs"
+    },
+    {
+      "repo": "webpack/webpack",
+      "lang": "JavaScript",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Bundler",
+      "notes": "Complex; upper-B"
+    },
+    {
+      "repo": "babel/babel",
+      "lang": "JavaScript",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Compiler monorepo",
+      "notes": "Monorepo — stricter filters"
+    },
+    {
+      "repo": "nestjs/nest",
+      "lang": "TypeScript",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Node framework",
+      "notes": "TS coverage"
+    },
+    {
+      "repo": "remix-run/react-router",
+      "lang": "TypeScript",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Routing",
+      "notes": "Was ReactTraining/react-router"
+    },
+    {
+      "repo": "go-chi/chi",
+      "lang": "Go",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Lightweight router",
+      "notes": "Complements Gin"
+    },
+    {
+      "repo": "gorilla/mux",
+      "lang": "Go",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Classic router",
+      "notes": "Maintenance-mode era still useful"
+    },
+    {
+      "repo": "spf13/viper",
+      "lang": "Go",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Config (Cobra sibling)",
+      "notes": "After Cobra harvest"
+    },
+    {
+      "repo": "urfave/cli",
+      "lang": "Go",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Alternate CLI",
+      "notes": "Diversity vs Cobra"
+    },
+    {
+      "repo": "go-gorm/gorm",
+      "lang": "Go",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "ORM",
+      "notes": ""
+    },
+    {
+      "repo": "etcd-io/etcd",
+      "lang": "Go",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Distributed KV",
+      "notes": "Large; near Tier C"
+    },
+    {
+      "repo": "tokio-rs/tokio",
+      "lang": "Rust",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Async runtime",
+      "notes": "Multi-crate workspace"
+    },
+    {
+      "repo": "hyperium/hyper",
+      "lang": "Rust",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "HTTP",
+      "notes": ""
+    },
+    {
+      "repo": "actix/actix-web",
+      "lang": "Rust",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Web framework",
+      "notes": ""
+    },
+    {
+      "repo": "diesel-rs/diesel",
+      "lang": "Rust",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "ORM",
+      "notes": ""
+    },
+    {
+      "repo": "rust-lang/mdBook",
+      "lang": "Rust",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Docs tool",
+      "notes": "Smaller Rust target"
+    },
+    {
+      "repo": "rust-lang/rust-clippy",
+      "lang": "Rust",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Lints",
+      "notes": "Many small lint PRs"
+    },
+    {
+      "repo": "square/retrofit",
+      "lang": "Java",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "HTTP client",
+      "notes": "Pairs with OkHttp"
+    },
+    {
+      "repo": "google/gson",
+      "lang": "Java",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "JSON",
+      "notes": "Focused"
+    },
+    {
+      "repo": "google/guava",
+      "lang": "Java",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Core libs",
+      "notes": "Large surface"
+    },
+    {
+      "repo": "junit-team/junit4",
+      "lang": "Java",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Classic tests",
+      "notes": "Prefer junit4 over junit5 volume"
+    },
+    {
+      "repo": "nlohmann/json",
+      "lang": "C++",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "JSON for Modern C++",
+      "notes": "Header-heavy but GitHub PRs"
+    },
+    {
+      "repo": "catchorg/Catch2",
+      "lang": "C++",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Test framework",
+      "notes": ""
+    },
+    {
+      "repo": "protocolbuffers/protobuf",
+      "lang": "C++",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "IDL + runtimes",
+      "notes": "Multi-language monorepo"
+    },
+    {
+      "repo": "Alamofire/Alamofire",
+      "lang": "Swift",
+      "risk": "S",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "HTTP client",
+      "notes": "Swift coverage"
+    },
+    {
+      "repo": "ReactiveX/RxSwift",
+      "lang": "Swift",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Reactive",
+      "notes": ""
+    },
+    {
+      "repo": "discourse/discourse",
+      "lang": "Ruby",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Forum app",
+      "notes": "App-scale Ruby before Rails"
+    },
+    {
+      "repo": "Homebrew/brew",
+      "lang": "Ruby",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Package manager",
+      "notes": "Formula noise — code PRs only"
+    },
+    {
+      "repo": "hashicorp/consul",
+      "lang": "Go",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Service mesh/discovery",
+      "notes": "Upper-B / near C"
+    }
+  ],
+  "tier_c": [
+    {
+      "repo": "facebook/react",
+      "lang": "JavaScript",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "User-requested heavyweight UI library",
+      "notes": "Monorepo; exclude bots; cap files/diff"
+    },
+    {
+      "repo": "microsoft/vscode",
+      "lang": "TypeScript",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "User-requested heavyweight editor",
+      "notes": "Huge volume; rate-limit time; extension noise"
+    },
+    {
+      "repo": "kubernetes/kubernetes",
+      "lang": "Go",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Orchestration standard",
+      "notes": "Massive; SIG bots; aggressive filters"
+    },
+    {
+      "repo": "rails/rails",
+      "lang": "Ruby",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Framework heavyweight",
+      "notes": "Multi-gem monorepo"
+    },
+    {
+      "repo": "spring-projects/spring-boot",
+      "lang": "Java",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Boot ecosystem",
+      "notes": "After smaller JVM Tier B"
+    },
+    {
+      "repo": "spring-projects/spring-framework",
+      "lang": "Java",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Core Spring",
+      "notes": ""
+    },
+    {
+      "repo": "golang/go",
+      "lang": "Go",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Language + stdlib",
+      "notes": "Some non-GitHub history"
+    },
+    {
+      "repo": "rust-lang/rust",
+      "lang": "Rust",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Compiler",
+      "notes": "Enormous; submodule/tooling noise"
+    },
+    {
+      "repo": "rust-lang/cargo",
+      "lang": "Rust",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Package manager",
+      "notes": "More tractable than rustc"
+    },
+    {
+      "repo": "python/cpython",
+      "lang": "Python",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": 19117,
+      "prs_verified": true,
+      "why": "Language",
+      "notes": "Huge; many misc/doc PRs"
+    },
+    {
+      "repo": "nodejs/node",
+      "lang": "JavaScript",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Runtime",
+      "notes": "Core + deps noise"
+    },
+    {
+      "repo": "numpy/numpy",
+      "lang": "Python",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": 6993,
+      "prs_verified": true,
+      "why": "Array compute",
+      "notes": ""
+    },
+    {
+      "repo": "scipy/scipy",
+      "lang": "Python",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Scientific",
+      "notes": ""
+    },
+    {
+      "repo": "pytorch/pytorch",
+      "lang": "Python",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": 4299,
+      "prs_verified": true,
+      "why": "ML framework",
+      "notes": "Monorepo; CUDA/build noise"
+    },
+    {
+      "repo": "tensorflow/tensorflow",
+      "lang": "C++",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "ML framework",
+      "notes": "Extreme monorepo risk"
+    },
+    {
+      "repo": "huggingface/transformers",
+      "lang": "Python",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": 3068,
+      "prs_verified": true,
+      "why": "NLP models",
+      "notes": "Model card / docs heavy"
+    },
+    {
+      "repo": "ansible/ansible",
+      "lang": "Python",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": 32367,
+      "prs_verified": true,
+      "why": "Automation",
+      "notes": "Extreme volume — sample windows"
+    },
+    {
+      "repo": "home-assistant/core",
+      "lang": "Python",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": 21563,
+      "prs_verified": true,
+      "why": "Home automation",
+      "notes": "Integration sprawl"
+    },
+    {
+      "repo": "microsoft/TypeScript",
+      "lang": "TypeScript",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Language",
+      "notes": "Compiler + tests huge"
+    },
+    {
+      "repo": "angular/angular",
+      "lang": "TypeScript",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Framework monorepo",
+      "notes": ""
+    },
+    {
+      "repo": "vuejs/core",
+      "lang": "TypeScript",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Vue 3 core",
+      "notes": "Pre-2021 may be thinner"
+    },
+    {
+      "repo": "vuejs/vue",
+      "lang": "JavaScript",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Vue 2",
+      "notes": "Stronger pre-2021 history"
+    },
+    {
+      "repo": "hashicorp/terraform",
+      "lang": "Go",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "IaC",
+      "notes": "Provider noise"
+    },
+    {
+      "repo": "hashicorp/vault",
+      "lang": "Go",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Secrets",
+      "notes": ""
+    },
+    {
+      "repo": "prometheus/prometheus",
+      "lang": "Go",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Metrics",
+      "notes": ""
+    },
+    {
+      "repo": "grafana/grafana",
+      "lang": "TypeScript",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Observability UI",
+      "notes": "Frontend+backend"
+    },
+    {
+      "repo": "elastic/elasticsearch",
+      "lang": "Java",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Search",
+      "notes": ""
+    },
+    {
+      "repo": "apache/kafka",
+      "lang": "Java",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Streaming",
+      "notes": ""
+    },
+    {
+      "repo": "apache/spark",
+      "lang": "Scala",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Data",
+      "notes": "Build-heavy"
+    },
+    {
+      "repo": "electron/electron",
+      "lang": "TypeScript",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Desktop shell",
+      "notes": ""
+    },
+    {
+      "repo": "facebook/react-native",
+      "lang": "JavaScript",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Mobile",
+      "notes": "Multi-platform monorepo"
+    },
+    {
+      "repo": "flutter/flutter",
+      "lang": "Dart",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "UI toolkit",
+      "notes": "Engine + framework"
+    },
+    {
+      "repo": "godotengine/godot",
+      "lang": "C++",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Game engine",
+      "notes": ""
+    },
+    {
+      "repo": "opencv/opencv",
+      "lang": "C++",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Vision",
+      "notes": ""
+    },
+    {
+      "repo": "llvm/llvm-project",
+      "lang": "C++",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Compiler infra",
+      "notes": "Monorepo extreme"
+    },
+    {
+      "repo": "dotnet/runtime",
+      "lang": "C#",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Runtime",
+      "notes": ""
+    },
+    {
+      "repo": "dotnet/aspnetcore",
+      "lang": "C#",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Web stack",
+      "notes": ""
+    },
+    {
+      "repo": "JetBrains/kotlin",
+      "lang": "Kotlin",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Language",
+      "notes": ""
+    },
+    {
+      "repo": "apple/swift",
+      "lang": "Swift",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Language",
+      "notes": "Partial GitHub mirror dynamics"
+    },
+    {
+      "repo": "redis/redis",
+      "lang": "C",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Datastore",
+      "notes": "Historically mixed contribution paths"
+    },
+    {
+      "repo": "postgresql/postgres",
+      "lang": "C",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "RDBMS",
+      "notes": "Mailing-list heavy; sample only"
+    },
+    {
+      "repo": "git/git",
+      "lang": "C",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "VCS",
+      "notes": "Mailing-list primary — low priority within C"
+    },
+    {
+      "repo": "moby/moby",
+      "lang": "Go",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Docker engine",
+      "notes": "Renames/history quirks"
+    },
+    {
+      "repo": "docker/cli",
+      "lang": "Go",
+      "risk": "M",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Docker CLI",
+      "notes": "Smaller than engine"
+    },
+    {
+      "repo": "helm/helm",
+      "lang": "Go",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "K8s packaging",
+      "notes": "After smaller Go Tier A/B"
+    },
+    {
+      "repo": "istio/istio",
+      "lang": "Go",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Service mesh",
+      "notes": ""
+    },
+    {
+      "repo": "envoyproxy/envoy",
+      "lang": "C++",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Proxy",
+      "notes": ""
+    },
+    {
+      "repo": "clickhouse/clickhouse",
+      "lang": "C++",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "OLAP DB",
+      "notes": ""
+    },
+    {
+      "repo": "pingcap/tidb",
+      "lang": "Go",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Distributed SQL",
+      "notes": ""
+    },
+    {
+      "repo": "cockroachdb/cockroach",
+      "lang": "Go",
+      "risk": "L",
+      "cutoff": "merged:<2021-01-01",
+      "pre_2021_merged_prs": null,
+      "prs_verified": false,
+      "why": "Distributed SQL",
+      "notes": ""
+    }
+  ],
+  "exclusions": [
+    {
+      "repo_or_class": "torvalds/linux",
+      "reason": "Mailing-list / patch-email primary; GitHub is not the real review surface"
+    },
+    {
+      "repo_or_class": "GNU / savannah GitHub mirrors",
+      "reason": "Incomplete PR history; mirror noise"
+    },
+    {
+      "repo_or_class": "awesome-* lists",
+      "reason": "Not product code; no meaningful patches"
+    },
+    {
+      "repo_or_class": "Pure documentation / book-only repos",
+      "reason": "Low ACE dual-exec value"
+    },
+    {
+      "repo_or_class": "sqlalchemy/sqlalchemy (early)",
+      "reason": "Only ~53 verified pre-2021 GitHub merges; history lived elsewhere"
+    },
+    {
+      "repo_or_class": "tiangolo/fastapi (early)",
+      "reason": "Search invalid/empty in this pass; rose late — verify before enqueue"
+    },
+    {
+      "repo_or_class": "chromium/chromium without filters",
+      "reason": "Volume + process mismatch for ACE v1"
+    }
+  ]
+}
