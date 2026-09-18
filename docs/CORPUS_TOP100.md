@@ -9,10 +9,12 @@ Machine-readable twin: [`data/corpus_repos.json`](../data/corpus_repos.json).
 | Repo | Status | Lang | Risk | Pre-2021 merged PRs | Notes |
 |------|--------|------|------|---------------------|-------|
 | `django/django` | **DONE / frozen** | Python | M | 6125 (harvested) | See [CORPUS_DJANGO.md](CORPUS_DJANGO.md) |
-| `pallets/flask` | **IN HARVEST** | Python | S | ~1100 | Mid-size, clean PR culture |
-| `expressjs/express` | **IN HARVEST** | JavaScript | S | TBD | Classic Node HTTP framework |
-| `spf13/cobra` | **IN HARVEST** | Go | S | TBD | CLI lib; tight PRs |
-| `clap-rs/clap` | **IN HARVEST** | Rust | S | TBD | CLI lib; parse-friendly |
+| `pallets/flask` | **DONE** | Python | S | 1054 (harvested) | Live DB; do not re-queue |
+| `expressjs/express` | **DONE** | JavaScript | S | 196 (harvested) | Live DB; do not re-queue |
+| `spf13/cobra` | **DONE** | Go | S | 343 (harvested) | Live DB; do not re-queue |
+| `clap-rs/clap` | **DONE** | Rust | S | 967 (harvested) | Live DB; do not re-queue |
+
+Remaining Tier A/B/C: run `./scripts/dgx_corpus_harvest.sh` on DGX (sequential; log `~/ace-bench/data/corpus_harvest.log`).
 
 **Cutoff (default for all rows below):** `merged:<2021-01-01`  
 **Suggested windowing:** monthly or quarterly slices (same pattern as Django).
@@ -31,13 +33,12 @@ Machine-readable twin: [`data/corpus_repos.json`](../data/corpus_repos.json).
 
 ## Harvest order (mandatory)
 
-1. Finish the **IN HARVEST** batch (`flask`, `express`, `cobra`, `clap`) one-by-one / small scripted queue.
-2. Run **Tier A** next, **one repo at a time** (or at most one concurrent harvest job).
-3. Then **Tier B**, still sequential; widen language coverage before volume.
-4. **Tier C last**, with stricter filters: e.g. `max files` / patch size caps, exclude bot authors (`dependabot`, `renovate`, `github-actions`), prefer issue-linked PRs, longer windows + backoff for rate limits.
-5. **Never** blast all ~100 repos at once — Search + Contents API limits will thrash the queue and corrupt progress tracking.
+1. Kickoff batch (`flask`, `express`, `cobra`, `clap`) is **done** in the live DB.
+2. Run **Tier A → B → C** via `scripts/dgx_corpus_harvest.sh` (**one repo at a time**, continue-on-failure).
+3. **Tier C** still expects stricter filters later (bot authors, issue-linked, size caps) — full windowed harvest first is intentional and slow.
+4. **Never** parallelize repos — shared Search + REST rate budget.
 
-Recommended cadence: complete + spot-check summary for repo *N* before starting *N+1*.
+Recommended cadence: the corpus script already spot-checks `--summary-only` after each repo.
 
 ---
 

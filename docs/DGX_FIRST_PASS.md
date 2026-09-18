@@ -179,6 +179,28 @@ Override repos: `REPOS="psf/requests axios/axios" ./scripts/dgx_multi_harvest.sh
 Default sleep is `1.0s` (REST ≈5k/hr); Search page gaps floor at `2.0s` (≈30/min).
 Log: `data/multi_harvest.log`.
 
+## Full curated corpus (Tier A → B → C)
+
+After the kickoff batch finishes, run the remaining curated list from
+[`data/corpus_repos.json`](../data/corpus_repos.json) (see also
+[CORPUS_TOP100.md](CORPUS_TOP100.md)). Script skips `done_frozen` /
+`in_harvest` / `done` status rows plus the five already-ingested repos
+(`django`, `flask`, `express`, `cobra`, `clap`). **One repo at a time**;
+continues on per-repo failure. Expect **days** of wall time (rate limits +
+Tier C volume).
+
+```bash
+export ACE_DB_PATH="$HOME/ace-bench/data/ace_patterns.sqlite"
+# kill idle ace-harvest shell only; do not touch pn-web
+tmux kill-session -t ace-harvest 2>/dev/null || true
+tmux new -s ace-harvest
+./scripts/dgx_corpus_harvest.sh
+# detach: Ctrl-b d
+```
+
+Log: `$HOME/ace-bench/data/corpus_harvest.log` (override with `CORPUS_HARVEST_LOG`).
+Override queue: `REPOS="psf/requests encode/httpx" ./scripts/dgx_corpus_harvest.sh`.
+
 ## Next (not this pass)
 
 Agent sandbox + ACE compare is stubbed in [EVAL_LOOP.md](EVAL_LOOP.md). Do not expect agent execution from these scripts yet.

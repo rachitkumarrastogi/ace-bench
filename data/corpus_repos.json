@@ -32,47 +32,47 @@
     },
     {
       "repo": "pallets/flask",
-      "status": "in_harvest",
+      "status": "done_harvested",
       "lang": "Python",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": 1100,
+      "pre_2021_merged_prs": 1054,
       "prs_verified": true,
       "why": "Mid-size web framework; clean PR culture",
-      "notes": "Do not re-queue as next"
+      "notes": "Harvested into live ace_patterns.sqlite; skip re-queue"
     },
     {
       "repo": "expressjs/express",
-      "status": "in_harvest",
+      "status": "done_harvested",
       "lang": "JavaScript",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 196,
+      "prs_verified": true,
       "why": "Classic Node HTTP framework",
-      "notes": "Do not re-queue as next"
+      "notes": "Harvested into live ace_patterns.sqlite; skip re-queue"
     },
     {
       "repo": "spf13/cobra",
-      "status": "in_harvest",
+      "status": "done_harvested",
       "lang": "Go",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 343,
+      "prs_verified": true,
       "why": "CLI library; tight PRs",
-      "notes": "Do not re-queue as next"
+      "notes": "Harvested into live ace_patterns.sqlite; skip re-queue"
     },
     {
       "repo": "clap-rs/clap",
-      "status": "in_harvest",
+      "status": "done_harvested",
       "lang": "Rust",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 967,
+      "prs_verified": true,
       "why": "CLI library; parse-friendly",
-      "notes": "Do not re-queue as next"
+      "notes": "Harvested into live ace_patterns.sqlite; skip re-queue"
     }
   ],
   "tier_a": [
@@ -134,7 +134,7 @@
       "pre_2021_merged_prs": null,
       "prs_verified": false,
       "why": "Utility lib; many small PRs",
-      "notes": "Docs churn — filter path noise"
+      "notes": "Docs churn \u2014 filter path noise"
     },
     {
       "repo": "gin-gonic/gin",
@@ -306,7 +306,7 @@
       "pre_2021_merged_prs": null,
       "prs_verified": false,
       "why": "Formatter; many small PRs",
-      "notes": "Style-only PRs — filter carefully"
+      "notes": "Style-only PRs \u2014 filter carefully"
     },
     {
       "repo": "eslint/eslint",
@@ -366,7 +366,7 @@
       "pre_2021_merged_prs": null,
       "prs_verified": false,
       "why": "Compiler monorepo",
-      "notes": "Monorepo — stricter filters"
+      "notes": "Monorepo \u2014 stricter filters"
     },
     {
       "repo": "nestjs/nest",
@@ -616,7 +616,7 @@
       "pre_2021_merged_prs": null,
       "prs_verified": false,
       "why": "Package manager",
-      "notes": "Formula noise — code PRs only"
+      "notes": "Formula noise \u2014 code PRs only"
     },
     {
       "repo": "hashicorp/consul",
@@ -798,7 +798,7 @@
       "pre_2021_merged_prs": 32367,
       "prs_verified": true,
       "why": "Automation",
-      "notes": "Extreme volume — sample windows"
+      "notes": "Extreme volume \u2014 sample windows"
     },
     {
       "repo": "home-assistant/core",
@@ -1048,7 +1048,7 @@
       "pre_2021_merged_prs": null,
       "prs_verified": false,
       "why": "VCS",
-      "notes": "Mailing-list primary — low priority within C"
+      "notes": "Mailing-list primary \u2014 low priority within C"
     },
     {
       "repo": "moby/moby",
@@ -1154,7 +1154,7 @@
     },
     {
       "repo_or_class": "tiangolo/fastapi (early)",
-      "reason": "Search invalid/empty in this pass; rose late — verify before enqueue"
+      "reason": "Search invalid/empty in this pass; rose late \u2014 verify before enqueue"
     },
     {
       "repo_or_class": "chromium/chromium without filters",
