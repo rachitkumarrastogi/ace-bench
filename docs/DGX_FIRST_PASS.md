@@ -14,6 +14,10 @@ enumerate the full pre-AI baseline.
 daily) queries so each window stays under ~1000 hits, then upserts into the
 same SQLite DB (idempotent on `(repo, pr_number)`).
 
+Each window uses the range qualifier `merged:YYYY-MM-DD..YYYY-MM-DD` (inclusive).
+Do **not** combine `merged:>=` with `merged:<` — GitHub Search often ignores the
+lower bound and reports a bogus inflated `total_count`.
+
 | Mode | Script | Scope |
 |------|--------|-------|
 | Pilot (capped) | `scripts/dgx_harvest.sh` | `--max-prs 200` (no windows) |

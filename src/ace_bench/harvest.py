@@ -93,6 +93,32 @@ def iter_date_windows(
         cursor = nxt
 
 
+def build_merged_search_query(
+    repo: str,
+    merged_before: str,
+    merged_after: str | None,
+) -> str:
+    """Build a GitHub Search query for merged PRs in a date range.
+
+    Prefer ``merged:YYYY-MM-DD..YYYY-MM-DD`` when both bounds are set.
+    Combining ``merged:>=`` with ``merged:<`` is unreliable (GitHub may ignore
+    the lower bound and inflate total_count). Windows are [after, before).
+    """
+    parts = [f"repo:{repo}", "is:pr", "is:merged"]
+    if merged_after:
+        # Inclusive range covering [after, before): end date is the day before before.
+        end_inclusive = parse_iso_date(merged_before) - timedelta(days=1)
+        start = parse_iso_date(merged_after)
+        if end_inclusive < start:
+            raise ValueError(
+                f"empty merged window: after={merged_after} before={merged_before}"
+            )
+        parts.append(f"merged:{format_iso_date(start)}..{format_iso_date(end_inclusive)}")
+    else:
+        parts.append(f"merged:<{merged_before}")
+    return " ".join(parts)
+
+
 class GitHubClient:
     def __init__(self, token: str | None = None, max_retries: int = 5) -> None:
         self.token = token or os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
@@ -153,12 +179,7 @@ class GitHubClient:
         GitHub Search returns at most SEARCH_RESULT_CAP (1000) hits per query.
         Use date windows so each query stays under that cap.
         """
-        # Search is the reliable way to filter merged:<date>
-        # Example: repo:django/django is:pr is:merged merged:<2021-01-01
-        parts = [f"repo:{repo}", "is:pr", "is:merged", f"merged:<{merged_before}"]
-        if merged_after:
-            parts.append(f"merged:>={merged_after}")
-        query = " ".join(parts)
+        query = build_merged_search_query(repo, merged_before, merged_after)
         page = 1
         yielded = 0
         warned_cap = False
