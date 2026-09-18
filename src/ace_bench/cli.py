@@ -9,12 +9,13 @@ import sys
 from pathlib import Path
 
 from ace_bench.db import PatternStore
-from ace_bench.harvest import HarvestConfig, harvest
+from ace_bench.harvest import SEARCH_RESULT_CAP, HarvestConfig, harvest
 
 
 DEFAULT_DB = os.environ.get("ACE_DB_PATH", "./data/ace_patterns.sqlite")
 DEFAULT_REPOS = ["django/django"]
 DEFAULT_MERGED_BEFORE = "2021-01-01"
+DEFAULT_FULL_MERGED_AFTER = "2012-01-01"
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -35,13 +36,33 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument(
         "--merged-after",
         default=None,
-        help="Optional inclusive lower bound on merge date YYYY-MM-DD",
+        help="Optional inclusive lower bound on merge date YYYY-MM-DD "
+        f"(required with --window; full Django baseline uses {DEFAULT_FULL_MERGED_AFTER})",
     )
     p.add_argument(
         "--max-prs",
         type=int,
-        default=100,
-        help="Max PRs to harvest per repo (default: 100; raise on DGX)",
+        default=None,
+        help=(
+            "Max PRs to harvest per repo per window "
+            f"(default: 100 pilot; {SEARCH_RESULT_CAP} when --window is set)"
+        ),
+    )
+    p.add_argument(
+        "--window",
+        choices=("days", "months"),
+        default=None,
+        help=(
+            "Auto-slice [--merged-after, --merged-before) into date windows so each "
+            f"GitHub Search query stays under the {SEARCH_RESULT_CAP}-result cap. "
+            "Requires --merged-after."
+        ),
+    )
+    p.add_argument(
+        "--window-size",
+        type=int,
+        default=1,
+        help="Number of days or months per window when --window is set (default: 1)",
     )
     p.add_argument(
         "--db",
@@ -71,6 +92,14 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(store.summary(), indent=2))
             return 0
 
+        if args.window and not args.merged_after:
+            print("error: --merged-after is required when using --window", file=sys.stderr)
+            return 2
+
+        if args.window_size < 1:
+            print("error: --window-size must be >= 1", file=sys.stderr)
+            return 2
+
         token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
         if not token:
             print(
@@ -78,13 +107,22 @@ def main(argv: list[str] | None = None) -> int:
                 file=sys.stderr,
             )
 
+        if args.max_prs is not None:
+            max_prs = args.max_prs
+        elif args.window:
+            max_prs = SEARCH_RESULT_CAP
+        else:
+            max_prs = 100
+
         config = HarvestConfig(
             repos=list(args.repos),
             merged_before=args.merged_before,
             merged_after=args.merged_after,
-            max_prs_per_repo=args.max_prs,
+            max_prs_per_repo=max_prs,
             sleep_seconds=args.sleep,
             token=token,
+            window_unit=args.window,
+            window_size=args.window_size,
         )
         result = harvest(store, config)
         print(json.dumps(result, indent=2))

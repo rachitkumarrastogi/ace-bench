@@ -11,8 +11,8 @@
 
 | Item | State |
 |------|--------|
-| **Django pilot harvest** | Live — merged pre-AI PRs → SQLite |
-| Default repo | `django/django` (`merged_before=2021-01-01`) |
+| **Django harvest** | Live — windowed pre-AI PRs → SQLite (Search API 1000-hit cap) |
+| Default repo | `django/django` (`2012-01-01` → `2021-01-01`, monthly windows) |
 | Linux kernel | Deferred (not default) |
 | Agent sandbox / ACE compare | Next — see [docs/EVAL_LOOP.md](docs/EVAL_LOOP.md) |
 
@@ -20,8 +20,10 @@ DGX overnight how-to: [docs/DGX_FIRST_PASS.md](docs/DGX_FIRST_PASS.md).
 
 ```bash
 export GITHUB_TOKEN=...   # or GH_TOKEN
+# full baseline (monthly windows; thousands of PRs):
+./scripts/dgx_full_harvest.sh
+# pilot cap only:
 python3 scripts/run_harvest.py --repos django/django --max-prs 100
-# or: ./scripts/dgx_harvest.sh
 ```
 
 DB path: `ACE_DB_PATH` or `./data/ace_patterns.sqlite`.
