@@ -24,4 +24,6 @@ htmlcov/
 artifacts/
 runs/
 *.patch
+data/*.sqlite
+data/*.sqlite-*
 !.gitkeep

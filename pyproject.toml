@@ -22,6 +22,7 @@ keywords = [
 ]
 dependencies = [
   "tree-sitter>=0.22",
+  "certifi>=2024.0",
 ]
 
 [project.optional-dependencies]
@@ -29,6 +30,9 @@ dev = [
   "pytest>=8.0",
   "ruff>=0.6",
 ]
+
+[project.scripts]
+ace-harvest = "ace_bench.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/rachitkumarrastogi/ace-bench"

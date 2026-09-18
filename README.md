@@ -7,6 +7,27 @@
 
 ---
 
+## Status (v1 first pass)
+
+| Item | State |
+|------|--------|
+| **Django pilot harvest** | Live — merged pre-AI PRs → SQLite |
+| Default repo | `django/django` (`merged_before=2021-01-01`) |
+| Linux kernel | Deferred (not default) |
+| Agent sandbox / ACE compare | Next — see [docs/EVAL_LOOP.md](docs/EVAL_LOOP.md) |
+
+DGX overnight how-to: [docs/DGX_FIRST_PASS.md](docs/DGX_FIRST_PASS.md).
+
+```bash
+export GITHUB_TOKEN=...   # or GH_TOKEN
+python3 scripts/run_harvest.py --repos django/django --max-prs 100
+# or: ./scripts/dgx_harvest.sh
+```
+
+DB path: `ACE_DB_PATH` or `./data/ace_patterns.sqlite`.
+
+---
+
 ## The Core Premise
 
 Prior to ~2012, blogs were judged on utility, clarity, and authority. After SEO mills and generative AI, the web filled with **content bloat**: 2,000-word articles for queries that needed 50 words.
@@ -26,12 +47,12 @@ Benchmarks that treat code generation as binary pass/fail ignore **code rot, mai
   (Human Baseline)         (Agent Generated)           (Structural Metrics)        (Leaderboard / Report)
 ```
 
-### 1. Data pipeline & baseline ingestion
+### 1. Data pipeline & baseline ingestion (this pass)
 
-- Harvest resolved, merged PRs from high-quality open-source repos (Python, TypeScript, Rust, …).
-- Store: issue description, human patch \(P_H\), human file set \(F_H\), and pre-PR repo state.
+- Harvest resolved, merged PRs from high-quality open-source repos (pilot: Django).
+- Store: issue description, human patch \(P_H\), human file set \(F_H\), crude diff metrics in `metrics_json`, and base SHA.
 
-### 2. Isolated agent execution (sandbox)
+### 2. Isolated agent execution (sandbox) — next
 
 - Containerized environment (Docker / microVM) at the pre-PR commit.
 - Give the agent the issue description only.
@@ -39,7 +60,7 @@ Benchmarks that treat code generation as binary pass/fail ignore **code rot, mai
 
 ### 3. Comparative structural analysis (AST & static analysis)
 
-Prefer tree-sitter ASTs over raw line diffs:
+Prefer tree-sitter ASTs over raw line diffs (first pass uses cheap diff proxies until AST lands):
 
 | Signal | What it captures |
 |--------|------------------|
@@ -107,13 +128,11 @@ Prefer tree-sitter ASTs over raw line diffs:
 
 ---
 
-## Status
+## Roadmap
 
-Early blueprint / scaffold. Roadmap:
-
-1. [ ] Dataset schema + sample human baselines
+1. [x] Dataset schema + Django pilot harvest → SQLite
 2. [ ] Sandbox runner (agent-agnostic interface)
-3. [ ] tree-sitter AST metrics + ACE Index
+3. [ ] tree-sitter AST metrics + ACE Index (formula stub in `scoring.py`)
 4. [ ] Public leaderboard + paper-ready report format
 
 ---
