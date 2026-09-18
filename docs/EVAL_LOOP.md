@@ -1,6 +1,6 @@
 # Eval loop (future) — human baseline → agent → ACE compare
 
-This is the intended long-term loop. **v1 first pass only implements human harvest into SQLite.** Agent sandbox and full ACE compare are stubs / future work.
+This is the intended long-term loop. **Human harvest is live; eval v0 (export + score CLI, sandbox stubbed) is in [EVAL_V0.md](EVAL_V0.md).** Full Docker dual-execution remains future work.
 
 ```
 ┌─────────────────────┐
@@ -30,8 +30,9 @@ This is the intended long-term loop. **v1 first pass only implements human harve
 |-------|--------|
 | Human PR harvest → SQLite | **Live** (Django pilot) |
 | First-pass diff metrics in `metrics_json` | **Live** (AST/GNN replace later) |
+| Eval v0 export + score-vs-human CLI | **Live** — [EVAL_V0.md](EVAL_V0.md) |
 | Agent sandbox / dual execution | Stub / docs only |
-| tree-sitter / GNN metrics | Deferred |
+| tree-sitter / GNN metrics | Deferred (v0 uses `max(added_lines,1)` AST proxy) |
 | Public leaderboard | Deferred |
 
 ## Compare inputs (when agent exists)

@@ -41,4 +41,5 @@ data/**/*.sqlite
 data/**/*.sqlite-*
 data/frozen/*.sqlite
 data/frozen/*.sqlite-*
+data/eval/
 !.gitkeep

@@ -16,7 +16,7 @@
 | **Curated Top ~100** | [docs/CORPUS_TOP100.md](docs/CORPUS_TOP100.md) + [`data/corpus_repos.json`](data/corpus_repos.json) — Tier A next after current batch |
 | Default repo | `django/django` (`2012-01-01` → `2021-01-01`, monthly windows) |
 | Linux kernel | Deferred / excluded as primary (see corpus exclusions) |
-| Agent sandbox / ACE compare | Next — see [docs/EVAL_LOOP.md](docs/EVAL_LOOP.md) |
+| **Agent sandbox / ACE compare** | Eval v0 CLI live — [docs/EVAL_V0.md](docs/EVAL_V0.md); Docker sandbox next |
 
 DGX overnight how-to: [docs/DGX_FIRST_PASS.md](docs/DGX_FIRST_PASS.md).
 

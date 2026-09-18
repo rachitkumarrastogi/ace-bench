@@ -184,6 +184,50 @@ class PatternStore:
             ).fetchone()
         return int(row["n"])
 
+    def get_pattern(self, repo: str, pr_number: int) -> HumanPattern | None:
+        """Load one human pattern by (repo, pr_number), or None."""
+        row = self._conn.execute(
+            "SELECT * FROM human_patterns WHERE repo = ? AND pr_number = ?",
+            (repo, pr_number),
+        ).fetchone()
+        if row is None:
+            return None
+        return _row_to_pattern(row)
+
+    def fetch_eval_candidates(
+        self,
+        *,
+        repo: str = "django/django",
+        min_files: int = 1,
+        max_files: int = 8,
+        merged_before: str = "2021-01-01",
+        limit: int | None = None,
+    ) -> list[HumanPattern]:
+        """Select eval candidates: title+body+patch, file band, merged before cutoff.
+
+        Returns all matching rows ordered by file_count ASC, merged_at ASC.
+        Callers may re-rank (e.g. prefer test-touching) and slice to ``limit``.
+        """
+        rows = self._conn.execute(
+            """
+            SELECT * FROM human_patterns
+            WHERE repo = ?
+              AND file_count BETWEEN ? AND ?
+              AND merged_at IS NOT NULL
+              AND merged_at < ?
+              AND title IS NOT NULL AND TRIM(title) != ''
+              AND body IS NOT NULL AND TRIM(body) != ''
+              AND patch_text IS NOT NULL AND LENGTH(patch_text) > 0
+              AND additions > 0
+            ORDER BY file_count ASC, merged_at ASC
+            """,
+            (repo, min_files, max_files, merged_before),
+        ).fetchall()
+        patterns = [_row_to_pattern(r) for r in rows]
+        if limit is not None:
+            return patterns[:limit]
+        return patterns
+
     def summary(self) -> dict[str, Any]:
         by_repo = self._conn.execute(
             """
@@ -203,6 +247,27 @@ class PatternStore:
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _row_to_pattern(row: sqlite3.Row) -> HumanPattern:
+    return HumanPattern(
+        repo=row["repo"],
+        pr_number=int(row["pr_number"]),
+        merged_at=row["merged_at"],
+        base_sha=row["base_sha"],
+        merge_commit_sha=row["merge_commit_sha"],
+        title=row["title"],
+        body=row["body"],
+        author_login=row["author_login"],
+        html_url=row["html_url"],
+        files=json.loads(row["files_json"]),
+        file_count=int(row["file_count"]),
+        additions=int(row["additions"]),
+        deletions=int(row["deletions"]),
+        directories_touched=int(row["directories_touched"]),
+        patch_text=row["patch_text"],
+        metrics=json.loads(row["metrics_json"]),
+    )
 
 
 def pattern_to_dict(pattern: HumanPattern) -> dict[str, Any]:
