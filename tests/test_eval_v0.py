@@ -14,7 +14,6 @@ from ace_bench.eval_v0 import (
     touches_tests,
 )
 
-
 SAMPLE = """\
 diff --git a/django/foo.py b/django/foo.py
 --- a/django/foo.py

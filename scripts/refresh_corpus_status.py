@@ -42,6 +42,13 @@ except ImportError:  # pragma: no cover
     _SSL_CONTEXT = ssl.create_default_context()
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from ace_bench.github_url import assert_github_api_url, redact_secrets, redact_url
+from ace_bench.harvest import SEARCH_PAGE_SLEEP_SECONDS, validate_repo_slug
+from ace_bench.paths import PathEscapeError, resolve_allowed_path
+from ace_bench.tokens import DEFAULT_TOKEN_FILE, resolve_github_token
+
 DEFAULT_DB = Path(os.environ.get("ACE_DB_PATH") or (ROOT / "data" / "ace_patterns.sqlite"))
 DEFAULT_CORPUS = ROOT / "data" / "corpus_repos.json"
 DEFAULT_OUT = ROOT / "docs" / "CORPUS_STATUS.md"
@@ -49,9 +56,8 @@ DEFAULT_LOG = Path(
     os.environ.get("CORPUS_HARVEST_LOG")
     or (Path.home() / "ace-bench" / "data" / "corpus_harvest.log")
 )
-DEFAULT_TOKEN_FILE = Path.home() / ".config" / "ace-bench" / "github_token"
 CUTOFF_QUERY = "merged:<2021-01-01"
-SEARCH_SLEEP_SECONDS = 2.0
+SEARCH_SLEEP_SECONDS = SEARCH_PAGE_SLEEP_SECONDS
 COVERAGE_DONE_THRESHOLD = 0.95
 ABS_SLACK = 5
 GITHUB_API = "https://api.github.com"
@@ -77,15 +83,7 @@ def _utc_now() -> str:
 
 
 def resolve_token(explicit: str | None, token_file: Path) -> str | None:
-    if explicit:
-        return explicit.strip() or None
-    for key in ("GITHUB_TOKEN", "GH_TOKEN"):
-        val = os.environ.get(key)
-        if val and val.strip():
-            return val.strip()
-    if token_file.is_file():
-        return token_file.read_text(encoding="utf-8").strip() or None
-    return None
+    return resolve_github_token(explicit=explicit, token_file=token_file)
 
 
 def load_harvested_counts(db_path: Path) -> dict[str, int]:
@@ -164,9 +162,12 @@ def iter_corpus_repos(data: dict[str, Any]) -> list[tuple[str, str, dict[str, An
 
 
 def github_search_total(repo: str, token: str | None, max_retries: int = 5) -> int:
+    repo = validate_repo_slug(repo)
     query = f"repo:{repo} is:pr is:merged {CUTOFF_QUERY}"
     params = urllib.parse.urlencode({"q": query, "per_page": 1})
     url = f"{GITHUB_API}/search/issues?{params}"
+    assert_github_api_url(url)
+    safe_url = redact_url(url)
     headers = {
         "Accept": "application/vnd.github+json",
         "User-Agent": "ace-bench-corpus-status/0.1",
@@ -190,8 +191,8 @@ def github_search_total(repo: str, token: str | None, max_retries: int = 5) -> i
                 payload = json.loads(resp.read().decode("utf-8"))
                 return int(payload.get("total_count") or 0)
         except urllib.error.HTTPError as exc:
-            body = exc.read().decode("utf-8", errors="replace")
-            last_err = RuntimeError(f"GitHub API {exc.code}: {body[:300]}")
+            body = redact_secrets(exc.read().decode("utf-8", errors="replace"))
+            last_err = RuntimeError(f"GitHub API {exc.code} for {safe_url}: {body[:300]}")
             if exc.code not in _TRANSIENT_HTTP or attempt + 1 >= max_retries:
                 raise last_err from exc
             retry_after = exc.headers.get("Retry-After")
@@ -203,9 +204,11 @@ def github_search_total(repo: str, token: str | None, max_retries: int = 5) -> i
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
             last_err = exc
             if attempt + 1 >= max_retries:
-                raise RuntimeError(f"GitHub request failed: {exc}") from exc
+                raise RuntimeError(
+                    f"GitHub request failed for {safe_url}: {exc}"
+                ) from exc
             time.sleep(min(60, (2**attempt) + 1))
-    raise RuntimeError(f"GitHub request failed: {last_err}")
+    raise RuntimeError(f"GitHub request failed for {safe_url}: {last_err}")
 
 
 def cache_count_into_corpus(
@@ -356,8 +359,8 @@ def render_markdown(
         "",
         "## Summary",
         "",
-        f"| Metric | Value |",
-        f"|--------|-------|",
+        "| Metric | Value |",
+        "|--------|-------|",
         f"| Total harvested rows | **{total_harvested}** |",
         f"| Repos with data | **{repos_with_data}** / {len(rows)} |",
         f"| Status: done | {n_done} |",
@@ -445,10 +448,31 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--dry-run", action="store_true", help="Print markdown; do not write files")
     args = p.parse_args(argv)
 
+    try:
+        db_path = resolve_allowed_path(args.db, purpose="--db")
+        corpus_path = resolve_allowed_path(args.corpus, purpose="--corpus")
+        out_path = resolve_allowed_path(args.out, purpose="--out")
+        # Harvest logs may live under $HOME/ace-bench — allow missing file.
+        try:
+            log_path = resolve_allowed_path(args.harvest_log, purpose="--harvest-log")
+        except PathEscapeError:
+            log_path = Path(args.harvest_log).expanduser()
+    except PathEscapeError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+
+    if args.sleep < SEARCH_SLEEP_SECONDS:
+        print(
+            f"warning: --sleep {args.sleep} < Search floor {SEARCH_SLEEP_SECONDS}s; "
+            f"using {SEARCH_SLEEP_SECONDS}",
+            file=sys.stderr,
+        )
+        args.sleep = SEARCH_SLEEP_SECONDS
+
     token = resolve_token(None, args.token_file)
-    data = json.loads(args.corpus.read_text(encoding="utf-8"))
-    harvested = load_harvested_counts(args.db)
-    finished_ok, _failed, harvesting = parse_harvest_log(args.harvest_log)
+    data = json.loads(corpus_path.read_text(encoding="utf-8"))
+    harvested = load_harvested_counts(db_path)
+    finished_ok, _failed, harvesting = parse_harvest_log(log_path)
 
     fetched = 0
     corpus_changed = False
@@ -472,10 +496,10 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"[{i}/{len(targets)}] Search total_count {repo}…", file=sys.stderr)
                 try:
                     count = github_search_total(repo, token)
-                except Exception as exc:  # noqa: BLE001 — continue on per-repo failure
-                    msg = str(exc)
+                except Exception as exc:
+                    msg = redact_secrets(str(exc))
                     short = msg.split(":", 1)[0][:80]
-                    print(f"  FAILED {repo}: {exc}", file=sys.stderr)
+                    print(f"  FAILED {repo}: {msg}", file=sys.stderr)
                     # Leave count as TBD; stash a short note for STATUS.md.
                     for key in ("status", "tier_a", "tier_b", "tier_c"):
                         for entry in data.get(key, []):
@@ -499,9 +523,9 @@ def main(argv: list[str] | None = None) -> int:
     md = render_markdown(
         rows,
         generated_at=generated_at,
-        db_path=args.db,
-        corpus_path=args.corpus,
-        log_path=args.harvest_log,
+        db_path=db_path,
+        corpus_path=corpus_path,
+        log_path=log_path,
         fetched=fetched,
         harvest_active=harvesting,
     )
@@ -510,15 +534,15 @@ def main(argv: list[str] | None = None) -> int:
     if args.dry_run:
         sys.stdout.write(md)
     else:
-        args.out.parent.mkdir(parents=True, exist_ok=True)
-        args.out.write_text(md, encoding="utf-8")
-        print(f"wrote {args.out}", file=sys.stderr)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(md, encoding="utf-8")
+        print(f"wrote {out_path}", file=sys.stderr)
         if corpus_changed:
-            args.corpus.write_text(
+            corpus_path.write_text(
                 json.dumps(data, indent=2, ensure_ascii=False) + "\n",
                 encoding="utf-8",
             )
-            print(f"updated cache in {args.corpus}", file=sys.stderr)
+            print(f"updated cache in {corpus_path}", file=sys.stderr)
 
     total = sum(r.harvested for r in rows)
     with_data = sum(1 for r in rows if r.harvested > 0)

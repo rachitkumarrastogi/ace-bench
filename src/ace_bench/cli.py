@@ -6,11 +6,19 @@ import argparse
 import json
 import os
 import sys
-from pathlib import Path
 
 from ace_bench.db import PatternStore
-from ace_bench.harvest import SEARCH_RESULT_CAP, HarvestConfig, harvest
-
+from ace_bench.harvest import (
+    MAX_PRS_HARD_CAP,
+    MIN_REST_SLEEP_SECONDS,
+    SEARCH_PAGE_SLEEP_SECONDS,
+    SEARCH_RESULT_CAP,
+    HarvestConfig,
+    harvest,
+    validate_repo_slug,
+)
+from ace_bench.paths import PathEscapeError, resolve_allowed_path
+from ace_bench.tokens import resolve_github_token
 
 DEFAULT_DB = os.environ.get("ACE_DB_PATH", "./data/ace_patterns.sqlite")
 DEFAULT_REPOS = ["django/django"]
@@ -45,7 +53,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help=(
             "Max PRs to harvest per repo per window "
-            f"(default: 100 pilot; {SEARCH_RESULT_CAP} when --window is set)"
+            f"(default: 100 pilot; {SEARCH_RESULT_CAP} when --window is set; "
+            f"hard cap {MAX_PRS_HARD_CAP})"
         ),
     )
     p.add_argument(
@@ -73,7 +82,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--sleep",
         type=float,
         default=0.75,
-        help="Seconds between GitHub REST calls (default: 0.75; Search pages floor at 2.0s)",
+        help=(
+            "Seconds between GitHub REST calls "
+            f"(default: 0.75; Search pages floor at {SEARCH_PAGE_SLEEP_SECONDS}s)"
+        ),
     )
     p.add_argument(
         "--summary-only",
@@ -85,7 +97,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    db_path = Path(args.db).expanduser()
+    try:
+        db_path = resolve_allowed_path(args.db, purpose="--db")
+    except PathEscapeError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
 
     with PatternStore(db_path) as store:
         if args.summary_only:
@@ -100,22 +116,45 @@ def main(argv: list[str] | None = None) -> int:
             print("error: --window-size must be >= 1", file=sys.stderr)
             return 2
 
-        token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+        if args.sleep < MIN_REST_SLEEP_SECONDS:
+            print(
+                f"error: --sleep must be >= {MIN_REST_SLEEP_SECONDS}",
+                file=sys.stderr,
+            )
+            return 2
+
+        try:
+            repos = [validate_repo_slug(r) for r in args.repos]
+        except ValueError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 2
+
+        token = resolve_github_token()
         if not token:
             print(
-                "warning: no GITHUB_TOKEN/GH_TOKEN — unauthenticated rate limits are low",
+                "warning: no GITHUB_TOKEN/GH_TOKEN/token file — "
+                "unauthenticated rate limits are low",
                 file=sys.stderr,
             )
 
         if args.max_prs is not None:
-            max_prs = args.max_prs
+            if args.max_prs < 1:
+                print("error: --max-prs must be >= 1", file=sys.stderr)
+                return 2
+            max_prs = min(args.max_prs, MAX_PRS_HARD_CAP)
+            if args.max_prs > MAX_PRS_HARD_CAP:
+                print(
+                    f"warning: --max-prs clamped to {MAX_PRS_HARD_CAP} "
+                    "(GitHub Search API cap)",
+                    file=sys.stderr,
+                )
         elif args.window:
             max_prs = SEARCH_RESULT_CAP
         else:
             max_prs = 100
 
         config = HarvestConfig(
-            repos=list(args.repos),
+            repos=repos,
             merged_before=args.merged_before,
             merged_after=args.merged_after,
             max_prs_per_repo=max_prs,

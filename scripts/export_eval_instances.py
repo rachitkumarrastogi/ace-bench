@@ -23,7 +23,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from ace_bench.db import PatternStore
-from ace_bench.eval_v0 import instance_record_from_row, touches_tests
+from ace_bench.eval_v0 import instance_record_from_row, touches_tests, validate_repo_slug
+from ace_bench.paths import PathEscapeError, resolve_allowed_path
 
 FROZEN_NAME = "ace_patterns_django_pre2021_6125.sqlite"
 DEFAULT_OUT = Path("benchmarks/django_eval_v0.jsonl")
@@ -32,10 +33,10 @@ DEFAULT_REPO = "django/django"
 
 def resolve_db_path(cli_db: str | None) -> Path:
     if cli_db:
-        return Path(cli_db).expanduser()
+        return resolve_allowed_path(cli_db, purpose="--db")
     env = os.environ.get("ACE_DB_PATH")
     if env:
-        return Path(env).expanduser()
+        return resolve_allowed_path(env, purpose="ACE_DB_PATH")
     candidates = [
         Path("data/frozen") / FROZEN_NAME,
         Path.home() / "ace-bench" / "data" / "frozen" / FROZEN_NAME,
@@ -43,9 +44,13 @@ def resolve_db_path(cli_db: str | None) -> Path:
         Path.home() / "ace-bench" / "data" / "ace_patterns.sqlite",
     ]
     for c in candidates:
-        if c.is_file():
-            return c
-    return candidates[0]
+        try:
+            resolved = resolve_allowed_path(c, purpose="db candidate")
+        except PathEscapeError:
+            continue
+        if resolved.is_file():
+            return resolved
+    return resolve_allowed_path(candidates[0], purpose="default db")
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -82,7 +87,19 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    db_path = resolve_db_path(args.db)
+    try:
+        db_path = resolve_db_path(args.db)
+        out_path = resolve_allowed_path(args.out, purpose="--out")
+        patches_dir = None
+        if args.write_patches_dir is not None:
+            patches_dir = resolve_allowed_path(
+                args.write_patches_dir, purpose="--write-patches-dir"
+            )
+        repo = validate_repo_slug(args.repo)
+    except (PathEscapeError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+
     if not db_path.is_file():
         print(f"error: DB not found: {db_path}", file=sys.stderr)
         print(
@@ -95,7 +112,7 @@ def main(argv: list[str] | None = None) -> int:
 
     with PatternStore(db_path) as store:
         candidates = store.fetch_eval_candidates(
-            repo=args.repo,
+            repo=repo,
             min_files=args.min_files,
             max_files=args.max_files,
             merged_before=args.merged_before,
@@ -105,7 +122,7 @@ def main(argv: list[str] | None = None) -> int:
         id_map: dict[tuple[str, int], int] = {}
         for row in store._conn.execute(
             "SELECT id, repo, pr_number FROM human_patterns WHERE repo = ?",
-            (args.repo,),
+            (repo,),
         ):
             id_map[(row["repo"], int(row["pr_number"]))] = int(row["id"])
 
@@ -114,7 +131,7 @@ def main(argv: list[str] | None = None) -> int:
     by_fc: dict[int, list] = {}
     for p in candidates:
         by_fc.setdefault(p.file_count, []).append(p)
-    for fc, bucket in by_fc.items():
+    for bucket in by_fc.values():
         bucket.sort(
             key=lambda pat: (
                 0 if (not args.no_prefer_tests and touches_tests(pat.files)) else 1,
@@ -138,13 +155,12 @@ def main(argv: list[str] | None = None) -> int:
         if not progressed:
             break
 
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    patches_dir = args.write_patches_dir
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     if patches_dir is not None:
         patches_dir.mkdir(parents=True, exist_ok=True)
 
     n_tests = 0
-    with args.out.open("w", encoding="utf-8") as fh:
+    with out_path.open("w", encoding="utf-8") as fh:
         for p in selected:
             if touches_tests(p.files):
                 n_tests += 1
@@ -176,11 +192,11 @@ def main(argv: list[str] | None = None) -> int:
         json.dumps(
             {
                 "db": str(db_path),
-                "repo": args.repo,
+                "repo": repo,
                 "exported": len(selected),
                 "pool_matched_filters": len(candidates),
                 "touches_tests": n_tests,
-                "out": str(args.out),
+                "out": str(out_path),
                 "patches_dir": str(patches_dir) if patches_dir else None,
             },
             indent=2,

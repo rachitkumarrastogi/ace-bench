@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Score an agent unified-diff patch against a human baseline row (ACE v0).
 
-AST proxy: max(added_lines, 1) — see ace_bench.eval_v0 and docs/EVAL.md.
+AST proxy: ``ace_bench.ast_metrics`` (added_lines fallback) — see docs/EVAL.md.
 
 GitHub harvest patches are usually *headerless* hunks (no ``diff --git``). For
 self-smoke use ``--self-smoke`` (loads human patch + human file list from DB).
@@ -28,38 +28,48 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from ace_bench.db import PatternStore
-from ace_bench.eval_v0 import score_agent_vs_human
+from ace_bench.eval_v0 import (
+    InstanceIdError,
+    parse_instance_id,
+    score_agent_vs_human,
+    validate_repo_slug,
+)
+from ace_bench.paths import (
+    MAX_AGENT_PATCH_BYTES,
+    PathEscapeError,
+    read_text_capped,
+    resolve_allowed_path,
+)
 
 FROZEN_NAME = "ace_patterns_django_pre2021_6125.sqlite"
 
 
 def resolve_db_path(cli_db: str | None) -> Path:
     if cli_db:
-        return Path(cli_db).expanduser()
+        return resolve_allowed_path(cli_db, purpose="--db")
     env = os.environ.get("ACE_DB_PATH")
     if env:
-        return Path(env).expanduser()
+        return resolve_allowed_path(env, purpose="ACE_DB_PATH")
     for c in (
         Path("data/frozen") / FROZEN_NAME,
         Path.home() / "ace-bench" / "data" / "frozen" / FROZEN_NAME,
         Path("data/ace_patterns.sqlite"),
         Path.home() / "ace-bench" / "data" / "ace_patterns.sqlite",
     ):
-        if c.is_file():
-            return c
-    return Path("data/frozen") / FROZEN_NAME
+        try:
+            resolved = resolve_allowed_path(c, purpose="db candidate")
+        except PathEscapeError:
+            continue
+        if resolved.is_file():
+            return resolved
+    return resolve_allowed_path(Path("data/frozen") / FROZEN_NAME, purpose="default db")
 
 
 def parse_instance(value: str) -> tuple[str, int]:
-    if "#" in value:
-        repo, pr_s = value.rsplit("#", 1)
-    elif "@" in value:
-        repo, pr_s = value.rsplit("@", 1)
-    else:
-        raise argparse.ArgumentTypeError(
-            "instance must look like owner/name#123 or owner/name@123"
-        )
-    return repo.strip(), int(pr_s.strip())
+    try:
+        return parse_instance_id(value)
+    except InstanceIdError as exc:
+        raise argparse.ArgumentTypeError(str(exc)) from exc
 
 
 def parse_bool(value: str) -> bool:
@@ -116,19 +126,28 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    if args.instance:
-        repo, pr_number = args.instance
-    else:
-        if not args.repo or args.pr is None:
-            print("error: pass --instance OR both --repo and --pr", file=sys.stderr)
-            return 2
-        repo, pr_number = args.repo, args.pr
+    try:
+        if args.instance:
+            repo, pr_number = args.instance
+        else:
+            if not args.repo or args.pr is None:
+                print("error: pass --instance OR both --repo and --pr", file=sys.stderr)
+                return 2
+            if args.pr < 1:
+                print("error: --pr must be >= 1", file=sys.stderr)
+                return 2
+            repo = validate_repo_slug(args.repo)
+            pr_number = args.pr
 
-    if not args.self_smoke and args.agent_patch is None:
-        print("error: pass --agent-patch or --self-smoke", file=sys.stderr)
+        if not args.self_smoke and args.agent_patch is None:
+            print("error: pass --agent-patch or --self-smoke", file=sys.stderr)
+            return 2
+
+        db_path = resolve_db_path(args.db)
+    except (PathEscapeError, InstanceIdError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
         return 2
 
-    db_path = resolve_db_path(args.db)
     if not db_path.is_file():
         print(f"error: DB not found: {db_path}", file=sys.stderr)
         return 2
@@ -136,11 +155,22 @@ def main(argv: list[str] | None = None) -> int:
     with PatternStore(db_path) as store:
         human = store.get_pattern(repo, pr_number)
         if human is None:
-            print(f"error: no row for {repo}#{pr_number} in {db_path}", file=sys.stderr)
+            # Fail closed: never invent a baseline.
+            print(
+                f"error: no human baseline row for {repo}#{pr_number} in {db_path}",
+                file=sys.stderr,
+            )
             return 2
         if args.dump_human_patch is not None:
-            args.dump_human_patch.parent.mkdir(parents=True, exist_ok=True)
-            args.dump_human_patch.write_text(human.patch_text or "", encoding="utf-8")
+            try:
+                dump_path = resolve_allowed_path(
+                    args.dump_human_patch, purpose="--dump-human-patch"
+                )
+            except PathEscapeError as exc:
+                print(f"error: {exc}", file=sys.stderr)
+                return 2
+            dump_path.parent.mkdir(parents=True, exist_ok=True)
+            dump_path.write_text(human.patch_text or "", encoding="utf-8")
 
     agent_files: list[str] | None = None
     if args.agent_files:
@@ -150,14 +180,30 @@ def main(argv: list[str] | None = None) -> int:
         agent_patch = human.patch_text or ""
         agent_files = list(human.files)
         if args.agent_patch is not None:
-            args.agent_patch.parent.mkdir(parents=True, exist_ok=True)
-            args.agent_patch.write_text(agent_patch, encoding="utf-8")
+            try:
+                out_patch = resolve_allowed_path(args.agent_patch, purpose="--agent-patch")
+            except PathEscapeError as exc:
+                print(f"error: {exc}", file=sys.stderr)
+                return 2
+            out_patch.parent.mkdir(parents=True, exist_ok=True)
+            out_patch.write_text(agent_patch, encoding="utf-8")
     else:
         assert args.agent_patch is not None
-        if not args.agent_patch.is_file():
-            print(f"error: agent patch not found: {args.agent_patch}", file=sys.stderr)
+        try:
+            patch_path = resolve_allowed_path(
+                args.agent_patch, purpose="--agent-patch", must_exist=False
+            )
+        except PathEscapeError as exc:
+            print(f"error: {exc}", file=sys.stderr)
             return 2
-        agent_patch = args.agent_patch.read_text(encoding="utf-8", errors="replace")
+        if not patch_path.is_file():
+            print(f"error: agent patch not found: {patch_path}", file=sys.stderr)
+            return 2
+        try:
+            agent_patch = read_text_capped(patch_path, max_bytes=MAX_AGENT_PATCH_BYTES)
+        except ValueError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 2
 
     report = score_agent_vs_human(
         repo=human.repo,

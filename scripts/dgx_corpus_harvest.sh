@@ -9,11 +9,17 @@
 # Rate limits (authenticated): Search ≈30/min (harvest floors page gaps at 2.0s);
 # core REST ≈5k/hr (default SLEEP 1.0s between PR fetches).
 #
+# Optional: REFRESH_STATUS=1 refreshes docs/CORPUS_STATUS.md after each repo
+# (DB-only; no --fetch-github). Cron: ./scripts/dgx_refresh_status.sh
+#
 # Expect days of wall time for ~100 repos / large Tier C volumes — intentional.
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
+
+# shellcheck source=scripts/_load_github_token.sh
+source "$ROOT/scripts/_load_github_token.sh"
 
 export ACE_DB_PATH="${ACE_DB_PATH:-$HOME/ace-bench/data/ace_patterns.sqlite}"
 export MERGED_AFTER="${MERGED_AFTER:-2012-01-01}"
@@ -29,6 +35,8 @@ LOG="${CORPUS_HARVEST_LOG:-$HOME/ace-bench/data/corpus_harvest.log}"
 # Space-separated; always skipped even if still listed under a tier.
 DEFAULT_SKIP="django/django pallets/flask expressjs/express spf13/cobra clap-rs/clap"
 SKIP_REPOS="${SKIP_REPOS:-$DEFAULT_SKIP}"
+# DB-only CORPUS_STATUS refresh after each repo (0=off, 1=on).
+REFRESH_STATUS="${REFRESH_STATUS:-0}"
 
 mkdir -p "$(dirname "$ACE_DB_PATH")" "$(dirname "$LOG")"
 
@@ -92,27 +100,14 @@ echo "merged_before: $MERGED_BEFORE"
 echo "window:        $WINDOW x $WINDOW_SIZE"
 echo "max_prs/window:$MAX_PRS"
 echo "sleep:         $SLEEP (Search pages ≥2.0s; sequential repos)"
+echo "refresh_status:$REFRESH_STATUS (DB-only CORPUS_STATUS after each repo)"
 echo "log:           $LOG"
 echo "started:       $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo "first_repos:"
 head -n 8 "$QUEUE_FILE" | sed 's/^/  - /'
 echo
 
-if [[ -z "${GITHUB_TOKEN:-}" && -z "${GH_TOKEN:-}" ]]; then
-  if [[ -f "$TOKEN_FILE" ]]; then
-    export GITHUB_TOKEN="$(tr -d '[:space:]' <"$TOKEN_FILE")"
-    echo "using token from: $TOKEN_FILE"
-  elif command -v gh >/dev/null 2>&1; then
-    if TOK="$(gh auth token 2>/dev/null)"; then
-      export GH_TOKEN="$TOK"
-      echo "using token from: gh auth token"
-    fi
-  fi
-fi
-
-if [[ -z "${GITHUB_TOKEN:-}" && -z "${GH_TOKEN:-}" ]]; then
-  echo "warning: no token — set GITHUB_TOKEN or write $TOKEN_FILE (mode 600)" >&2
-fi
+ace_load_github_token
 
 {
   echo "==== corpus harvest start $(date -u +%Y-%m-%dT%H:%M:%SZ) ===="
@@ -120,6 +115,7 @@ fi
   echo "skip: $SKIP_REPOS"
   echo "sleep: ${SLEEP:-$DEFAULT_SLEEP}"
   echo "db: $ACE_DB_PATH"
+  echo "refresh_status: $REFRESH_STATUS"
   echo "first:"
   head -n 8 "$QUEUE_FILE" | sed 's/^/  /'
 } >>"$LOG"
@@ -146,11 +142,20 @@ while IFS= read -r repo; do
     echo "FAILED_repo: $(date -u +%Y-%m-%dT%H:%M:%SZ) $repo rc=$rc (continuing)" | tee -a "$LOG"
   fi
   "$PYTHON" scripts/run_harvest.py --db "$ACE_DB_PATH" --summary-only 2>&1 | tee -a "$LOG" || true
+  "$PYTHON" scripts/check_db_size.py --db "$ACE_DB_PATH" --ok-missing 2>&1 | tee -a "$LOG" || true
+  if [[ "$REFRESH_STATUS" == "1" || "$REFRESH_STATUS" == "true" ]]; then
+    echo "refresh_status: $(date -u +%Y-%m-%dT%H:%M:%SZ) (DB-only)" | tee -a "$LOG"
+    "$PYTHON" scripts/refresh_corpus_status.py --db "$ACE_DB_PATH" 2>&1 | tee -a "$LOG" || true
+  fi
 done <"$QUEUE_FILE"
 
 echo
 echo "== Final DB summary =="
 "$PYTHON" scripts/run_harvest.py --db "$ACE_DB_PATH" --summary-only 2>&1 | tee -a "$LOG" || true
+"$PYTHON" scripts/check_db_size.py --db "$ACE_DB_PATH" --ok-missing 2>&1 | tee -a "$LOG" || true
+if [[ "$REFRESH_STATUS" == "1" || "$REFRESH_STATUS" == "true" ]]; then
+  "$PYTHON" scripts/refresh_corpus_status.py --db "$ACE_DB_PATH" 2>&1 | tee -a "$LOG" || true
+fi
 echo
 echo "corpus_done: $(date -u +%Y-%m-%dT%H:%M:%SZ) ok=$OK fail=$FAIL queued=$QUEUE_COUNT" | tee -a "$LOG"
 # Non-zero only if every repo failed.

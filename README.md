@@ -62,7 +62,7 @@ DB: `ACE_DB_PATH` or `./data/ace_patterns.sqlite`. Frozen copies under `data/fro
 
 1. **Human baseline is ground truth for efficiency**, not correctness alone.
 2. **Pass/fail is a gate**, not the score — failing tests → ACE = 0.
-3. **Prefer AST metrics over line diffs** — v0 uses `max(added_lines, 1)` until tree-sitter lands.
+3. **Prefer AST metrics over line diffs** — v0 uses `ace_bench.ast_metrics` (`max(added_lines, 1)` until tree-sitter lands).
 4. **Agent-agnostic harness** — any agent that emits a patch against a checkout.
 
 ---
@@ -74,10 +74,13 @@ DB: `ACE_DB_PATH` or `./data/ace_patterns.sqlite`. Frozen copies under `data/fro
 | [docs/CORPUS.md](docs/CORPUS.md) | Curated repos, Django freeze, human baseline headlines |
 | [docs/CORPUS_STATUS.md](docs/CORPUS_STATUS.md) | Living harvest coverage table (`scripts/refresh_corpus_status.py`) |
 | [docs/EVAL.md](docs/EVAL.md) | Score CLI (v0) + future dual-execution loop |
-| [docs/OPS.md](docs/OPS.md) | DGX / tmux harvest, tokens, rate limits |
+| [docs/OPS.md](docs/OPS.md) | DGX / tmux harvest, tokens, rate limits, DB size |
+| [docs/SECURITY.md](docs/SECURITY.md) | Threat model, hardening findings, residual risks |
 | [AGENTS.md](AGENTS.md) | Commit identity for agents |
 
 Machine source of truth for the ~100-repo list: [`data/corpus_repos.json`](data/corpus_repos.json).
+
+Helpers: `scripts/check_db_size.py`, `scripts/dgx_refresh_status.sh`, `REFRESH_STATUS=1 ./scripts/dgx_corpus_harvest.sh`.
 
 ---
 

@@ -14,7 +14,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from ace_bench.db import HumanPattern, PatternStore
 from ace_bench.metrics import metrics_from_patch
 
-
 SAMPLE_PATCH = """\
 diff --git a/foo/bar.py b/foo/bar.py
 --- a/foo/bar.py

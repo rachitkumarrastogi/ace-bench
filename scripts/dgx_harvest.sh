@@ -6,6 +6,9 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+# shellcheck source=scripts/_load_github_token.sh
+source "$ROOT/scripts/_load_github_token.sh"
+
 export ACE_DB_PATH="${ACE_DB_PATH:-$ROOT/data/ace_patterns.sqlite}"
 MAX_PRS="${MAX_PRS:-200}"
 REPOS="${REPOS:-django/django}"
@@ -24,26 +27,13 @@ echo "note:          for full baseline see ./scripts/dgx_full_harvest.sh"
 echo "started:       $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo
 
-# Prefer env token; else mode-600 file; else gh auth token.
-if [[ -z "${GITHUB_TOKEN:-}" && -z "${GH_TOKEN:-}" ]]; then
-  if [[ -f "$TOKEN_FILE" ]]; then
-    export GITHUB_TOKEN="$(tr -d '[:space:]' <"$TOKEN_FILE")"
-    echo "using token from: $TOKEN_FILE"
-  elif command -v gh >/dev/null 2>&1; then
-    if TOK="$(gh auth token 2>/dev/null)"; then
-      export GH_TOKEN="$TOK"
-      echo "using token from: gh auth token"
-    fi
-  fi
-fi
+ace_load_github_token
 
-if [[ -z "${GITHUB_TOKEN:-}" && -z "${GH_TOKEN:-}" ]]; then
-  echo "warning: no token — set GITHUB_TOKEN or write $TOKEN_FILE (mode 600)" >&2
-fi
-
-# shellcheck disable=SC2086
+# Pass repos as separate argv words (no eval / shell=True).
+# shellcheck disable=SC2206
+REPO_ARR=($REPOS)
 "$PYTHON" scripts/run_harvest.py \
-  --repos $REPOS \
+  --repos "${REPO_ARR[@]}" \
   --merged-before "$MERGED_BEFORE" \
   --max-prs "$MAX_PRS" \
   --db "$ACE_DB_PATH"
@@ -51,5 +41,6 @@ fi
 echo
 echo "== DB summary =="
 "$PYTHON" scripts/run_harvest.py --db "$ACE_DB_PATH" --summary-only
+"$PYTHON" scripts/check_db_size.py --db "$ACE_DB_PATH" --ok-missing || true
 echo
 echo "finished: $(date -u +%Y-%m-%dT%H:%M:%SZ)"

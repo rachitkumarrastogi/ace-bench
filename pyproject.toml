@@ -44,3 +44,16 @@ packages = ["src/ace_bench"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+
+[tool.ruff.lint]
+# Keep CI signal high; defer style nits that predate this pass.
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = [
+  "E501",    # line length — handled by formatter preference elsewhere
+  "SIM114",  # combine if branches — readability in harvest status
+  "UP017",   # datetime.UTC — keep timezone.utc for broader readability
+]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*" = ["EXE001", "E402"]
+"tests/*" = ["E501", "E402"]

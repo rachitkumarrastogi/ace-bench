@@ -56,14 +56,16 @@ export GITHUB_TOKEN=...   # or GH_TOKEN
 # wrappers may fall back to: gh auth token
 ```
 
-On DGX, prefer a mode-600 file:
+On DGX, prefer a mode-600 file (wrappers warn if group/other bits are set):
 
 ```bash
 mkdir -p ~/.config/ace-bench
-# write token once; never commit
+# write token once; never commit; never `cat` into logs
 chmod 600 ~/.config/ace-bench/github_token
-# wrappers load: export GITHUB_TOKEN="$(tr -d '[:space:]' <~/.config/ace-bench/github_token)"
+# loaders: scripts/_load_github_token.sh / ace_bench.tokens
 ```
+
+Security notes: [SECURITY.md](SECURITY.md).
 
 ### DB location
 
@@ -73,6 +75,14 @@ chmod 600 ~/.config/ace-bench/github_token
 | Fallback | `./data/ace_patterns.sqlite` |
 
 Prefer local disk on DGX (not NFS if possible). `data/*.sqlite` is gitignored.
+
+Soft size guardrail (~1 GiB):
+
+```bash
+python3 scripts/check_db_size.py --db "$ACE_DB_PATH"
+```
+
+When over threshold: freeze a snapshot under `data/frozen/`, point a new `ACE_DB_PATH` at a fresh file — no automatic sharding yet.
 
 ---
 
@@ -106,7 +116,12 @@ Re-attach: `tmux attach -t ace-harvest`. Harvest is **idempotent** on `(repo, pr
 
 # remaining Tier A→C (skips done_frozen / done / in_harvest + kickoff five)
 ./scripts/dgx_corpus_harvest.sh
+# optional: refresh docs/CORPUS_STATUS.md after each repo (DB-only, no Search)
+REFRESH_STATUS=1 ./scripts/dgx_corpus_harvest.sh
 # log: $HOME/ace-bench/data/corpus_harvest.log (override CORPUS_HARVEST_LOG)
+
+# cron-friendly status refresh (DB-only; FETCH_GITHUB=1 to hit Search)
+./scripts/dgx_refresh_status.sh
 ```
 
 Override repos: `REPOS="psf/requests encode/httpx" ./scripts/dgx_corpus_harvest.sh`.  
@@ -118,19 +133,22 @@ Do **not** parallelize repos. Kill only idle `ace-harvest` sessions — do not t
 |------|-------|---------------|
 | Sleep (REST) | ~0.75–1.0s | same (core ≈5k req/hr) |
 | Search pages | ≥2.0s floor | Search ≈30 req/min |
-| Max PRs / window | — | 1000 (API max) |
+| Max PRs / window | — | 1000 (API max; CLI hard-caps here) |
 
 ### Success check
 
 ```bash
 python3 scripts/run_harvest.py --db "$ACE_DB_PATH" --summary-only
+python3 scripts/check_db_size.py --db "$ACE_DB_PATH"
 sqlite3 "$ACE_DB_PATH" "SELECT pr_number, file_count, additions, deletions, title FROM human_patterns LIMIT 10;"
 ```
 
 Refresh the living status table:
 
 ```bash
+python3 scripts/refresh_corpus_status.py              # DB + cached JSON only
 python3 scripts/refresh_corpus_status.py --fetch-github
+./scripts/dgx_refresh_status.sh
 ```
 
 Django freeze + recreate: [CORPUS.md](CORPUS.md). Agent sandbox is not part of these harvest scripts — see [EVAL.md](EVAL.md).

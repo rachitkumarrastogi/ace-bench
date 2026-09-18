@@ -13,10 +13,10 @@ __all__ = [
     "PatchMetrics",
     "PatternStore",
     "ScoreReport",
+    "__version__",
     "compute_ace_score",
     "harvest",
     "metrics_from_patch",
     "score_agent_vs_human",
-    "__version__",
 ]
 __version__ = "0.1.0"

@@ -15,6 +15,9 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+# shellcheck source=scripts/_load_github_token.sh
+source "$ROOT/scripts/_load_github_token.sh"
+
 export ACE_DB_PATH="${ACE_DB_PATH:-$ROOT/data/ace_patterns.sqlite}"
 export MERGED_AFTER="${MERGED_AFTER:-2012-01-01}"
 export MERGED_BEFORE="${MERGED_BEFORE:-2021-01-01}"
@@ -49,21 +52,7 @@ echo "log:           $LOG"
 echo "started:       $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo
 
-if [[ -z "${GITHUB_TOKEN:-}" && -z "${GH_TOKEN:-}" ]]; then
-  if [[ -f "$TOKEN_FILE" ]]; then
-    export GITHUB_TOKEN="$(tr -d '[:space:]' <"$TOKEN_FILE")"
-    echo "using token from: $TOKEN_FILE"
-  elif command -v gh >/dev/null 2>&1; then
-    if TOK="$(gh auth token 2>/dev/null)"; then
-      export GH_TOKEN="$TOK"
-      echo "using token from: gh auth token"
-    fi
-  fi
-fi
-
-if [[ -z "${GITHUB_TOKEN:-}" && -z "${GH_TOKEN:-}" ]]; then
-  echo "warning: no token — set GITHUB_TOKEN or write $TOKEN_FILE (mode 600)" >&2
-fi
+ace_load_github_token
 
 {
   echo "==== multi harvest start $(date -u +%Y-%m-%dT%H:%M:%SZ) ===="
@@ -71,7 +60,7 @@ fi
   echo "sleep: ${SLEEP:-$DEFAULT_SLEEP}"
 } >>"$LOG"
 
-# shellcheck disable=SC2086
+# shellcheck disable=SC2206
 for repo in $REPOS_LIST; do
   # Re-export before each Python process so remaining repos get current pacing.
   export SLEEP="${SLEEP:-$DEFAULT_SLEEP}"
@@ -87,5 +76,6 @@ done
 echo
 echo "== Final DB summary =="
 "$PYTHON" scripts/run_harvest.py --db "$ACE_DB_PATH" --summary-only | tee -a "$LOG"
+"$PYTHON" scripts/check_db_size.py --db "$ACE_DB_PATH" --ok-missing || true
 echo
 echo "finished: $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee -a "$LOG"

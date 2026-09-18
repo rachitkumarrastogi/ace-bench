@@ -11,7 +11,6 @@ import re
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-
 _IF_RE = re.compile(r"^\+\s*(?:if|elif|else\s+if|case)\b", re.MULTILINE)
 _LOOP_RE = re.compile(r"^\+\s*(?:for|while|do)\b", re.MULTILINE)
 _CATCH_RE = re.compile(r"^\+\s*(?:catch|except|rescue)\b", re.MULTILINE)

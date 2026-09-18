@@ -5,31 +5,38 @@ from __future__ import annotations
 import calendar
 import json
 import os
+import re
 import ssl
 import sys
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from collections.abc import Iterator
 from dataclasses import dataclass, replace
 from datetime import date, datetime, timedelta
-from typing import Any, Iterator, Literal
+from typing import Any, Literal
 
 import certifi
 
 from ace_bench.db import HumanPattern, PatternStore
+from ace_bench.github_url import assert_github_api_url, redact_secrets, redact_url
 from ace_bench.metrics import directories_from_files, metrics_from_patch
-
 
 GITHUB_API = "https://api.github.com"
 # GitHub Search API hard-caps at 1000 results per query — window harvests stay under this.
 SEARCH_RESULT_CAP = 1000
+# Absolute safety ceiling for --max-prs (Search cannot return more than SEARCH_RESULT_CAP).
+MAX_PRS_HARD_CAP = SEARCH_RESULT_CAP
 # Search authenticated ≈30 req/min; floor between search pages (do not use the REST sleep).
 SEARCH_PAGE_SLEEP_SECONDS = 2.0
 # Default pause between REST calls (core API ≈5k req/hr authenticated).
 DEFAULT_SLEEP_SECONDS = 0.75
+# Soft floor for operator-supplied --sleep (Search pages still force ≥ SEARCH_PAGE_SLEEP_SECONDS).
+MIN_REST_SLEEP_SECONDS = 0.0
 _TRANSIENT_HTTP = {408, 429, 500, 502, 503, 504}
 _SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
+_REPO_NAME_RE = re.compile(r"^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$")
 
 WindowUnit = Literal["days", "months"]
 
@@ -97,6 +104,17 @@ def iter_date_windows(
         cursor = nxt
 
 
+def validate_repo_slug(repo: str) -> str:
+    """Require ``owner/name`` with a conservative character set (CLI safety)."""
+    repo = repo.strip()
+    if not _REPO_NAME_RE.match(repo):
+        raise ValueError(
+            f"invalid repo slug {repo!r}; expected owner/name "
+            "(letters, digits, ., _, - only)"
+        )
+    return repo
+
+
 def build_merged_search_query(
     repo: str,
     merged_before: str,
@@ -108,6 +126,7 @@ def build_merged_search_query(
     Combining ``merged:>=`` with ``merged:<`` is unreliable (GitHub may ignore
     the lower bound and inflate total_count). Windows are [after, before).
     """
+    repo = validate_repo_slug(repo)
     parts = [f"repo:{repo}", "is:pr", "is:merged"]
     if merged_after:
         # Inclusive range covering [after, before): end date is the day before before.
@@ -139,6 +158,8 @@ class GitHubClient:
         return headers
 
     def get_json(self, url: str) -> Any:
+        assert_github_api_url(url)
+        safe_url = redact_url(url)
         last_err: Exception | None = None
         for attempt in range(self.max_retries):
             req = urllib.request.Request(url, headers=self._headers())
@@ -152,8 +173,10 @@ class GitHubClient:
                             time.sleep(wait)
                     return json.loads(resp.read().decode("utf-8"))
             except urllib.error.HTTPError as exc:
-                body = exc.read().decode("utf-8", errors="replace")
-                last_err = RuntimeError(f"GitHub API {exc.code} for {url}: {body[:500]}")
+                body = redact_secrets(exc.read().decode("utf-8", errors="replace"))
+                last_err = RuntimeError(
+                    f"GitHub API {exc.code} for {safe_url}: {body[:500]}"
+                )
                 if exc.code not in _TRANSIENT_HTTP or attempt + 1 >= self.max_retries:
                     raise last_err from exc
                 # Respect Retry-After when present (esp. secondary rate limits).
@@ -166,9 +189,11 @@ class GitHubClient:
             except (urllib.error.URLError, TimeoutError, OSError) as exc:
                 last_err = exc
                 if attempt + 1 >= self.max_retries:
-                    raise RuntimeError(f"GitHub request failed for {url}: {exc}") from exc
+                    raise RuntimeError(
+                        f"GitHub request failed for {safe_url}: {exc}"
+                    ) from exc
                 time.sleep(min(60, (2**attempt) + 1))
-        raise RuntimeError(f"GitHub request failed for {url}: {last_err}")
+        raise RuntimeError(f"GitHub request failed for {safe_url}: {last_err}")
 
     def iter_merged_pulls(
         self,
@@ -183,6 +208,16 @@ class GitHubClient:
         GitHub Search returns at most SEARCH_RESULT_CAP (1000) hits per query.
         Use date windows so each query stays under that cap.
         """
+        repo = validate_repo_slug(repo)
+        if max_prs < 1:
+            raise ValueError(f"max_prs must be >= 1, got {max_prs}")
+        if max_prs > MAX_PRS_HARD_CAP:
+            print(
+                f"warning: max_prs={max_prs} exceeds Search API cap "
+                f"{MAX_PRS_HARD_CAP}; clamping",
+                file=sys.stderr,
+            )
+            max_prs = MAX_PRS_HARD_CAP
         query = build_merged_search_query(repo, merged_before, merged_after)
         page = 1
         yielded = 0
@@ -225,9 +260,11 @@ class GitHubClient:
                 break
 
     def get_pull(self, repo: str, number: int) -> dict[str, Any]:
+        repo = validate_repo_slug(repo)
         return self.get_json(f"{GITHUB_API}/repos/{repo}/pulls/{number}")
 
     def get_pull_files(self, repo: str, number: int) -> list[dict[str, Any]]:
+        repo = validate_repo_slug(repo)
         files: list[dict[str, Any]] = []
         page = 1
         while True:
@@ -306,12 +343,12 @@ def _harvest_single_window(store: PatternStore, config: HarvestConfig) -> dict[s
                         inserted += 1
                     else:
                         updated += 1
-                except Exception as exc:  # noqa: BLE001 — keep harvest looping on DGX
+                except Exception as exc:
                     errors.append(f"{repo}#{number}: {exc}")
                 time.sleep(config.sleep_seconds)
         status = "completed" if not errors else "completed_with_errors"
         store.finish_run(run_id, status=status, notes=f"errors={len(errors)}")
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         store.finish_run(run_id, status="failed", notes=str(exc))
         raise
 
@@ -372,7 +409,7 @@ def harvest(store: PatternStore, config: HarvestConfig) -> dict[str, Any]:
         )
         try:
             result = _harvest_single_window(store, win_config)
-        except Exception as exc:  # noqa: BLE001 — continue remaining windows
+        except Exception as exc:
             msg = f"window [{win_after}, {win_before}): {exc}"
             window_errors.append(msg)
             error_count += 1

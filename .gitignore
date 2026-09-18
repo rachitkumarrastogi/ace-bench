@@ -25,6 +25,10 @@ htmlcov/
 **/*token*.txt
 **/*.pem
 **/*.key
+**/*secret*
+**/credentials*
+.github_token
+id_token
 !.env.example
 
 # Benchmark artifacts + harvest DBs (live on DGX only)
@@ -35,6 +39,7 @@ logs/
 *.patch
 *.sqlite
 *.sqlite-*
+*.sqlite3
 data/*.sqlite
 data/*.sqlite-*
 data/**/*.sqlite

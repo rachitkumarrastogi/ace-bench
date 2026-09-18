@@ -32,7 +32,7 @@ Human harvest is live. **Eval v0** (export + score CLI) is usable now; **Docker 
 | Diff metrics in `metrics_json` | **Live** (AST/GNN later) |
 | Export + score-vs-human CLI | **Live** (below) |
 | Agent sandbox / dual execution | Stub |
-| tree-sitter metrics | Deferred — v0 AST proxy = `max(added_lines, 1)` |
+| tree-sitter metrics | Stub in `ast_metrics.py` — v0 AST proxy = `max(added_lines, 1)` |
 | Public leaderboard | Deferred |
 
 Do not treat pass/fail alone as the score — efficiency vs human structure is the point.
@@ -46,7 +46,10 @@ Do not treat pass/fail alone as the score — efficiency vs human structure is t
 | Export instances | `scripts/export_eval_instances.py` → `benchmarks/django_eval_v0.jsonl` |
 | Score CLI | `scripts/score_against_human.py` |
 | Helpers | `src/ace_bench/eval_v0.py` |
+| AST interface | `src/ace_bench/ast_metrics.py` (tree-sitter TODO; v0 fallback) |
 | Formula | `src/ace_bench/scoring.py` (`compute_ace_score`) |
+
+Instance ids must look like **`owner/repo#123`**. Missing human baseline rows fail closed (exit 2). Agent patches are size-capped (10 MiB) and path-checked — see [SECURITY.md](SECURITY.md).
 
 ### DB
 
@@ -60,13 +63,13 @@ Prefer the **frozen** twin so ongoing corpus harvest does not move the goalposts
 
 ### AST proxy
 
-`compute_ace_score` wants AST node counts. Until tree-sitter lands:
+`compute_ace_score` wants AST node counts. `ace_bench.ast_metrics.ast_nodes_from_patch` is the swap point. Until tree-sitter + a language grammar land:
 
 ```text
 ast_nodes_proxy = max(added_lines, 1)
 ```
 
-(`PatchMetrics.added_lines` = count of `+` lines in the unified diff.) Size proxy only — swap `ast_nodes_proxy()` in `eval_v0.py` later without changing the formula.
+(`PatchMetrics.added_lines` = count of `+` lines in the unified diff.) Size proxy only — complete the TODO in `ast_metrics.py` later without changing the ACE formula.
 
 ### Export (~50 metadata-only instances)
 

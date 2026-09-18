@@ -20,6 +20,11 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
+from ace_bench.ast_metrics import (
+    AST_PROXY_ADDED_LINES,
+    ast_nodes_from_patch,
+    ast_nodes_report_note,
+)
 from ace_bench.metrics import PatchMetrics, metrics_from_patch
 from ace_bench.scoring import AceScoreInputs, compute_ace_score
 
@@ -30,7 +35,37 @@ DJANGO_SPRAWL_MIN_FILES = 9  # > human p90 (8) → sprawl flag
 
 _DIFF_GIT_RE = re.compile(r"^diff --git a/(.+?) b/(.+)$", re.MULTILINE)
 _PLUS_PLUS_RE = re.compile(r"^\+\+\+ [ab]/(.+)$", re.MULTILINE)
+# Canonical: owner/repo#123 — owner/repo@123 accepted as legacy alias.
+_INSTANCE_ID_RE = re.compile(
+    r"^([A-Za-z0-9._-]+/[A-Za-z0-9._-]+)[#@](\d+)$"
+)
+_REPO_SLUG_RE = re.compile(r"^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$")
 _BODY_SNIPPET_CHARS = 400
+
+
+class InstanceIdError(ValueError):
+    """Invalid eval instance id or missing human baseline row."""
+
+
+def parse_instance_id(value: str) -> tuple[str, int]:
+    """Parse ``owner/repo#123`` (or legacy ``owner/repo@123``). Fail closed."""
+    text = (value or "").strip()
+    m = _INSTANCE_ID_RE.match(text)
+    if not m:
+        raise InstanceIdError(
+            "instance must look like owner/repo#123 "
+            f"(got {value!r})"
+        )
+    return m.group(1), int(m.group(2))
+
+
+def validate_repo_slug(repo: str) -> str:
+    repo = (repo or "").strip()
+    if not _REPO_SLUG_RE.match(repo):
+        raise InstanceIdError(
+            f"invalid repo slug {repo!r}; expected owner/name"
+        )
+    return repo
 
 
 def files_from_patch(patch_text: str | None) -> list[str]:
@@ -60,8 +95,12 @@ def files_from_patch(patch_text: str | None) -> list[str]:
 
 
 def ast_nodes_proxy(metrics: PatchMetrics) -> int:
-    """Map patch size → positive AST-node stand-in for ACE v0."""
-    return max(int(metrics.added_lines), 1)
+    """Map patch size → positive AST-node stand-in for ACE v0.
+
+    Delegates to ``ace_bench.ast_metrics`` (added-lines proxy until tree-sitter).
+    """
+    nodes, _name = ast_nodes_from_patch(None, metrics=metrics)
+    return nodes
 
 
 def touches_tests(files: list[str]) -> bool:
@@ -147,9 +186,9 @@ def score_agent_vs_human(
 ) -> ScoreReport:
     """Score an agent unified diff against a human pattern row."""
     notes: list[str] = [
-        "AST proxy = max(added_lines, 1); replace with tree-sitter when available",
-        f"Django baseline p50 files={DJANGO_P50_FILES}; surgical≤{DJANGO_SURGICAL_MAX_FILES}; "
-        f"sprawl≥{DJANGO_SPRAWL_MIN_FILES}",
+        ast_nodes_report_note(),
+        f"Django baseline p50 files={DJANGO_P50_FILES}; "
+        f"surgical≤{DJANGO_SURGICAL_MAX_FILES}; sprawl≥{DJANGO_SPRAWL_MIN_FILES}",
     ]
 
     parsed_agent_files = files_from_patch(agent_patch)
@@ -188,8 +227,11 @@ def score_agent_vs_human(
 
     agent_pm = metrics_from_patch(agent_patch, resolved_agent_files)
 
-    h_ast = ast_nodes_proxy(human_pm)
-    a_ast = ast_nodes_proxy(agent_pm)
+    h_ast, h_proxy = ast_nodes_from_patch(human_patch, human_files, metrics=human_pm)
+    a_ast, a_proxy = ast_nodes_from_patch(
+        agent_patch, resolved_agent_files, metrics=agent_pm
+    )
+    proxy_label = h_proxy if h_proxy == a_proxy else f"{h_proxy}|{a_proxy}"
     h_files_n = max(len(human_files), human_pm.file_count, 1)
     a_files_n = max(len(resolved_agent_files), agent_pm.file_count, 1)
     if not resolved_agent_files:
@@ -227,7 +269,7 @@ def score_agent_vs_human(
         pr_number=pr_number,
         passed_tests=passed_tests,
         ace_score=ace,
-        ast_proxy="max(added_lines, 1)",
+        ast_proxy=proxy_label or AST_PROXY_ADDED_LINES,
         human_ast_nodes=h_ast,
         agent_ast_nodes=a_ast,
         human_file_count=h_files_n,
