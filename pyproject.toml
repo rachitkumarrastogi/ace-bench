@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ace-bench"
+version = "0.1.0"
+description = "Agent Code Efficiency Benchmark — structural efficiency vs human baselines"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [
+  { name = "Rachit Rastogi", email = "rachitrastogi777@gmail.com" },
+]
+keywords = [
+  "benchmark",
+  "llm",
+  "coding-agents",
+  "code-efficiency",
+  "ast",
+  "evaluation",
+]
+dependencies = [
+  "tree-sitter>=0.22",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.6",
+]
+
+[project.urls]
+Homepage = "https://github.com/rachitkumarrastogi/ace-bench"
+Repository = "https://github.com/rachitkumarrastogi/ace-bench"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ace_bench"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
