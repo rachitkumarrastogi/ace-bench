@@ -11,7 +11,8 @@
 
 | Item | State |
 |------|--------|
-| **Django harvest** | Live — windowed pre-AI PRs → SQLite (Search API 1000-hit cap) |
+| **Django harvest** | Done — **6125** rows; frozen snapshot documented in [docs/CORPUS_DJANGO.md](docs/CORPUS_DJANGO.md) |
+| **Multi-repo batch** | Next — Flask / Express / Cobra / Clap (pre-AI, windowed) via `scripts/dgx_multi_harvest.sh` |
 | Default repo | `django/django` (`2012-01-01` → `2021-01-01`, monthly windows) |
 | Linux kernel | Deferred (not default) |
 | Agent sandbox / ACE compare | Next — see [docs/EVAL_LOOP.md](docs/EVAL_LOOP.md) |
@@ -20,13 +21,16 @@ DGX overnight how-to: [docs/DGX_FIRST_PASS.md](docs/DGX_FIRST_PASS.md).
 
 ```bash
 export GITHUB_TOKEN=...   # or GH_TOKEN
-# full baseline (monthly windows; thousands of PRs):
+# full django baseline (monthly windows):
 ./scripts/dgx_full_harvest.sh
+# multi-repo curated batch (same live DB, upsert on repo+pr_number):
+./scripts/dgx_multi_harvest.sh
 # pilot cap only:
 python3 scripts/run_harvest.py --repos django/django --max-prs 100
 ```
 
-DB path: `ACE_DB_PATH` or `./data/ace_patterns.sqlite`.
+DB path: `ACE_DB_PATH` or `./data/ace_patterns.sqlite`. Keep the live DB;
+freeze copies live under `data/frozen/` (see [data/FROZEN.md](data/FROZEN.md)).
 
 ---
 
@@ -132,10 +136,11 @@ Prefer tree-sitter ASTs over raw line diffs (first pass uses cheap diff proxies 
 
 ## Roadmap
 
-1. [x] Dataset schema + Django pilot harvest → SQLite
-2. [ ] Sandbox runner (agent-agnostic interface)
-3. [ ] tree-sitter AST metrics + ACE Index (formula stub in `scoring.py`)
-4. [ ] Public leaderboard + paper-ready report format
+1. [x] Dataset schema + Django pilot harvest → SQLite (**6125** frozen)
+2. [ ] Multi-repo pre-AI harvest (Flask / Express / Cobra / Clap)
+3. [ ] Sandbox runner (agent-agnostic interface)
+4. [ ] tree-sitter AST metrics + ACE Index (formula stub in `scoring.py`)
+5. [ ] Public leaderboard + paper-ready report format
 
 ---
 

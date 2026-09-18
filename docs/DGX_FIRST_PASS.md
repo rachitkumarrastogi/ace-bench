@@ -21,7 +21,8 @@ lower bound and reports a bogus inflated `total_count`.
 | Mode | Script | Scope |
 |------|--------|-------|
 | Pilot (capped) | `scripts/dgx_harvest.sh` | `--max-prs 200` (no windows) |
-| Full baseline | `scripts/dgx_full_harvest.sh` | monthly windows `2012-01-01` → `2021-01-01` |
+| Full baseline | `scripts/dgx_full_harvest.sh` | monthly windows `2012-01-01` → `2021-01-01` (default: django) |
+| Multi-repo batch | `scripts/dgx_multi_harvest.sh` | same windows; loops Flask / Express / Cobra / Clap into live DB |
 
 CLI equivalent for full mode:
 
@@ -146,6 +147,33 @@ sqlite3 "$ACE_DB_PATH" "SELECT pr_number, file_count, additions, deletions, titl
 | Sleep | `0.25s` | same (Search paced ≥0.35s) |
 
 Optional second repo later: `--repos django/django someorg/smallrepo`.
+
+## Django freeze + multi-repo (same live DB)
+
+Django baseline is frozen at **6125** rows — see [CORPUS_DJANGO.md](CORPUS_DJANGO.md)
+and [data/FROZEN.md](../data/FROZEN.md). Keep using the live
+`ace_patterns.sqlite` for further upserts (`UNIQUE(repo, pr_number)`).
+
+Curated multi-language batch (pre-AI Search totals verified ≥50; no swaps):
+
+| Repo | Language |
+|------|----------|
+| `pallets/flask` | Python |
+| `expressjs/express` | JavaScript |
+| `spf13/cobra` | Go |
+| `clap-rs/clap` | Rust |
+
+```bash
+export ACE_DB_PATH=/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite
+# kill idle ace-harvest shell only; do not touch pn-web
+tmux kill-session -t ace-harvest 2>/dev/null || true
+tmux new -s ace-harvest
+./scripts/dgx_multi_harvest.sh
+# detach: Ctrl-b d
+```
+
+Override repos: `REPOS="psf/requests axios/axios" ./scripts/dgx_multi_harvest.sh`.
+Default sleep is `0.4s` (rate-limit friendly). Log: `data/multi_harvest.log`.
 
 ## Next (not this pass)
 
