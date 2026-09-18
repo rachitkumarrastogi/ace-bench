@@ -4,7 +4,7 @@ Read-only analysis of the frozen/live ACE-Bench human-pattern corpus for **`djan
 
 | Field | Value |
 |-------|--------|
-| **Source DB** | DGX `/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite` (table `human_patterns`) |
+| **Source DB** | DGX `$HOME/ace-bench/data/ace_patterns.sqlite` (table `human_patterns`) |
 | **Frozen twin** | See [CORPUS_DJANGO.md](CORPUS_DJANGO.md) |
 | **Rows** | **6125** PRs |
 | **Window** | Merged ~2012-04-28 → 2020-12-31 (`merged:<2021-01-01`) |
@@ -207,7 +207,7 @@ Do **not** treat mean churn (~100) or mean files (~5.7) as targets; they are mea
 ```bash
 ssh LocalModelRunner
 python3 - <<'PY'
-# open file:/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite?mode=ro
+# open file:$HOME/ace-bench/data/ace_patterns.sqlite?mode=ro
 # SELECT COUNT(*), AVG(file_count), ... FROM human_patterns WHERE repo='django/django';
 PY
 ```

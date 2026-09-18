@@ -110,7 +110,7 @@ chmod 600 ~/.config/ace-bench/github_token
 ## Overnight / tmux on DGX — full windowed harvest
 
 ```bash
-export ACE_DB_PATH=/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite
+export ACE_DB_PATH="$HOME/ace-bench/data/ace_patterns.sqlite"
 # token from ~/.config/ace-bench/github_token (mode 600) or GITHUB_TOKEN
 
 tmux new -s ace-harvest
@@ -167,7 +167,7 @@ Curated multi-language batch (pre-AI Search totals verified ≥50; no swaps):
 | `clap-rs/clap` | Rust |
 
 ```bash
-export ACE_DB_PATH=/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite
+export ACE_DB_PATH="$HOME/ace-bench/data/ace_patterns.sqlite"
 # kill idle ace-harvest shell only; do not touch pn-web
 tmux kill-session -t ace-harvest 2>/dev/null || true
 tmux new -s ace-harvest

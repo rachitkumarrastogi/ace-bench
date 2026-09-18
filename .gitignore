@@ -20,10 +20,25 @@ venv/
 htmlcov/
 .DS_Store
 
-# Benchmark artifacts
+# Secrets / tokens (never commit)
+**/github_token
+**/*token*.txt
+**/*.pem
+**/*.key
+!.env.example
+
+# Benchmark artifacts + harvest DBs (live on DGX only)
 artifacts/
 runs/
+logs/
+*.log
 *.patch
+*.sqlite
+*.sqlite-*
 data/*.sqlite
 data/*.sqlite-*
+data/**/*.sqlite
+data/**/*.sqlite-*
+data/frozen/*.sqlite
+data/frozen/*.sqlite-*
 !.gitkeep

@@ -9,7 +9,7 @@ Immutable snapshot of the first ACE-Bench human-pattern harvest.
 | **Row count** | **6125** |
 | **Freeze date** | 2026-09-18 (UTC) |
 | **Method** | `VACUUM INTO` compact copy (+ `.bak`) |
-| **DGX path** | `/home/arnavrastogi/ace-bench/data/frozen/ace_patterns_django_pre2021_6125.sqlite` |
+| **DGX path** | `$HOME/ace-bench/data/frozen/ace_patterns_django_pre2021_6125.sqlite` |
 | **Backup** | same dir, `ace_patterns_django_pre2021_6125.sqlite.bak` |
 
 ## Live vs frozen
