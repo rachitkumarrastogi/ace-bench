@@ -28,7 +28,7 @@
       "pre_2021_merged_prs": 6125,
       "prs_verified": true,
       "why": "First frozen human-pattern corpus",
-      "notes": "See docs/CORPUS_DJANGO.md"
+      "notes": "See docs/CORPUS.md (frozen Django)"
     },
     {
       "repo": "pallets/flask",

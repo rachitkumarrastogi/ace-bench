@@ -7,77 +7,17 @@
 
 ---
 
-## Status (v1 first pass)
-
-| Item | State |
-|------|--------|
-| **Django harvest** | Done — **6125** rows; frozen snapshot documented in [docs/CORPUS_DJANGO.md](docs/CORPUS_DJANGO.md) |
-| **Multi-repo batch** | Kickoff done (Flask / Express / Cobra / Clap); Tier A+ via `scripts/dgx_corpus_harvest.sh` |
-| **Corpus status** | Live table: [docs/CORPUS_STATUS.md](docs/CORPUS_STATUS.md) (`scripts/refresh_corpus_status.py`) |
-| **Curated Top ~100** | [docs/CORPUS_TOP100.md](docs/CORPUS_TOP100.md) + [`data/corpus_repos.json`](data/corpus_repos.json) — Tier A next after current batch |
-| Default repo | `django/django` (`2012-01-01` → `2021-01-01`, monthly windows) |
-| Linux kernel | Deferred / excluded as primary (see corpus exclusions) |
-| **Agent sandbox / ACE compare** | Eval v0 CLI live — [docs/EVAL_V0.md](docs/EVAL_V0.md); Docker sandbox next |
-
-DGX overnight how-to: [docs/DGX_FIRST_PASS.md](docs/DGX_FIRST_PASS.md).
-
-```bash
-export GITHUB_TOKEN=...   # or GH_TOKEN
-# full django baseline (monthly windows):
-./scripts/dgx_full_harvest.sh
-# multi-repo curated batch (same live DB, upsert on repo+pr_number):
-./scripts/dgx_multi_harvest.sh
-# pilot cap only:
-python3 scripts/run_harvest.py --repos django/django --max-prs 100
-```
-
-DB path: `ACE_DB_PATH` or `./data/ace_patterns.sqlite`. Keep the live DB;
-freeze copies live under `data/frozen/` (see [data/FROZEN.md](data/FROZEN.md)).
-
----
-
-## The Core Premise
-
-Prior to ~2012, blogs were judged on utility, clarity, and authority. After SEO mills and generative AI, the web filled with **content bloat**: 2,000-word articles for queries that needed 50 words.
-
-A software engineering counterpart is happening now.
-
-AI coding agents maximize likelihoods and pass tests. Asked to fix a bug or add a feature, an agent often generates **150 lines across 4 files** — redundant helpers, unnecessary abstractions, duplicated logic — for a problem a senior engineer fixes in **12 lines in one file**.
-
-Benchmarks that treat code generation as binary pass/fail ignore **code rot, maintenance debt, and context-window bloat**.
-
----
-
-## Pipeline
+## Three-step flow
 
 ```
-[GitHub Merged PRs] ──> [Dual-Execution Engine] ──> [AST & Diff Analyzer] ──> [Efficiency Score (ACE Index)]
-  (Human Baseline)         (Agent Generated)           (Structural Metrics)        (Leaderboard / Report)
+[1. Human harvest]  →  [2. Agent sandbox]  →  [3. ACE compare]
+ merged pre-AI PRs      issue-only prompt       score vs human structure
+ → SQLite               (Docker next)           (CLI live; sandbox stubbed)
 ```
 
-### 1. Data pipeline & baseline ingestion (this pass)
-
-- Harvest resolved, merged PRs from high-quality open-source repos (pilot: Django).
-- Store: issue description, human patch \(P_H\), human file set \(F_H\), crude diff metrics in `metrics_json`, and base SHA.
-
-### 2. Isolated agent execution (sandbox) — next
-
-- Containerized environment (Docker / microVM) at the pre-PR commit.
-- Give the agent the issue description only.
-- Capture agent patch \(P_A\), file set \(F_A\), and traces.
-
-### 3. Comparative structural analysis (AST & static analysis)
-
-Prefer tree-sitter ASTs over raw line diffs (first pass uses cheap diff proxies until AST lands):
-
-| Signal | What it captures |
-|--------|------------------|
-| **AST node overhead** | Syntactic size of \(P_A\) vs \(P_H\) |
-| **Scope creep** | Files outside the human touch-set: \(F_A \setminus F_H\) |
-| **Redundancy** | Logic reimplemented instead of reusing existing utilities |
-| **Cyclomatic complexity Δ** | Net increase in decision branches |
-
-### 4. Scoring — the ACE Index
+1. **Harvest** — merged PRs before the AI era → SQLite (`human_patterns`).
+2. **Sandbox** — checkout `base_sha`, give the agent the issue only, capture \(P_A\).
+3. **Score** — ACE Index vs human \(P_H\) / \(F_H\) (pass/fail is a gate, not the score).
 
 \[
 \text{ACE Score} =
@@ -91,60 +31,80 @@ Prefer tree-sitter ASTs over raw line diffs (first pass uses cheap diff proxies 
 | Score | Meaning |
 |-------|---------|
 | **1.0** | Matched human efficiency |
-| **&lt; 1.0** | Bloat, unnecessary files, or over-engineering |
-| **&gt; 1.0** | More concise structural fix than the human baseline |
-| **0.0** | Failed the unit test suite |
+| **&lt; 1.0** | Bloat / scope creep |
+| **&gt; 1.0** | More concise than the human baseline |
+| **0.0** | Failed tests |
+
+---
+
+## Quick start
+
+```bash
+export GITHUB_TOKEN=...   # or GH_TOKEN
+pip install -e .
+
+# harvest (pilot or full windowed Django baseline)
+python3 scripts/run_harvest.py --repos django/django --max-prs 100
+./scripts/dgx_full_harvest.sh          # monthly windows 2012→2021
+./scripts/dgx_corpus_harvest.sh        # curated Tier A→C (sequential)
+
+# eval v0 — export instances + score an agent patch vs human
+export ACE_DB_PATH=$HOME/ace-bench/data/frozen/ace_patterns_django_pre2021_6125.sqlite
+python3 scripts/export_eval_instances.py --limit 50
+python3 scripts/score_against_human.py --instance django/django#22 --self-smoke --passed-tests true
+```
+
+DB: `ACE_DB_PATH` or `./data/ace_patterns.sqlite`. Frozen copies under `data/frozen/` (see [docs/CORPUS.md](docs/CORPUS.md)).
+
+---
+
+## Design principles
+
+1. **Human baseline is ground truth for efficiency**, not correctness alone.
+2. **Pass/fail is a gate**, not the score — failing tests → ACE = 0.
+3. **Prefer AST metrics over line diffs** — v0 uses `max(added_lines, 1)` until tree-sitter lands.
+4. **Agent-agnostic harness** — any agent that emits a patch against a checkout.
+
+---
+
+## Docs
+
+| Doc | Role |
+|-----|------|
+| [docs/CORPUS.md](docs/CORPUS.md) | Curated repos, Django freeze, human baseline headlines |
+| [docs/CORPUS_STATUS.md](docs/CORPUS_STATUS.md) | Living harvest coverage table (`scripts/refresh_corpus_status.py`) |
+| [docs/EVAL.md](docs/EVAL.md) | Score CLI (v0) + future dual-execution loop |
+| [docs/OPS.md](docs/OPS.md) | DGX / tmux harvest, tokens, rate limits |
+| [AGENTS.md](AGENTS.md) | Commit identity for agents |
+
+Machine source of truth for the ~100-repo list: [`data/corpus_repos.json`](data/corpus_repos.json).
+
+---
+
+## Status (v1)
+
+| Item | State |
+|------|--------|
+| Django harvest | **6125** rows frozen |
+| Kickoff multi-repo | Flask / Express / Cobra / Clap done; Tier A+ via corpus script |
+| Eval v0 CLI | Live — [docs/EVAL.md](docs/EVAL.md) |
+| Docker sandbox | Next |
 
 ---
 
 ## Market gap
 
-```
-                               FUNCTIONAL VALIDATION
-                              (Does the patch work?)
-                                  │          │
-                     ┌────────────┘          └────────────┐
-                     ▼                                    ▼
-           [SWE-bench / SWE-bench Lite]            [Static Linters / SonarQube]
-           • Binary Pass/Fail                      • Static rule checking
-           • Ignores code quality                  • No comparison to human diff
-           • Ignores verbosity                     • Doesn't measure intent efficiency
-                     │                                    │
-                     └────────────┬───────────────────────┘
-                                  ▼
-                    ┌──────────────────────────┐
-                    │    THE UNADDRESSED GAP   │
-                    │   Structural Efficiency  │
-                    │   vs. Human Baselines    │
-                    │        (ACE-Bench)       │
-                    └──────────────────────────┘
-```
+SWE-bench-style evals score task completion; linters score static rules. Neither compares agent diffs to **human structural intent**. ACE-Bench fills that gap.
 
-| Approach | Strength | Blind spot |
-|----------|----------|------------|
-| **SWE-bench & peers** | Task completion | Same score for 5 clean lines vs 500 spaghetti, if tests pass |
-| **Linters / SonarQube** | Static quality rules | No *human intent ratio* — can't tell if 100 lines should have been 5 |
-| **Enterprise telemetry** | Org-level churn | Not an agent/LLM evaluation harness |
-
----
-
-## Who this is for
-
-- **Researchers & model providers** — spot models that hallucinate architecture or emit verbose boilerplate.
-- **Engineering leadership** — quantify “codebase tax”: does an agent buy short-term velocity at long-term maintenance cost?
-- **Tool builders** — a target for prompts, system instructions, and AST-pruning post-processors that compress agent output toward human structural quality.
-
----
+**Who it's for:** model providers, eng leadership quantifying “codebase tax,” and tool builders targeting human-like patch shape.
 
 ## Roadmap
 
-1. [x] Dataset schema + Django pilot harvest → SQLite (**6125** frozen)
-2. [ ] Multi-repo pre-AI harvest (Flask / Express / Cobra / Clap)
-3. [ ] Sandbox runner (agent-agnostic interface)
-4. [ ] tree-sitter AST metrics + ACE Index (formula stub in `scoring.py`)
-5. [ ] Public leaderboard + paper-ready report format
-
----
+1. [x] Schema + Django pilot → SQLite (**6125** frozen)
+2. [ ] Multi-repo pre-AI harvest (Tier A→C in progress)
+3. [ ] Sandbox runner (agent-agnostic)
+4. [ ] tree-sitter AST metrics + ACE Index
+5. [ ] Public leaderboard
 
 ## License
 

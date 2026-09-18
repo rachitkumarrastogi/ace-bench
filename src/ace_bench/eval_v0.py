@@ -23,7 +23,7 @@ from typing import Any
 from ace_bench.metrics import PatchMetrics, metrics_from_patch
 from ace_bench.scoring import AceScoreInputs, compute_ace_score
 
-# Django human baseline (docs/HUMAN_PATTERN_BASELINE_DJANGO.md)
+# Django human baseline (docs/CORPUS.md)
 DJANGO_P50_FILES = 2
 DJANGO_SURGICAL_MAX_FILES = 2  # ≤ p50 → surgical
 DJANGO_SPRAWL_MIN_FILES = 9  # > human p90 (8) → sprawl flag

@@ -34,7 +34,7 @@ python3 scripts/refresh_corpus_status.py --fetch-github
 
 | repo | tier | status | github_pre2021 | harvested | coverage % | notes |
 |------|------|--------|----------------|-----------|------------|-------|
-| `django/django` | kickoff | done | 6125 | 6125 | 100.0% | See docs/CORPUS_DJANGO.md; coverage ≥95% of GitHub Search |
+| `django/django` | kickoff | done | 6125 | 6125 | 100.0% | See docs/CORPUS.md (frozen Django); coverage ≥95% of GitHub Search |
 | `pallets/flask` | kickoff | done | 1054 | 1054 | 100.0% | Harvested into live ace_patterns.sqlite; skip re-queue; coverage ≥95% of GitHub Search |
 | `expressjs/express` | kickoff | done | 196 | 196 | 100.0% | Harvested into live ace_patterns.sqlite; skip re-queue; coverage ≥95% of GitHub Search |
 | `spf13/cobra` | kickoff | done | 343 | 343 | 100.0% | Harvested into live ace_patterns.sqlite; skip re-queue; coverage ≥95% of GitHub Search |

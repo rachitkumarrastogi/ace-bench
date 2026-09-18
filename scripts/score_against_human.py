@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Score an agent unified-diff patch against a human baseline row (ACE v0).
 
-AST proxy: max(added_lines, 1) — see ace_bench.eval_v0 and docs/EVAL_V0.md.
+AST proxy: max(added_lines, 1) — see ace_bench.eval_v0 and docs/EVAL.md.
 
 GitHub harvest patches are usually *headerless* hunks (no ``diff --git``). For
 self-smoke use ``--self-smoke`` (loads human patch + human file list from DB).
