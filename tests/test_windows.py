@@ -8,7 +8,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from ace_bench.harvest import add_months, iter_date_windows, parse_iso_date
+from ace_bench.harvest import (
+    add_months,
+    build_merged_search_query,
+    iter_date_windows,
+    parse_iso_date,
+)
 
 
 class WindowTests(unittest.TestCase):
@@ -40,6 +45,16 @@ class WindowTests(unittest.TestCase):
     def test_bad_range(self) -> None:
         with self.assertRaises(ValueError):
             list(iter_date_windows("2021-01-01", "2012-01-01", "months", 1))
+
+    def test_search_query_uses_range_syntax(self) -> None:
+        q = build_merged_search_query("django/django", "2012-02-01", "2012-01-01")
+        self.assertIn("merged:2012-01-01..2012-01-31", q)
+        self.assertNotIn("merged:>=", q)
+        self.assertNotIn("merged:<2012-02-01", q)
+
+    def test_search_query_before_only(self) -> None:
+        q = build_merged_search_query("django/django", "2021-01-01", None)
+        self.assertIn("merged:<2021-01-01", q)
 
 
 if __name__ == "__main__":
