@@ -386,7 +386,7 @@ def harvest(store: PatternStore, config: HarvestConfig) -> dict[str, Any]:
         print(
             f"  → inserted={result['inserted']} updated={result['updated']} "
             f"errors={result['error_count']} "
-            f"db_total={result['summary'].get('pattern_count')}",
+            f"db_total={result['summary'].get('total')}",
             file=sys.stderr,
         )
 
