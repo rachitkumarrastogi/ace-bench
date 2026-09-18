@@ -12,7 +12,8 @@
 | Item | State |
 |------|--------|
 | **Django harvest** | Done — **6125** rows; frozen snapshot documented in [docs/CORPUS_DJANGO.md](docs/CORPUS_DJANGO.md) |
-| **Multi-repo batch** | In flight — Flask / Express / Cobra / Clap (pre-AI, windowed) via `scripts/dgx_multi_harvest.sh` |
+| **Multi-repo batch** | Kickoff done (Flask / Express / Cobra / Clap); Tier A+ via `scripts/dgx_corpus_harvest.sh` |
+| **Corpus status** | Live table: [docs/CORPUS_STATUS.md](docs/CORPUS_STATUS.md) (`scripts/refresh_corpus_status.py`) |
 | **Curated Top ~100** | [docs/CORPUS_TOP100.md](docs/CORPUS_TOP100.md) + [`data/corpus_repos.json`](data/corpus_repos.json) — Tier A next after current batch |
 | Default repo | `django/django` (`2012-01-01` → `2021-01-01`, monthly windows) |
 | Linux kernel | Deferred / excluded as primary (see corpus exclusions) |

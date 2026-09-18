@@ -111,8 +111,8 @@
       "lang": "JavaScript",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 360,
+      "prs_verified": true,
       "why": "Ubiquitous HTTP client",
       "notes": "Browser+Node patterns"
     },
@@ -121,8 +121,8 @@
       "lang": "JavaScript",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 1353,
+      "prs_verified": true,
       "why": "Small core; high review bar",
       "notes": "Avoid redux-toolkit monorepo first"
     },
@@ -131,18 +131,18 @@
       "lang": "JavaScript",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 568,
+      "prs_verified": true,
       "why": "Utility lib; many small PRs",
-      "notes": "Docs churn \u2014 filter path noise"
+      "notes": "Docs churn — filter path noise"
     },
     {
       "repo": "gin-gonic/gin",
       "lang": "Go",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 652,
+      "prs_verified": true,
       "why": "Popular Go web framework",
       "notes": "Strong PR culture"
     },
@@ -151,8 +151,8 @@
       "lang": "Go",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 309,
+      "prs_verified": true,
       "why": "Test helpers; focused patches",
       "notes": "High signal, low monorepo risk"
     },
@@ -161,8 +161,8 @@
       "lang": "Go",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 374,
+      "prs_verified": true,
       "why": "Logging lib; mature history",
       "notes": "Mid volume"
     },
@@ -171,8 +171,8 @@
       "lang": "Rust",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 527,
+      "prs_verified": true,
       "why": "Serialization ecosystem hub",
       "notes": "Often multi-crate; still tractable"
     },
@@ -181,8 +181,8 @@
       "lang": "Rust",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 387,
+      "prs_verified": true,
       "why": "Search tool; excellent reviews",
       "notes": "Single-purpose, testable"
     },
@@ -191,8 +191,8 @@
       "lang": "Ruby",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 625,
+      "prs_verified": true,
       "why": "Micro-framework; classic PRs",
       "notes": "Ruby without Rails weight"
     },
@@ -204,15 +204,15 @@
       "pre_2021_merged_prs": null,
       "prs_verified": false,
       "why": "HTTP client; strong review culture",
-      "notes": "JVM + Kotlin mix"
+      "notes": "JVM + Kotlin mix; Search unavailable (422 / not searchable with token)"
     },
     {
       "repo": "fmtlib/fmt",
       "lang": "C++",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 480,
+      "prs_verified": true,
       "why": "Formatting library; GitHub-native",
       "notes": "Prefer over mailing-list C++"
     },
@@ -221,8 +221,8 @@
       "lang": "Ruby",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 2851,
+      "prs_verified": true,
       "why": "SSG; long PR history",
       "notes": "Some docs-heavy PRs"
     }
@@ -273,8 +273,8 @@
       "lang": "Python",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 434,
+      "prs_verified": true,
       "why": "CLI; pairs with Flask/Cobra/Clap",
       "notes": "Small, high quality"
     },
@@ -283,8 +283,8 @@
       "lang": "Python",
       "risk": "M",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 2525,
+      "prs_verified": true,
       "why": "DRF; Django-adjacent",
       "notes": "Complements frozen Django"
     },
@@ -293,8 +293,8 @@
       "lang": "Python",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 1412,
+      "prs_verified": true,
       "why": "Property-based testing",
       "notes": "Niche but clean"
     },
@@ -303,18 +303,18 @@
       "lang": "Python",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 462,
+      "prs_verified": true,
       "why": "Formatter; many small PRs",
-      "notes": "Style-only PRs \u2014 filter carefully"
+      "notes": "Style-only PRs — filter carefully"
     },
     {
       "repo": "eslint/eslint",
       "lang": "JavaScript",
       "risk": "M",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 4609,
+      "prs_verified": true,
       "why": "Linter platform",
       "notes": "Rule churn; path filters help"
     },
@@ -323,8 +323,8 @@
       "lang": "JavaScript",
       "risk": "M",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 4375,
+      "prs_verified": true,
       "why": "Formatter",
       "notes": "Snapshot/fixture heavy"
     },
@@ -333,8 +333,8 @@
       "lang": "JavaScript",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 1051,
+      "prs_verified": true,
       "why": "Classic test runner",
       "notes": "Mid-size"
     },
@@ -343,8 +343,8 @@
       "lang": "JavaScript",
       "risk": "M",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 496,
+      "prs_verified": true,
       "why": "Long history, pre-AI era",
       "notes": "Legacy + docs"
     },
@@ -353,8 +353,8 @@
       "lang": "JavaScript",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 3320,
+      "prs_verified": true,
       "why": "Bundler",
       "notes": "Complex; upper-B"
     },
@@ -363,18 +363,18 @@
       "lang": "JavaScript",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 3798,
+      "prs_verified": true,
       "why": "Compiler monorepo",
-      "notes": "Monorepo \u2014 stricter filters"
+      "notes": "Monorepo — stricter filters"
     },
     {
       "repo": "nestjs/nest",
       "lang": "TypeScript",
       "risk": "M",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 2339,
+      "prs_verified": true,
       "why": "Node framework",
       "notes": "TS coverage"
     },
@@ -383,8 +383,8 @@
       "lang": "TypeScript",
       "risk": "M",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 1179,
+      "prs_verified": true,
       "why": "Routing",
       "notes": "Was ReactTraining/react-router"
     },
@@ -393,8 +393,8 @@
       "lang": "Go",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 153,
+      "prs_verified": true,
       "why": "Lightweight router",
       "notes": "Complements Gin"
     },
@@ -403,8 +403,8 @@
       "lang": "Go",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 162,
+      "prs_verified": true,
       "why": "Classic router",
       "notes": "Maintenance-mode era still useful"
     },
@@ -413,8 +413,8 @@
       "lang": "Go",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 151,
+      "prs_verified": true,
       "why": "Config (Cobra sibling)",
       "notes": "After Cobra harvest"
     },
@@ -423,8 +423,8 @@
       "lang": "Go",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 481,
+      "prs_verified": true,
       "why": "Alternate CLI",
       "notes": "Diversity vs Cobra"
     },
@@ -433,8 +433,8 @@
       "lang": "Go",
       "risk": "M",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 365,
+      "prs_verified": true,
       "why": "ORM",
       "notes": ""
     },
@@ -443,8 +443,8 @@
       "lang": "Go",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 6092,
+      "prs_verified": true,
       "why": "Distributed KV",
       "notes": "Large; near Tier C"
     },
@@ -453,8 +453,8 @@
       "lang": "Rust",
       "risk": "M",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 1669,
+      "prs_verified": true,
       "why": "Async runtime",
       "notes": "Multi-crate workspace"
     },
@@ -463,8 +463,8 @@
       "lang": "Rust",
       "risk": "M",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 913,
+      "prs_verified": true,
       "why": "HTTP",
       "notes": ""
     },
@@ -473,8 +473,8 @@
       "lang": "Rust",
       "risk": "M",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 596,
+      "prs_verified": true,
       "why": "Web framework",
       "notes": ""
     },
@@ -483,8 +483,8 @@
       "lang": "Rust",
       "risk": "M",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 1096,
+      "prs_verified": true,
       "why": "ORM",
       "notes": ""
     },
@@ -493,8 +493,8 @@
       "lang": "Rust",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 551,
+      "prs_verified": true,
       "why": "Docs tool",
       "notes": "Smaller Rust target"
     },
@@ -503,8 +503,8 @@
       "lang": "Rust",
       "risk": "M",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 2825,
+      "prs_verified": true,
       "why": "Lints",
       "notes": "Many small lint PRs"
     },
@@ -516,15 +516,15 @@
       "pre_2021_merged_prs": null,
       "prs_verified": false,
       "why": "HTTP client",
-      "notes": "Pairs with OkHttp"
+      "notes": "Pairs with OkHttp; Search unavailable (422 / not searchable with token)"
     },
     {
       "repo": "google/gson",
       "lang": "Java",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 203,
+      "prs_verified": true,
       "why": "JSON",
       "notes": "Focused"
     },
@@ -533,8 +533,8 @@
       "lang": "Java",
       "risk": "M",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 286,
+      "prs_verified": true,
       "why": "Core libs",
       "notes": "Large surface"
     },
@@ -543,8 +543,8 @@
       "lang": "Java",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 441,
+      "prs_verified": true,
       "why": "Classic tests",
       "notes": "Prefer junit4 over junit5 volume"
     },
@@ -553,8 +553,8 @@
       "lang": "C++",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 408,
+      "prs_verified": true,
       "why": "JSON for Modern C++",
       "notes": "Header-heavy but GitHub PRs"
     },
@@ -563,8 +563,8 @@
       "lang": "C++",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 404,
+      "prs_verified": true,
       "why": "Test framework",
       "notes": ""
     },
@@ -573,8 +573,8 @@
       "lang": "C++",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 2761,
+      "prs_verified": true,
       "why": "IDL + runtimes",
       "notes": "Multi-language monorepo"
     },
@@ -583,8 +583,8 @@
       "lang": "Swift",
       "risk": "S",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 479,
+      "prs_verified": true,
       "why": "HTTP client",
       "notes": "Swift coverage"
     },
@@ -593,8 +593,8 @@
       "lang": "Swift",
       "risk": "M",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 690,
+      "prs_verified": true,
       "why": "Reactive",
       "notes": ""
     },
@@ -603,8 +603,8 @@
       "lang": "Ruby",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 9359,
+      "prs_verified": true,
       "why": "Forum app",
       "notes": "App-scale Ruby before Rails"
     },
@@ -613,18 +613,18 @@
       "lang": "Ruby",
       "risk": "M",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 5790,
+      "prs_verified": true,
       "why": "Package manager",
-      "notes": "Formula noise \u2014 code PRs only"
+      "notes": "Formula noise — code PRs only"
     },
     {
       "repo": "hashicorp/consul",
       "lang": "Go",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 4529,
+      "prs_verified": true,
       "why": "Service mesh/discovery",
       "notes": "Upper-B / near C"
     }
@@ -638,15 +638,15 @@
       "pre_2021_merged_prs": null,
       "prs_verified": false,
       "why": "User-requested heavyweight UI library",
-      "notes": "Monorepo; exclude bots; cap files/diff"
+      "notes": "Monorepo; exclude bots; cap files/diff; Search unavailable (422 / not searchable with token)"
     },
     {
       "repo": "microsoft/vscode",
       "lang": "TypeScript",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 6016,
+      "prs_verified": true,
       "why": "User-requested heavyweight editor",
       "notes": "Huge volume; rate-limit time; extension noise"
     },
@@ -655,8 +655,8 @@
       "lang": "Go",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 45430,
+      "prs_verified": true,
       "why": "Orchestration standard",
       "notes": "Massive; SIG bots; aggressive filters"
     },
@@ -665,8 +665,8 @@
       "lang": "Ruby",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 17522,
+      "prs_verified": true,
       "why": "Framework heavyweight",
       "notes": "Multi-gem monorepo"
     },
@@ -675,8 +675,8 @@
       "lang": "Java",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 41,
+      "prs_verified": true,
       "why": "Boot ecosystem",
       "notes": "After smaller JVM Tier B"
     },
@@ -685,8 +685,8 @@
       "lang": "Java",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 610,
+      "prs_verified": true,
       "why": "Core Spring",
       "notes": ""
     },
@@ -695,8 +695,8 @@
       "lang": "Go",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 0,
+      "prs_verified": true,
       "why": "Language + stdlib",
       "notes": "Some non-GitHub history"
     },
@@ -705,8 +705,8 @@
       "lang": "Rust",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 31932,
+      "prs_verified": true,
       "why": "Compiler",
       "notes": "Enormous; submodule/tooling noise"
     },
@@ -715,8 +715,8 @@
       "lang": "Rust",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 3499,
+      "prs_verified": true,
       "why": "Package manager",
       "notes": "More tractable than rustc"
     },
@@ -735,8 +735,8 @@
       "lang": "JavaScript",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 2738,
+      "prs_verified": true,
       "why": "Runtime",
       "notes": "Core + deps noise"
     },
@@ -755,8 +755,8 @@
       "lang": "Python",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 4954,
+      "prs_verified": true,
       "why": "Scientific",
       "notes": ""
     },
@@ -775,8 +775,8 @@
       "lang": "C++",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 11132,
+      "prs_verified": true,
       "why": "ML framework",
       "notes": "Extreme monorepo risk"
     },
@@ -798,7 +798,7 @@
       "pre_2021_merged_prs": 32367,
       "prs_verified": true,
       "why": "Automation",
-      "notes": "Extreme volume \u2014 sample windows"
+      "notes": "Extreme volume — sample windows"
     },
     {
       "repo": "home-assistant/core",
@@ -815,8 +815,8 @@
       "lang": "TypeScript",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 10230,
+      "prs_verified": true,
       "why": "Language",
       "notes": "Compiler + tests huge"
     },
@@ -825,8 +825,8 @@
       "lang": "TypeScript",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 2918,
+      "prs_verified": true,
       "why": "Framework monorepo",
       "notes": ""
     },
@@ -835,8 +835,8 @@
       "lang": "TypeScript",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 1137,
+      "prs_verified": true,
       "why": "Vue 3 core",
       "notes": "Pre-2021 may be thinner"
     },
@@ -845,8 +845,8 @@
       "lang": "JavaScript",
       "risk": "M",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 986,
+      "prs_verified": true,
       "why": "Vue 2",
       "notes": "Stronger pre-2021 history"
     },
@@ -855,8 +855,8 @@
       "lang": "Go",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 8638,
+      "prs_verified": true,
       "why": "IaC",
       "notes": "Provider noise"
     },
@@ -865,8 +865,8 @@
       "lang": "Go",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 5633,
+      "prs_verified": true,
       "why": "Secrets",
       "notes": ""
     },
@@ -875,8 +875,8 @@
       "lang": "Go",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 3460,
+      "prs_verified": true,
       "why": "Metrics",
       "notes": ""
     },
@@ -885,8 +885,8 @@
       "lang": "TypeScript",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 9530,
+      "prs_verified": true,
       "why": "Observability UI",
       "notes": "Frontend+backend"
     },
@@ -895,8 +895,8 @@
       "lang": "Java",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 34080,
+      "prs_verified": true,
       "why": "Search",
       "notes": ""
     },
@@ -905,8 +905,8 @@
       "lang": "Java",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 3713,
+      "prs_verified": true,
       "why": "Streaming",
       "notes": ""
     },
@@ -915,8 +915,8 @@
       "lang": "Scala",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 5,
+      "prs_verified": true,
       "why": "Data",
       "notes": "Build-heavy"
     },
@@ -925,8 +925,8 @@
       "lang": "TypeScript",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 10822,
+      "prs_verified": true,
       "why": "Desktop shell",
       "notes": ""
     },
@@ -938,15 +938,15 @@
       "pre_2021_merged_prs": null,
       "prs_verified": false,
       "why": "Mobile",
-      "notes": "Multi-platform monorepo"
+      "notes": "Multi-platform monorepo; Search unavailable (422 / not searchable with token)"
     },
     {
       "repo": "flutter/flutter",
       "lang": "Dart",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 17877,
+      "prs_verified": true,
       "why": "UI toolkit",
       "notes": "Engine + framework"
     },
@@ -955,8 +955,8 @@
       "lang": "C++",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 13698,
+      "prs_verified": true,
       "why": "Game engine",
       "notes": ""
     },
@@ -965,8 +965,8 @@
       "lang": "C++",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 9295,
+      "prs_verified": true,
       "why": "Vision",
       "notes": ""
     },
@@ -975,8 +975,8 @@
       "lang": "C++",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 1,
+      "prs_verified": true,
       "why": "Compiler infra",
       "notes": "Monorepo extreme"
     },
@@ -985,8 +985,8 @@
       "lang": "C#",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 7360,
+      "prs_verified": true,
       "why": "Runtime",
       "notes": ""
     },
@@ -995,8 +995,8 @@
       "lang": "C#",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 6700,
+      "prs_verified": true,
       "why": "Web stack",
       "notes": ""
     },
@@ -1005,8 +1005,8 @@
       "lang": "Kotlin",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 1674,
+      "prs_verified": true,
       "why": "Language",
       "notes": ""
     },
@@ -1018,15 +1018,15 @@
       "pre_2021_merged_prs": null,
       "prs_verified": false,
       "why": "Language",
-      "notes": "Partial GitHub mirror dynamics"
+      "notes": "Partial GitHub mirror dynamics; Search unavailable (422 / not searchable with token)"
     },
     {
       "repo": "redis/redis",
       "lang": "C",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 1512,
+      "prs_verified": true,
       "why": "Datastore",
       "notes": "Historically mixed contribution paths"
     },
@@ -1038,25 +1038,25 @@
       "pre_2021_merged_prs": null,
       "prs_verified": false,
       "why": "RDBMS",
-      "notes": "Mailing-list heavy; sample only"
+      "notes": "Mailing-list heavy; sample only; Search unavailable (422 / not searchable with token)"
     },
     {
       "repo": "git/git",
       "lang": "C",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 2,
+      "prs_verified": true,
       "why": "VCS",
-      "notes": "Mailing-list primary \u2014 low priority within C"
+      "notes": "Mailing-list primary — low priority within C"
     },
     {
       "repo": "moby/moby",
       "lang": "Go",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 16428,
+      "prs_verified": true,
       "why": "Docker engine",
       "notes": "Renames/history quirks"
     },
@@ -1065,8 +1065,8 @@
       "lang": "Go",
       "risk": "M",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 1607,
+      "prs_verified": true,
       "why": "Docker CLI",
       "notes": "Smaller than engine"
     },
@@ -1075,8 +1075,8 @@
       "lang": "Go",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 3041,
+      "prs_verified": true,
       "why": "K8s packaging",
       "notes": "After smaller Go Tier A/B"
     },
@@ -1085,8 +1085,8 @@
       "lang": "Go",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 13036,
+      "prs_verified": true,
       "why": "Service mesh",
       "notes": ""
     },
@@ -1095,8 +1095,8 @@
       "lang": "C++",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 8088,
+      "prs_verified": true,
       "why": "Proxy",
       "notes": ""
     },
@@ -1105,8 +1105,8 @@
       "lang": "C++",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 10490,
+      "prs_verified": true,
       "why": "OLAP DB",
       "notes": ""
     },
@@ -1115,8 +1115,8 @@
       "lang": "Go",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 13403,
+      "prs_verified": true,
       "why": "Distributed SQL",
       "notes": ""
     },
@@ -1125,8 +1125,8 @@
       "lang": "Go",
       "risk": "L",
       "cutoff": "merged:<2021-01-01",
-      "pre_2021_merged_prs": null,
-      "prs_verified": false,
+      "pre_2021_merged_prs": 25862,
+      "prs_verified": true,
       "why": "Distributed SQL",
       "notes": ""
     }
@@ -1154,7 +1154,7 @@
     },
     {
       "repo_or_class": "tiangolo/fastapi (early)",
-      "reason": "Search invalid/empty in this pass; rose late \u2014 verify before enqueue"
+      "reason": "Search invalid/empty in this pass; rose late — verify before enqueue"
     },
     {
       "repo_or_class": "chromium/chromium without filters",

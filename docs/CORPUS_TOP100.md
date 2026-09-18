@@ -16,6 +16,8 @@ Machine-readable twin: [`data/corpus_repos.json`](../data/corpus_repos.json).
 
 Remaining Tier A/B/C: run `./scripts/dgx_corpus_harvest.sh` on DGX (sequential; log `~/ace-bench/data/corpus_harvest.log`).
 
+**Live coverage table:** [CORPUS_STATUS.md](CORPUS_STATUS.md) — regenerate with `python3 scripts/refresh_corpus_status.py --fetch-github`.
+
 **Cutoff (default for all rows below):** `merged:<2021-01-01`  
 **Suggested windowing:** monthly or quarterly slices (same pattern as Django).
 
