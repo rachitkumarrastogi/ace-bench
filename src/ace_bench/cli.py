@@ -72,8 +72,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument(
         "--sleep",
         type=float,
-        default=0.25,
-        help="Seconds between GitHub API calls (default: 0.25)",
+        default=0.75,
+        help="Seconds between GitHub REST calls (default: 0.75; Search pages floor at 2.0s)",
     )
     p.add_argument(
         "--summary-only",

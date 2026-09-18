@@ -144,9 +144,12 @@ sqlite3 "$ACE_DB_PATH" "SELECT pr_number, file_count, additions, deletions, titl
 | Range | `merged_before=2021-01-01` | `2012-01-01` → `2021-01-01` |
 | Windows | none | `--window months --window-size 1` (~108 months) |
 | Max PRs | `100` CLI / `200` dgx script | `1000` per window (Search API max) |
-| Sleep | `0.25s` | same (Search paced ≥0.35s) |
+| Sleep (REST) | `0.75s` | same (core API ≈5k req/hr) |
+| Search pages | ≥`2.0s` | Search API ≈30 req/min (floor in `harvest.py`) |
 
 Optional second repo later: `--repos django/django someorg/smallrepo`.
+Multi-repo runs (`dgx_multi_harvest.sh`) are **sequential one-repo-at-a-time**
+(shared rate budget; default `SLEEP=1.0`). Do not parallelize repos.
 
 ## Django freeze + multi-repo (same live DB)
 
@@ -173,7 +176,8 @@ tmux new -s ace-harvest
 ```
 
 Override repos: `REPOS="psf/requests axios/axios" ./scripts/dgx_multi_harvest.sh`.
-Default sleep is `0.4s` (rate-limit friendly). Log: `data/multi_harvest.log`.
+Default sleep is `1.0s` (REST ≈5k/hr); Search page gaps floor at `2.0s` (≈30/min).
+Log: `data/multi_harvest.log`.
 
 ## Next (not this pass)
 

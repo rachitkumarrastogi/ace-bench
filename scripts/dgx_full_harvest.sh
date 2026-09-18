@@ -13,7 +13,8 @@ export MERGED_BEFORE="${MERGED_BEFORE:-2021-01-01}"
 export WINDOW="${WINDOW:-months}"
 export WINDOW_SIZE="${WINDOW_SIZE:-1}"
 export MAX_PRS="${MAX_PRS:-1000}"
-export SLEEP="${SLEEP:-0.25}"
+# REST pacing (~5k/hr). Search pages are floored at 2.0s in harvest.py (~30/min).
+export SLEEP="${SLEEP:-0.75}"
 PYTHON="${PYTHON:-python3}"
 
 TOKEN_FILE="${TOKEN_FILE:-$HOME/.config/ace-bench/github_token}"

@@ -28,7 +28,7 @@ def build_argv() -> list[str]:
     before = os.environ.get("MERGED_BEFORE", DEFAULT_BEFORE)
     repos = os.environ.get("REPOS", "django/django").split()
     db = os.environ.get("ACE_DB_PATH", "./data/ace_patterns.sqlite")
-    sleep = os.environ.get("SLEEP", "0.25")
+    sleep = os.environ.get("SLEEP", "0.75")
     window = os.environ.get("WINDOW", "months")
     window_size = os.environ.get("WINDOW_SIZE", "1")
     # Per-window cap = Search API max unless caller overrides.

@@ -24,6 +24,10 @@ from ace_bench.metrics import directories_from_files, metrics_from_patch
 GITHUB_API = "https://api.github.com"
 # GitHub Search API hard-caps at 1000 results per query — window harvests stay under this.
 SEARCH_RESULT_CAP = 1000
+# Search authenticated ≈30 req/min; floor between search pages (do not use the REST sleep).
+SEARCH_PAGE_SLEEP_SECONDS = 2.0
+# Default pause between REST calls (core API ≈5k req/hr authenticated).
+DEFAULT_SLEEP_SECONDS = 0.75
 _TRANSIENT_HTTP = {408, 429, 500, 502, 503, 504}
 _SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
 
@@ -36,7 +40,7 @@ class HarvestConfig:
     merged_before: str  # ISO date YYYY-MM-DD — exclusive upper bound (pre-AI era)
     merged_after: str | None = None
     max_prs_per_repo: int = 100
-    sleep_seconds: float = 0.25
+    sleep_seconds: float = DEFAULT_SLEEP_SECONDS
     token: str | None = None
     max_retries: int = 5
     # When set, harvest() slices [merged_after, merged_before) into windows and runs each.
@@ -214,8 +218,8 @@ class GitHubClient:
                 if yielded >= max_prs:
                     break
             page += 1
-            # Search API allows ~30 req/min authenticated; keep polite pacing.
-            time.sleep(max(sleep_seconds, 0.35))
+            # Search API ≈30 req/min authenticated — always pace ≥2.0s between pages.
+            time.sleep(max(sleep_seconds, SEARCH_PAGE_SLEEP_SECONDS))
             # Hard stop: Search pagination cannot go past result #1000.
             if page * 50 > SEARCH_RESULT_CAP:
                 break
