@@ -1,6 +1,6 @@
 # ACE-Bench corpus status
 
-_Generated: **2026-09-18T20:20:32Z** (UTC)_
+_Generated: **2026-09-19T11:48:46Z** (UTC)_
 
 Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs rows in `human_patterns`.
 
@@ -8,18 +8,18 @@ Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs
 
 | Metric | Value |
 |--------|-------|
-| Total harvested rows | **8928** |
-| Repos with data | **6** / 110 |
-| Status: done | 5 |
+| Total harvested rows | **34813** |
+| Repos with data | **26** / 110 |
+| Status: done | 25 |
 | Status: harvesting | 1 |
-| Status: queued / pending | 104 |
+| Status: queued / pending | 84 |
 | Status: skipped | 0 |
 | GitHub counts known | 104 / 110 (sum of known = 547378) |
-| Active harvest (log) | `psf/requests` |
+| Active harvest (log) | `prettier/prettier` |
 | DB | `/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite` |
-| Corpus JSON | `data/corpus_repos.json` |
+| Corpus JSON | `/home/arnavrastogi/ace-bench/data/corpus_repos.json` |
 | Harvest log | `/home/arnavrastogi/ace-bench/data/corpus_harvest.log` |
-| GitHub Search fetches this run | 86 |
+| GitHub Search fetches this run | 0 |
 
 **Done** when harvested &gt; 0 and harvest finished for the repo in logs, or coverage ≥ 95% of the GitHub count (or within ±5 PRs).
 
@@ -39,31 +39,31 @@ python3 scripts/refresh_corpus_status.py --fetch-github
 | `expressjs/express` | kickoff | done | 196 | 196 | 100.0% | Harvested into live ace_patterns.sqlite; skip re-queue; coverage ≥95% of GitHub Search |
 | `spf13/cobra` | kickoff | done | 343 | 343 | 100.0% | Harvested into live ace_patterns.sqlite; skip re-queue; coverage ≥95% of GitHub Search |
 | `clap-rs/clap` | kickoff | done | 967 | 967 | 100.0% | Harvested into live ace_patterns.sqlite; skip re-queue; coverage ≥95% of GitHub Search |
-| `psf/requests` | A | harvesting | 1349 | 243 | 18.0% | Best first post-batch target; active in corpus_harvest.log |
-| `encode/httpx` | A | queued | 688 | 0 | 0.0% | Complements Requests |
-| `pydantic/pydantic` | A | queued | 707 | 0 | 0.0% | v1-era pre-2021 useful |
-| `axios/axios` | A | queued | 360 | 0 | 0.0% | Browser+Node patterns |
-| `reduxjs/redux` | A | queued | 1353 | 0 | 0.0% | Avoid redux-toolkit monorepo first |
-| `lodash/lodash` | A | queued | 568 | 0 | 0.0% | Docs churn — filter path noise |
-| `gin-gonic/gin` | A | queued | 652 | 0 | 0.0% | Strong PR culture |
-| `stretchr/testify` | A | queued | 309 | 0 | 0.0% | High signal, low monorepo risk |
-| `sirupsen/logrus` | A | queued | 374 | 0 | 0.0% | Mid volume |
-| `serde-rs/serde` | A | queued | 527 | 0 | 0.0% | Often multi-crate; still tractable |
-| `BurntSushi/ripgrep` | A | queued | 387 | 0 | 0.0% | Single-purpose, testable |
-| `sinatra/sinatra` | A | queued | 625 | 0 | 0.0% | Ruby without Rails weight |
-| `square/okhttp` | A | queued | TBD | 0 | — | JVM + Kotlin mix; Search unavailable (422 / not searchable with token) |
+| `psf/requests` | A | done | 1349 | 1247 | 92.4% | Best first post-batch target; finished_repo in harvest log |
+| `encode/httpx` | A | done | 688 | 688 | 100.0% | Complements Requests; finished_repo in harvest log |
+| `pydantic/pydantic` | A | done | 707 | 707 | 100.0% | v1-era pre-2021 useful; finished_repo in harvest log |
+| `axios/axios` | A | done | 360 | 360 | 100.0% | Browser+Node patterns; finished_repo in harvest log |
+| `reduxjs/redux` | A | done | 1353 | 1353 | 100.0% | Avoid redux-toolkit monorepo first; finished_repo in harvest log |
+| `lodash/lodash` | A | done | 568 | 568 | 100.0% | Docs churn — filter path noise; finished_repo in harvest log |
+| `gin-gonic/gin` | A | done | 652 | 652 | 100.0% | Strong PR culture; finished_repo in harvest log |
+| `stretchr/testify` | A | done | 309 | 309 | 100.0% | High signal, low monorepo risk; finished_repo in harvest log |
+| `sirupsen/logrus` | A | done | 374 | 374 | 100.0% | Mid volume; finished_repo in harvest log |
+| `serde-rs/serde` | A | done | 527 | 527 | 100.0% | Often multi-crate; still tractable; finished_repo in harvest log |
+| `BurntSushi/ripgrep` | A | done | 387 | 387 | 100.0% | Single-purpose, testable; finished_repo in harvest log |
+| `sinatra/sinatra` | A | done | 625 | 533 | 85.3% | Ruby without Rails weight; finished_repo in harvest log |
+| `square/okhttp` | A | queued | TBD | 0 | — | JVM + Kotlin mix; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https) |
 | `fmtlib/fmt` | A | queued | 480 | 0 | 0.0% | Prefer over mailing-list C++ |
 | `jekyll/jekyll` | A | queued | 2851 | 0 | 0.0% | Some docs-heavy PRs |
 | `aio-libs/aiohttp` | B | queued | 2354 | 0 | 0.0% | Larger than Tier A HTTP libs |
-| `scrapy/scrapy` | B | queued | 1606 | 0 | 0.0% | Good issue linkage |
-| `celery/celery` | B | queued | 1398 | 0 | 0.0% | Multi-package layout |
-| `pytest-dev/pytest` | B | queued | 3194 | 0 | 0.0% | Plugin ecosystem noise |
-| `pallets/click` | B | queued | 434 | 0 | 0.0% | Small, high quality |
-| `encode/django-rest-framework` | B | queued | 2525 | 0 | 0.0% | Complements frozen Django |
-| `HypothesisWorks/hypothesis` | B | queued | 1412 | 0 | 0.0% | Niche but clean |
-| `psf/black` | B | queued | 462 | 0 | 0.0% | Style-only PRs — filter carefully |
-| `eslint/eslint` | B | queued | 4609 | 0 | 0.0% | Rule churn; path filters help |
-| `prettier/prettier` | B | queued | 4375 | 0 | 0.0% | Snapshot/fixture heavy |
+| `scrapy/scrapy` | B | done | 1606 | 473 | 29.5% | Good issue linkage; finished_repo in harvest log |
+| `celery/celery` | B | done | 1398 | 1321 | 94.5% | Multi-package layout; finished_repo in harvest log |
+| `pytest-dev/pytest` | B | done | 3194 | 3194 | 100.0% | Plugin ecosystem noise; finished_repo in harvest log |
+| `pallets/click` | B | done | 434 | 434 | 100.0% | Small, high quality; finished_repo in harvest log |
+| `encode/django-rest-framework` | B | done | 2525 | 2501 | 99.0% | Complements frozen Django; finished_repo in harvest log |
+| `HypothesisWorks/hypothesis` | B | done | 1412 | 1412 | 100.0% | Niche but clean; finished_repo in harvest log |
+| `psf/black` | B | done | 462 | 462 | 100.0% | Style-only PRs — filter carefully; finished_repo in harvest log |
+| `eslint/eslint` | B | done | 4609 | 4609 | 100.0% | Rule churn; path filters help; finished_repo in harvest log |
+| `prettier/prettier` | B | harvesting | 4375 | 4017 | 91.8% | Snapshot/fixture heavy; active in corpus_harvest.log |
 | `mochajs/mocha` | B | queued | 1051 | 0 | 0.0% | Mid-size |
 | `jquery/jquery` | B | queued | 496 | 0 | 0.0% | Legacy + docs |
 | `webpack/webpack` | B | queued | 3320 | 0 | 0.0% | Complex; upper-B |
@@ -82,7 +82,7 @@ python3 scripts/refresh_corpus_status.py --fetch-github
 | `diesel-rs/diesel` | B | queued | 1096 | 0 | 0.0% |  |
 | `rust-lang/mdBook` | B | queued | 551 | 0 | 0.0% | Smaller Rust target |
 | `rust-lang/rust-clippy` | B | queued | 2825 | 0 | 0.0% | Many small lint PRs |
-| `square/retrofit` | B | queued | TBD | 0 | — | Pairs with OkHttp; Search unavailable (422 / not searchable with token) |
+| `square/retrofit` | B | queued | TBD | 0 | — | Pairs with OkHttp; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https) |
 | `google/gson` | B | queued | 203 | 0 | 0.0% | Focused |
 | `google/guava` | B | queued | 286 | 0 | 0.0% | Large surface |
 | `junit-team/junit4` | B | queued | 441 | 0 | 0.0% | Prefer junit4 over junit5 volume |
@@ -94,7 +94,7 @@ python3 scripts/refresh_corpus_status.py --fetch-github
 | `discourse/discourse` | B | queued | 9359 | 0 | 0.0% | App-scale Ruby before Rails |
 | `Homebrew/brew` | B | queued | 5790 | 0 | 0.0% | Formula noise — code PRs only |
 | `hashicorp/consul` | B | queued | 4529 | 0 | 0.0% | Upper-B / near C |
-| `facebook/react` | C | queued | TBD | 0 | — | Monorepo; exclude bots; cap files/diff; Search unavailable (422 / not searchable with token) |
+| `facebook/react` | C | queued | TBD | 0 | — | Monorepo; exclude bots; cap files/diff; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https) |
 | `microsoft/vscode` | C | queued | 6016 | 0 | 0.0% | Huge volume; rate-limit time; extension noise |
 | `kubernetes/kubernetes` | C | queued | 45430 | 0 | 0.0% | Massive; SIG bots; aggressive filters |
 | `rails/rails` | C | queued | 17522 | 0 | 0.0% | Multi-gem monorepo |
@@ -124,7 +124,7 @@ python3 scripts/refresh_corpus_status.py --fetch-github
 | `apache/kafka` | C | queued | 3713 | 0 | 0.0% |  |
 | `apache/spark` | C | queued | 5 | 0 | 0.0% | Build-heavy |
 | `electron/electron` | C | queued | 10822 | 0 | 0.0% |  |
-| `facebook/react-native` | C | queued | TBD | 0 | — | Multi-platform monorepo; Search unavailable (422 / not searchable with token) |
+| `facebook/react-native` | C | queued | TBD | 0 | — | Multi-platform monorepo; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https) |
 | `flutter/flutter` | C | queued | 17877 | 0 | 0.0% | Engine + framework |
 | `godotengine/godot` | C | queued | 13698 | 0 | 0.0% |  |
 | `opencv/opencv` | C | queued | 9295 | 0 | 0.0% |  |
@@ -132,9 +132,9 @@ python3 scripts/refresh_corpus_status.py --fetch-github
 | `dotnet/runtime` | C | queued | 7360 | 0 | 0.0% |  |
 | `dotnet/aspnetcore` | C | queued | 6700 | 0 | 0.0% |  |
 | `JetBrains/kotlin` | C | queued | 1674 | 0 | 0.0% |  |
-| `apple/swift` | C | queued | TBD | 0 | — | Partial GitHub mirror dynamics; Search unavailable (422 / not searchable with token) |
+| `apple/swift` | C | queued | TBD | 0 | — | Partial GitHub mirror dynamics; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https) |
 | `redis/redis` | C | queued | 1512 | 0 | 0.0% | Historically mixed contribution paths |
-| `postgresql/postgres` | C | queued | TBD | 0 | — | Mailing-list heavy; sample only; Search unavailable (422 / not searchable with token) |
+| `postgresql/postgres` | C | queued | TBD | 0 | — | Mailing-list heavy; sample only; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https) |
 | `git/git` | C | queued | 2 | 0 | 0.0% | Mailing-list primary — low priority within C |
 | `moby/moby` | C | queued | 16428 | 0 | 0.0% | Renames/history quirks |
 | `docker/cli` | C | queued | 1607 | 0 | 0.0% | Smaller than engine |

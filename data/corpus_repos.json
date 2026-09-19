@@ -204,7 +204,7 @@
       "pre_2021_merged_prs": null,
       "prs_verified": false,
       "why": "HTTP client; strong review culture",
-      "notes": "JVM + Kotlin mix; Search unavailable (422 / not searchable with token)"
+      "notes": "JVM + Kotlin mix; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https)"
     },
     {
       "repo": "fmtlib/fmt",
@@ -516,7 +516,7 @@
       "pre_2021_merged_prs": null,
       "prs_verified": false,
       "why": "HTTP client",
-      "notes": "Pairs with OkHttp; Search unavailable (422 / not searchable with token)"
+      "notes": "Pairs with OkHttp; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https)"
     },
     {
       "repo": "google/gson",
@@ -638,7 +638,7 @@
       "pre_2021_merged_prs": null,
       "prs_verified": false,
       "why": "User-requested heavyweight UI library",
-      "notes": "Monorepo; exclude bots; cap files/diff; Search unavailable (422 / not searchable with token)"
+      "notes": "Monorepo; exclude bots; cap files/diff; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https)"
     },
     {
       "repo": "microsoft/vscode",
@@ -938,7 +938,7 @@
       "pre_2021_merged_prs": null,
       "prs_verified": false,
       "why": "Mobile",
-      "notes": "Multi-platform monorepo; Search unavailable (422 / not searchable with token)"
+      "notes": "Multi-platform monorepo; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https)"
     },
     {
       "repo": "flutter/flutter",
@@ -1018,7 +1018,7 @@
       "pre_2021_merged_prs": null,
       "prs_verified": false,
       "why": "Language",
-      "notes": "Partial GitHub mirror dynamics; Search unavailable (422 / not searchable with token)"
+      "notes": "Partial GitHub mirror dynamics; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https)"
     },
     {
       "repo": "redis/redis",
@@ -1038,7 +1038,7 @@
       "pre_2021_merged_prs": null,
       "prs_verified": false,
       "why": "RDBMS",
-      "notes": "Mailing-list heavy; sample only; Search unavailable (422 / not searchable with token)"
+      "notes": "Mailing-list heavy; sample only; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https)"
     },
     {
       "repo": "git/git",
