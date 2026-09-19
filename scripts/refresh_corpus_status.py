@@ -135,7 +135,7 @@ def parse_harvest_log(log_path: Path) -> tuple[set[str], set[str], str | None]:
 
 
 def iter_corpus_repos(data: dict[str, Any]) -> list[tuple[str, str, dict[str, Any]]]:
-    """Yield (repo, tier_label, entry) for status + tier_a/b/c (deduped)."""
+    """Yield (repo, tier_label, entry) for status + tier_a/b/c/d (deduped)."""
     seen: set[str] = set()
     out: list[tuple[str, str, dict[str, Any]]] = []
 
@@ -150,6 +150,7 @@ def iter_corpus_repos(data: dict[str, Any]) -> list[tuple[str, str, dict[str, An
         ("tier_a", "A"),
         ("tier_b", "B"),
         ("tier_c", "C"),
+        ("tier_d", "D"),
     ):
         for entry in data.get(tier_key, []):
             repo = entry.get("repo")
@@ -218,7 +219,7 @@ def cache_count_into_corpus(
 ) -> bool:
     """Set pre_2021_merged_prs + prs_verified on the matching entry. Return True if changed."""
     changed = False
-    for key in ("status", "tier_a", "tier_b", "tier_c"):
+    for key in ("status", "tier_a", "tier_b", "tier_c", "tier_d"):
         for entry in data.get(key, []):
             if entry.get("repo") != repo:
                 continue
@@ -228,6 +229,39 @@ def cache_count_into_corpus(
                 changed = True
             return changed
     return changed
+
+
+def parse_prior_status_table(status_md: Path) -> tuple[dict[str, int], set[str], str | None]:
+    """Parse harvested counts, done repos, and active harvest from CORPUS_STATUS.md."""
+    if not status_md.is_file():
+        return {}, set(), None
+    harvested: dict[str, int] = {}
+    done: set[str] = set()
+    harvesting: str | None = None
+    # | `repo` | tier | status | github | harvested | coverage | notes |
+    row_re = re.compile(
+        r"^\|\s*`([^`]+)`\s*\|\s*([^|]+)\|\s*([^|]+)\|\s*([^|]+)\|\s*(\d+)\s*\|"
+    )
+    for line in status_md.read_text(encoding="utf-8", errors="replace").splitlines():
+        m = row_re.match(line.strip())
+        if not m:
+            continue
+        repo = m.group(1).strip()
+        status = m.group(3).strip().lower()
+        n = int(m.group(5))
+        if n > 0:
+            harvested[repo] = n
+        if status == "done":
+            done.add(repo)
+        elif status == "harvesting":
+            harvesting = repo
+    return harvested, done, harvesting
+
+
+def parse_prior_status_harvested(status_md: Path) -> dict[str, int]:
+    """Parse harvested counts from an existing CORPUS_STATUS.md table."""
+    harvested, _done, _harvesting = parse_prior_status_table(status_md)
+    return harvested
 
 
 def decide_status(
@@ -443,6 +477,19 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Re-fetch Search total_count even when JSON already has a value",
     )
+    p.add_argument(
+        "--fetch-limit",
+        type=int,
+        default=0,
+        help="Max Search fetches this run (0 = no limit). Useful for ~1000-repo lists.",
+    )
+    p.add_argument(
+        "--merge-prior-status",
+        type=Path,
+        default=None,
+        help="If set (or when DB missing), merge harvested counts from a prior "
+        "CORPUS_STATUS.md (default: --out path when DB has no rows)",
+    )
     p.add_argument("--sleep", type=float, default=SEARCH_SLEEP_SECONDS)
     p.add_argument("--token-file", type=Path, default=DEFAULT_TOKEN_FILE)
     p.add_argument("--dry-run", action="store_true", help="Print markdown; do not write files")
@@ -473,6 +520,29 @@ def main(argv: list[str] | None = None) -> int:
     data = json.loads(corpus_path.read_text(encoding="utf-8"))
     harvested = load_harvested_counts(db_path)
     finished_ok, _failed, harvesting = parse_harvest_log(log_path)
+    prior_path = args.merge_prior_status
+    if prior_path is None and (not harvested or not finished_ok):
+        # Prefer filling gaps from the last STATUS when DB/log unavailable locally.
+        prior_path = out_path
+    if prior_path is not None:
+        try:
+            prior_resolved = resolve_allowed_path(prior_path, purpose="--merge-prior-status")
+        except PathEscapeError:
+            prior_resolved = Path(prior_path).expanduser()
+        prior_h, prior_done, prior_harvesting = parse_prior_status_table(prior_resolved)
+        for repo, n in prior_h.items():
+            if repo not in harvested:
+                harvested[repo] = n
+        finished_ok |= prior_done
+        if harvesting is None and prior_harvesting:
+            harvesting = prior_harvesting
+        if prior_h or prior_done:
+            print(
+                f"merged prior status {prior_resolved}: "
+                f"harvested={len(prior_h)} done={len(prior_done)} "
+                f"harvesting={prior_harvesting or '-'}",
+                file=sys.stderr,
+            )
 
     fetched = 0
     corpus_changed = False
@@ -486,6 +556,12 @@ def main(argv: list[str] | None = None) -> int:
         else:
             targets = iter_corpus_repos(data)
             for i, (repo, _tier, entry) in enumerate(targets, start=1):
+                if args.fetch_limit and fetched >= args.fetch_limit:
+                    print(
+                        f"fetch-limit {args.fetch_limit} reached; remaining left TBD",
+                        file=sys.stderr,
+                    )
+                    break
                 existing = entry.get("pre_2021_merged_prs")
                 if (
                     not args.refetch_github
@@ -501,7 +577,7 @@ def main(argv: list[str] | None = None) -> int:
                     short = msg.split(":", 1)[0][:80]
                     print(f"  FAILED {repo}: {msg}", file=sys.stderr)
                     # Leave count as TBD; stash a short note for STATUS.md.
-                    for key in ("status", "tier_a", "tier_b", "tier_c"):
+                    for key in ("status", "tier_a", "tier_b", "tier_c", "tier_d"):
                         for entry in data.get(key, []):
                             if entry.get("repo") == repo:
                                 note = str(entry.get("notes") or "").strip()
@@ -519,6 +595,41 @@ def main(argv: list[str] | None = None) -> int:
                 time.sleep(args.sleep)
 
     rows = build_rows(data, harvested, finished_ok, harvesting)
+    # Persist harvest_status onto corpus entries so the next dgx_corpus_harvest
+    # launch skips finished work without relying on a baked-in queue.
+    for r in rows:
+        for key in ("status", "tier_a", "tier_b", "tier_c", "tier_d"):
+            for entry in data.get(key, []):
+                if entry.get("repo") != r.repo:
+                    continue
+                if key == "status":
+                    # Keep kickoff done_frozen / done_harvested labels.
+                    if entry.get("status") in {"done_frozen", "done_harvested"}:
+                        break
+                    if r.status == "done" and entry.get("status") not in {
+                        "done_frozen",
+                        "done_harvested",
+                    }:
+                        entry["status"] = "done"
+                        corpus_changed = True
+                else:
+                    prev = entry.get("harvest_status")
+                    if r.status == "done" and prev != "done":
+                        entry["harvest_status"] = "done"
+                        corpus_changed = True
+                    elif r.status == "harvesting" and prev != "harvesting":
+                        entry["harvest_status"] = "harvesting"
+                        corpus_changed = True
+                    elif r.status == "queued" and prev not in {None, "queued"}:
+                        # Don't downgrade done → queued on partial refresh.
+                        if prev != "done":
+                            entry["harvest_status"] = "queued"
+                            corpus_changed = True
+                    elif r.status == "queued" and prev is None:
+                        entry["harvest_status"] = "queued"
+                        corpus_changed = True
+                break
+
     generated_at = _utc_now()
     md = render_markdown(
         rows,

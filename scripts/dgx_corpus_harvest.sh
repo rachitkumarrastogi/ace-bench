@@ -1,18 +1,27 @@
 #!/usr/bin/env bash
-# Full curated corpus harvest (Tier A → B → C) into the same ACE_DB_PATH.
+# Full curated corpus harvest (Tier A → B → C → D) into the same ACE_DB_PATH.
 # Sequential only: one repo at a time. Continues on per-repo failure.
 #
 # Reads owner/name list from data/corpus_repos.json (prefer) unless REPOS= is set.
-# Skips status done_frozen / in_harvest / done, plus SKIP_REPOS (defaults to the
-# five already-ingested kickoff repos).
+# Skips status done_frozen / in_harvest / done / done_harvested, plus SKIP_REPOS
+# (defaults to the five already-ingested kickoff repos). Also skips entries with
+# harvest_status in {done, done_harvested, done_frozen, skipped}.
+#
+# Queue order: tier_a → tier_b → tier_c → tier_d (master list ~1000; first wave
+# was A–C ~110). A live run that baked in the old ~105 list is left alone —
+# relaunch this script after it finishes to pick up Tier D backlog.
+#
+# Optional env:
+#   CORPUS_LIMIT=N     — stop after N queued repos (useful for staged waves)
+#   CORPUS_TIERS=a,b,c — limit which tiers to include (default: a,b,c,d)
+#   QUEUE_FILE_IN=path — use a prebuilt list (e.g. data/corpus_tier_d_queue.txt)
+#   REFRESH_STATUS=1   — refresh docs/CORPUS_STATUS.md after each repo (DB-only)
 #
 # Rate limits (authenticated): Search ≈30/min (harvest floors page gaps at 2.0s);
 # core REST ≈5k/hr (default SLEEP 1.0s between PR fetches).
 #
-# Optional: REFRESH_STATUS=1 refreshes docs/CORPUS_STATUS.md after each repo
-# (DB-only; no --fetch-github). Cron: ./scripts/dgx_refresh_status.sh
-#
-# Expect days of wall time for ~100 repos / large Tier C volumes — intentional.
+# Cron status: ./scripts/dgx_refresh_status.sh
+# Expect days–weeks of wall time for the full master list — intentional.
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -37,6 +46,12 @@ DEFAULT_SKIP="django/django pallets/flask expressjs/express spf13/cobra clap-rs/
 SKIP_REPOS="${SKIP_REPOS:-$DEFAULT_SKIP}"
 # DB-only CORPUS_STATUS refresh after each repo (0=off, 1=on).
 REFRESH_STATUS="${REFRESH_STATUS:-0}"
+# Optional: max repos from the built queue (empty = no limit).
+CORPUS_LIMIT="${CORPUS_LIMIT:-}"
+# Comma-separated tier letters: a,b,c,d (default all).
+CORPUS_TIERS="${CORPUS_TIERS:-a,b,c,d}"
+# Optional prebuilt queue file (one owner/name per line).
+QUEUE_FILE_IN="${QUEUE_FILE_IN:-}"
 
 mkdir -p "$(dirname "$ACE_DB_PATH")" "$(dirname "$LOG")"
 
@@ -48,30 +63,77 @@ build_queue() {
     printf '%s\n' $REPOS
     return 0
   fi
+  if [[ -n "$QUEUE_FILE_IN" ]]; then
+    if [[ ! -f "$QUEUE_FILE_IN" ]]; then
+      echo "error: QUEUE_FILE_IN not found: $QUEUE_FILE_IN" >&2
+      return 1
+    fi
+    # Strip comments/blank lines; apply SKIP_REPOS only.
+    SKIP_REPOS="$SKIP_REPOS" QUEUE_FILE_IN="$QUEUE_FILE_IN" CORPUS_LIMIT="$CORPUS_LIMIT" "$PYTHON" - <<'PY'
+import os
+from pathlib import Path
+skip = {r for r in os.environ.get("SKIP_REPOS", "").split() if r}
+limit = os.environ.get("CORPUS_LIMIT") or ""
+limit_n = int(limit) if limit.strip().isdigit() else None
+n = 0
+for line in Path(os.environ["QUEUE_FILE_IN"]).read_text().splitlines():
+    line = line.strip()
+    if not line or line.startswith("#"):
+        continue
+    if line in skip:
+        continue
+    print(line)
+    n += 1
+    if limit_n is not None and n >= limit_n:
+        break
+PY
+    return 0
+  fi
   if [[ ! -f "$CORPUS_JSON" ]]; then
     echo "error: corpus JSON not found: $CORPUS_JSON" >&2
     return 1
   fi
-  SKIP_REPOS="$SKIP_REPOS" CORPUS_JSON="$CORPUS_JSON" "$PYTHON" - <<'PY'
+  SKIP_REPOS="$SKIP_REPOS" CORPUS_JSON="$CORPUS_JSON" CORPUS_LIMIT="$CORPUS_LIMIT" CORPUS_TIERS="$CORPUS_TIERS" "$PYTHON" - <<'PY'
 import json, os
 from pathlib import Path
 
 path = Path(os.environ["CORPUS_JSON"])
 skip = {r for r in os.environ.get("SKIP_REPOS", "").split() if r}
 data = json.loads(path.read_text())
+done_statuses = {"done_frozen", "in_harvest", "done", "done_harvested", "skipped"}
 status_skip = {
     e["repo"]
     for e in data.get("status", [])
-    if e.get("status") in {"done_frozen", "in_harvest", "done", "done_harvested"}
+    if e.get("status") in done_statuses
 }
 skip |= status_skip
+tier_map = {
+    "a": "tier_a",
+    "b": "tier_b",
+    "c": "tier_c",
+    "d": "tier_d",
+}
+wanted = []
+for part in os.environ.get("CORPUS_TIERS", "a,b,c,d").split(","):
+    part = part.strip().lower()
+    if part in tier_map:
+        wanted.append(tier_map[part])
+limit = os.environ.get("CORPUS_LIMIT") or ""
+limit_n = int(limit) if limit.strip().isdigit() else None
 queued = []
-for tier in ("tier_a", "tier_b", "tier_c"):
+for tier in wanted:
     for entry in data.get(tier, []):
         repo = entry.get("repo")
         if not repo or repo in skip:
             continue
+        hs = str(entry.get("harvest_status") or entry.get("status") or "").lower()
+        if hs in done_statuses:
+            continue
         queued.append(repo)
+        if limit_n is not None and len(queued) >= limit_n:
+            break
+    if limit_n is not None and len(queued) >= limit_n:
+        break
 for repo in queued:
     print(repo)
 PY
@@ -93,6 +155,9 @@ fi
 echo "== ACE-Bench CORPUS windowed harvest =="
 echo "db:            $ACE_DB_PATH"
 echo "corpus:        $CORPUS_JSON"
+echo "queue_file_in: ${QUEUE_FILE_IN:-—}"
+echo "tiers:         $CORPUS_TIERS"
+echo "corpus_limit:  ${CORPUS_LIMIT:-none}"
 echo "queued:        $QUEUE_COUNT"
 echo "skip:          $SKIP_REPOS"
 echo "merged_after:  $MERGED_AFTER"
@@ -112,6 +177,9 @@ ace_load_github_token
 {
   echo "==== corpus harvest start $(date -u +%Y-%m-%dT%H:%M:%SZ) ===="
   echo "queued: $QUEUE_COUNT"
+  echo "tiers: $CORPUS_TIERS"
+  echo "corpus_limit: ${CORPUS_LIMIT:-none}"
+  echo "queue_file_in: ${QUEUE_FILE_IN:-—}"
   echo "skip: $SKIP_REPOS"
   echo "sleep: ${SLEEP:-$DEFAULT_SLEEP}"
   echo "db: $ACE_DB_PATH"

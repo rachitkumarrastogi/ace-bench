@@ -46,7 +46,7 @@ pip install -e .
 # harvest (pilot or full windowed Django baseline)
 python3 scripts/run_harvest.py --repos django/django --max-prs 100
 ./scripts/dgx_full_harvest.sh          # monthly windows 2012→2021
-./scripts/dgx_corpus_harvest.sh        # curated Tier A→C (sequential)
+./scripts/dgx_corpus_harvest.sh        # curated Tier A→D master list (sequential; first wave A–C)
 
 # eval v0 — export instances + score an agent patch vs human
 export ACE_DB_PATH=$HOME/ace-bench/data/frozen/ace_patterns_django_pre2021_6125.sqlite
@@ -78,7 +78,7 @@ DB: `ACE_DB_PATH` or `./data/ace_patterns.sqlite`. Frozen copies under `data/fro
 | [docs/SECURITY.md](docs/SECURITY.md) | Threat model, hardening findings, residual risks |
 | [AGENTS.md](AGENTS.md) | Commit identity for agents |
 
-Machine source of truth for the ~100-repo list: [`data/corpus_repos.json`](data/corpus_repos.json).
+Machine source of truth for the **~1000-repo** master list: [`data/corpus_repos.json`](data/corpus_repos.json) (first harvest wave was Tier A–C ~110; Tier D is backlog).
 
 Helpers: `scripts/check_db_size.py`, `scripts/dgx_refresh_status.sh`, `REFRESH_STATUS=1 ./scripts/dgx_corpus_harvest.sh`.
 
@@ -89,7 +89,7 @@ Helpers: `scripts/check_db_size.py`, `scripts/dgx_refresh_status.sh`, `REFRESH_S
 | Item | State |
 |------|--------|
 | Django harvest | **6125** rows frozen |
-| Kickoff multi-repo | Flask / Express / Cobra / Clap done; Tier A+ via corpus script |
+| Kickoff multi-repo | Flask / Express / Cobra / Clap done; master list ~1000 (A–C wave in progress; D backlog) |
 | Eval v0 CLI | Live — [docs/EVAL.md](docs/EVAL.md) |
 | Docker sandbox | Next |
 

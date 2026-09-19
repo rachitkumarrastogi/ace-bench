@@ -17,7 +17,7 @@ Use range qualifier `merged:YYYY-MM-DD..YYYY-MM-DD` (inclusive). Do **not** comb
 | Pilot (capped) | `scripts/dgx_harvest.sh` | `--max-prs 200` (no windows) |
 | Full baseline | `scripts/dgx_full_harvest.sh` | monthly `2012-01-01` → `2021-01-01` (default: django) |
 | Multi-repo kickoff | `scripts/dgx_multi_harvest.sh` | Flask / Express / Cobra / Clap |
-| Full curated corpus | `scripts/dgx_corpus_harvest.sh` | Tier A→C from `data/corpus_repos.json` |
+| Full curated corpus | `scripts/dgx_corpus_harvest.sh` | Tier A→D from `data/corpus_repos.json` (~1000 master; first wave A–C) |
 
 ```bash
 python3 scripts/run_harvest.py \
@@ -114,18 +114,26 @@ Re-attach: `tmux attach -t ace-harvest`. Harvest is **idempotent** on `(repo, pr
 ./scripts/dgx_multi_harvest.sh
 # log: data/multi_harvest.log
 
-# remaining Tier A→C (skips done_frozen / done / in_harvest + kickoff five)
+# Tier A→B→C→D from master list (skips done_frozen / done / in_harvest + kickoff five).
+# Live ace-harvest jobs that baked in the old ~105 list are left alone — relaunch
+# after they finish to pick up Tier D (~890 backlog).
 ./scripts/dgx_corpus_harvest.sh
 # optional: refresh docs/CORPUS_STATUS.md after each repo (DB-only, no Search)
 REFRESH_STATUS=1 ./scripts/dgx_corpus_harvest.sh
+# staged waves / Tier D only:
+CORPUS_LIMIT=50 ./scripts/dgx_corpus_harvest.sh
+CORPUS_TIERS=d ./scripts/dgx_corpus_harvest.sh
+QUEUE_FILE_IN=data/corpus_tier_d_queue.txt ./scripts/dgx_corpus_harvest.sh
 # log: $HOME/ace-bench/data/corpus_harvest.log (override CORPUS_HARVEST_LOG)
 
 # cron-friendly status refresh (DB-only; FETCH_GITHUB=1 to hit Search)
 ./scripts/dgx_refresh_status.sh
+# partial Search fills for the ~1000 list:
+python3 scripts/refresh_corpus_status.py --fetch-github --fetch-limit 50
 ```
 
 Override repos: `REPOS="psf/requests encode/httpx" ./scripts/dgx_corpus_harvest.sh`.  
-Do **not** parallelize repos. Kill only idle `ace-harvest` sessions — do not touch unrelated tmux sessions.
+Do **not** parallelize repos. Kill only idle `ace-harvest` sessions — do not touch unrelated tmux sessions. **Do not stop** a running corpus harvest to load Tier D; wait for finish or start a follow-on with `QUEUE_FILE_IN` / `CORPUS_TIERS=d`.
 
 ### Defaults / rate limits
 

@@ -1,9 +1,23 @@
 # Corpus — curated repos, freeze, human baseline
 
-Machine-readable list: [`data/corpus_repos.json`](../data/corpus_repos.json) (~110 rows: 5 kickoff + Tier A/B/C).  
-Living coverage: [CORPUS_STATUS.md](CORPUS_STATUS.md) (`python3 scripts/refresh_corpus_status.py --fetch-github`).
+Machine-readable master list: [`data/corpus_repos.json`](../data/corpus_repos.json) (**~1000** repos: 5 kickoff + Tier A/B/C + Tier D backlog).  
+Living coverage: [CORPUS_STATUS.md](CORPUS_STATUS.md) (`python3 scripts/refresh_corpus_status.py [--fetch-github]`).
 
 Default cutoff for all harvests: `merged:<2021-01-01` (windowed monthly/quarterly as needed).
+
+---
+
+## Master list vs harvest waves
+
+| Layer | Count | Role |
+|-------|------:|------|
+| Kickoff / status | 5 | Frozen Django + four mid-size libs (**done**) |
+| Tier A | 15 | Mid-size, high signal |
+| Tier B | 40 | Larger / more languages |
+| Tier C | 50 | Heavyweights; stricter filters later |
+| **Tier D** | **~890** | Ongoing backlog — `harvest_status: queued`; **do not** interrupt the live A–C run |
+
+Harvest remains **one repo at a time**. First wave was A–C (~110). Relaunch `./scripts/dgx_corpus_harvest.sh` after the current job finishes to continue into Tier D (script reads all non-done tiers **A→B→C→D**). Optional: `CORPUS_LIMIT=N`, `CORPUS_TIERS=d`, or `QUEUE_FILE_IN=data/corpus_tier_d_queue.txt`.
 
 ---
 
@@ -17,34 +31,25 @@ Default cutoff for all harvests: `merged:<2021-01-01` (windowed monthly/quarterl
 | `spf13/cobra` | DONE | Go | 343 |
 | `clap-rs/clap` | DONE | Rust | 967 |
 
-Remaining Tier A → B → C: `./scripts/dgx_corpus_harvest.sh` on DGX (one repo at a time; see [OPS.md](OPS.md)).
+Remaining Tier A → B → C → D: `./scripts/dgx_corpus_harvest.sh` on DGX (one repo at a time; see [OPS.md](OPS.md)).
 
 ---
 
 ## Curation principles
 
 - Clear GitHub PR history before 2021; issue-linked merges; eventual testability.
-- Diversify languages (Python, JS/TS, Go, Rust, Java, C/C++, Ruby, …).
-- Skip mailing-list-primary workflows as **primary** targets (kernel, many GNU projects).
-- Heavyweights (React, VS Code, …) stay in **Tier C** with stricter filters later.
+- Diversify languages (Python, JS/TS, Go, Rust, Java, C/C++, Ruby, Kotlin, Swift, C#, PHP, Scala, Elixir, …).
+- Prefer foundations / mid-tier libraries with real PR culture (CNCF-ish, Apache, Mozilla, Google/Microsoft OSS, HashiCorp, Elastic mid-tier, …).
+- Skip mailing-list-primary workflows as **primary** targets (kernel, many GNU projects), mirrors, `awesome-*`, content farms.
+- Heavyweights (React, VS Code, …) stay in **Tier C** with stricter filters later; Tier D adds more mid-size.
 - **Never** parallelize repos — shared Search + REST rate budget.
 
 ### Harvest order
 
 1. Kickoff batch — **done**.
-2. Tier A → B → C via `scripts/dgx_corpus_harvest.sh` (continue-on-failure).
-3. Tier C: full windowed harvest first is intentional; apply bot/issue/size filters later.
-
-### Tiers (summary — full list in JSON)
-
-| Tier | Count | Role |
-|------|-------|------|
-| Kickoff / status | 5 | Frozen Django + four mid-size libs |
-| A | 15 | Mid-size, high signal, parse-friendly (next) |
-| B | 40 | Larger / more languages |
-| C | 50 | Heavyweights; stricter filters later |
-
-Language mix (primary `lang` in JSON): Go 22, Python 20, JavaScript 14, Rust 11, C++ 10, TypeScript 8, Java 8, Ruby 5, … (total **110**).
+2. Tier A → B → C via `scripts/dgx_corpus_harvest.sh` (continue-on-failure) — **first wave / in progress**.
+3. Tier D backlog — after A–C finishes (or `CORPUS_TIERS=d` / queue file on next launch).
+4. Tier C filters: full windowed harvest first is intentional; apply bot/issue/size filters later.
 
 ### Exclusions (primary harvest)
 
