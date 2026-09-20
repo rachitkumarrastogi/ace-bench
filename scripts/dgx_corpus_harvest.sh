@@ -210,7 +210,10 @@ while IFS= read -r repo; do
     echo "FAILED_repo: $(date -u +%Y-%m-%dT%H:%M:%SZ) $repo rc=$rc (continuing)" | tee -a "$LOG"
   fi
   "$PYTHON" scripts/run_harvest.py --db "$ACE_DB_PATH" --summary-only 2>&1 | tee -a "$LOG" || true
+  # Exit 2 = over ~1 GiB; still log. Rotate only between repos (no writers).
   "$PYTHON" scripts/check_db_size.py --db "$ACE_DB_PATH" --ok-missing 2>&1 | tee -a "$LOG" || true
+  echo "shard_rotate_check: $(date -u +%Y-%m-%dT%H:%M:%SZ) after $repo" | tee -a "$LOG"
+  "$PYTHON" scripts/rotate_shard_if_needed.py --db "$ACE_DB_PATH" 2>&1 | tee -a "$LOG" || true
   if [[ "$REFRESH_STATUS" == "1" || "$REFRESH_STATUS" == "true" ]]; then
     echo "refresh_status: $(date -u +%Y-%m-%dT%H:%M:%SZ) (DB-only)" | tee -a "$LOG"
     "$PYTHON" scripts/refresh_corpus_status.py --db "$ACE_DB_PATH" 2>&1 | tee -a "$LOG" || true

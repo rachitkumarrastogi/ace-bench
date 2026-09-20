@@ -25,6 +25,9 @@ def default_allowed_roots() -> list[Path]:
     roots: list[Path] = [Path.cwd().resolve()]
     home_ace = (Path.home() / "ace-bench").resolve()
     roots.append(home_ace)
+    # Mac / laptop mirror outside the git checkout (see docs/OPS.md).
+    home_ace_data = (Path.home() / "ace-bench-data").resolve()
+    roots.append(home_ace_data)
     tmp = Path("/tmp")
     if tmp.exists():
         roots.append(tmp.resolve())

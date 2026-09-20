@@ -74,16 +74,54 @@ Security notes: [SECURITY.md](SECURITY.md).
 | Env | `ACE_DB_PATH` |
 | Fallback | `./data/ace_patterns.sqlite` |
 
-Prefer local disk on DGX (not NFS if possible). `data/*.sqlite` is gitignored.
+Prefer local disk on DGX (not NFS if possible). `data/*.sqlite` is gitignored — **never commit** SQLite files.
 
-Soft size guardrail (~1 GiB):
+### Soft size guardrail + automatic sharding (~1 GiB)
+
+When the live DB reaches **1 GiB** (`1073741824` bytes):
+
+1. Harvest stops writing to the current file **between repos**.
+2. `scripts/rotate_shard_if_needed.py` renames it to `data/shards/ace_patterns_shard_NNN.sqlite`.
+3. A fresh empty `ace_patterns.sqlite` is created (same path / `ACE_DB_PATH`) for continued inserts.
+4. `data/shards_manifest.json` records path, approx rows, size, `created_at`, and repos covered.
 
 ```bash
-python3 scripts/check_db_size.py --db "$ACE_DB_PATH"
+python3 scripts/check_db_size.py --db "$ACE_DB_PATH"          # exit 2 if over limit
+python3 scripts/rotate_shard_if_needed.py --db "$ACE_DB_PATH"  # no-op under limit
+# dry-run / force:
+python3 scripts/rotate_shard_if_needed.py --db "$ACE_DB_PATH" --dry-run
+python3 scripts/rotate_shard_if_needed.py --db "$ACE_DB_PATH" --force --dry-run
 ```
 
-When over threshold: freeze a snapshot under `data/frozen/`, point a new `ACE_DB_PATH` at a fresh file — no automatic sharding yet.
+`dgx_corpus_harvest.sh` calls rotate after each repo. If a long-running harvest started **before** that hook existed, run a side watcher (does not stop harvest):
 
+```bash
+tmux new -s ace-shard-watch './scripts/dgx_shard_watch.sh'
+# polls every 5m; on ≥1 GiB waits for finished_repo + idle harvest python, then rotates
+```
+
+### Mac / laptop mirror (outside git)
+
+Prefer storing shard copies **outside** the repo:
+
+| Role | Path |
+|------|------|
+| Mac shards + snapshots | `~/ace-bench-data/shards/` |
+| DGX live + shards | `$HOME/ace-bench/data/ace_patterns.sqlite` + `…/shards/` |
+| Manifest (DGX) | `$HOME/ace-bench/data/shards_manifest.json` |
+
+Consistent snapshot while harvest runs (preferred over raw `scp` of a live file):
+
+```bash
+# on DGX
+sqlite3 "$ACE_DB_PATH" ".backup '/tmp/ace_patterns_backup.sqlite'"
+# on Mac
+mkdir -p ~/ace-bench-data/shards
+scp LocalModelRunner:/tmp/ace_patterns_backup.sqlite \
+  ~/ace-bench-data/shards/ace_patterns_live_snapshot_YYYYMMDD.sqlite
+```
+
+See the README in `~/ace-bench-data/shards/` on the Mac. `refresh_corpus_status.py` sums rows across live DB + completed shards.
 ---
 
 ## Smoke (laptop)

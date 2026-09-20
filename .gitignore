@@ -46,5 +46,10 @@ data/**/*.sqlite
 data/**/*.sqlite-*
 data/frozen/*.sqlite
 data/frozen/*.sqlite-*
+data/shards/
+data/shards_manifest.json
 data/eval/
 !.gitkeep
+
+# Local Mac mirror of harvest DBs (outside-repo path may also be used)
+ace-bench-data/

@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
-"""Warn when the ACE SQLite DB grows past a soft size threshold (~1 GiB).
-
-Does not rotate or shard — operators should freeze snapshots and start a new
-DB when approaching the limit (see docs/OPS.md).
+"""Report ACE SQLite DB size vs the soft ~1 GiB sharding threshold.
 
 Exit codes:
   0 — under threshold (or missing DB with --ok-missing)
-  1 — at/over threshold (still prints JSON; useful for cron/alerts)
-  2 — usage / path errors
+  1 — usage / path errors
+  2 — at/over threshold (rotate via scripts/rotate_shard_if_needed.py)
 """
 
 from __future__ import annotations
@@ -22,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from ace_bench.paths import PathEscapeError, resolve_allowed_path
 
-# Soft guardrail (~1 GiB). Not a hard SQLite limit.
+# Soft guardrail (~1 GiB). Triggers shard rotation between harvest repos.
 DEFAULT_WARN_BYTES = 1_073_741_824
 
 
@@ -53,7 +50,7 @@ def main(argv: list[str] | None = None) -> int:
         db_path = resolve_allowed_path(args.db, purpose="--db")
     except PathEscapeError as exc:
         print(f"error: {exc}", file=sys.stderr)
-        return 2
+        return 1
 
     if not db_path.is_file():
         payload = {"db": str(db_path), "exists": False, "size_bytes": 0}
@@ -61,7 +58,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.ok_missing:
             return 0
         print(f"error: DB not found: {db_path}", file=sys.stderr)
-        return 2
+        return 1
 
     size = db_path.stat().st_size
     over = size >= args.warn_bytes
@@ -77,11 +74,11 @@ def main(argv: list[str] | None = None) -> int:
     if over:
         print(
             f"warning: DB size {size} bytes exceeds soft threshold "
-            f"{args.warn_bytes} (~1 GiB). Consider freezing a snapshot and "
-            "starting a fresh ACE_DB_PATH (see docs/OPS.md).",
+            f"{args.warn_bytes} (~1 GiB). Rotate with "
+            "scripts/rotate_shard_if_needed.py between repos (see docs/OPS.md).",
             file=sys.stderr,
         )
-        return 1
+        return 2
     return 0
 
 

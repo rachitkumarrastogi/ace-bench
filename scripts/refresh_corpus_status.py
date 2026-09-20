@@ -86,9 +86,8 @@ def resolve_token(explicit: str | None, token_file: Path) -> str | None:
     return resolve_github_token(explicit=explicit, token_file=token_file)
 
 
-def load_harvested_counts(db_path: Path) -> dict[str, int]:
+def _counts_from_one_db(db_path: Path) -> dict[str, int]:
     if not db_path.is_file():
-        print(f"warning: DB not found at {db_path}; harvested counts = 0", file=sys.stderr)
         return {}
     conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
     try:
@@ -98,6 +97,59 @@ def load_harvested_counts(db_path: Path) -> dict[str, int]:
     finally:
         conn.close()
     return {str(repo): int(n) for repo, n in rows}
+
+
+def _merge_counts(into: dict[str, int], extra: dict[str, int]) -> None:
+    for repo, n in extra.items():
+        into[repo] = into.get(repo, 0) + n
+
+
+def discover_shard_dbs(live_db: Path, manifest_path: Path | None = None) -> list[Path]:
+    """Return completed shard SQLite paths (live DB excluded)."""
+    found: list[Path] = []
+    seen: set[Path] = set()
+    manifest = manifest_path or (live_db.parent / "shards_manifest.json")
+    if manifest.is_file():
+        try:
+            data = json.loads(manifest.read_text(encoding="utf-8"))
+            for entry in data.get("shards") or []:
+                raw = entry.get("path") if isinstance(entry, dict) else None
+                if not raw:
+                    continue
+                p = Path(str(raw)).expanduser()
+                if p.is_file() and p.resolve() not in seen:
+                    seen.add(p.resolve())
+                    found.append(p)
+        except (OSError, json.JSONDecodeError) as exc:
+            print(f"warning: could not read shard manifest {manifest}: {exc}", file=sys.stderr)
+    shards_dir = live_db.parent / "shards"
+    if shards_dir.is_dir():
+        for p in sorted(shards_dir.glob("ace_patterns_shard_*.sqlite")):
+            if p.is_file() and p.resolve() not in seen:
+                seen.add(p.resolve())
+                found.append(p)
+    return found
+
+
+def load_harvested_counts(db_path: Path) -> dict[str, int]:
+    """Sum per-repo counts across live DB + completed shards."""
+    out: dict[str, int] = {}
+    if not db_path.is_file():
+        print(f"warning: DB not found at {db_path}; harvested counts = 0", file=sys.stderr)
+    else:
+        _merge_counts(out, _counts_from_one_db(db_path))
+    shards = discover_shard_dbs(db_path)
+    for shard in shards:
+        try:
+            _merge_counts(out, _counts_from_one_db(shard))
+        except sqlite3.Error as exc:
+            print(f"warning: skip shard {shard}: {exc}", file=sys.stderr)
+    if shards:
+        print(
+            f"loaded harvested counts from live DB + {len(shards)} shard(s)",
+            file=sys.stderr,
+        )
+    return out
 
 
 def parse_harvest_log(log_path: Path) -> tuple[set[str], set[str], str | None]:
@@ -373,6 +425,7 @@ def render_markdown(
     log_path: Path,
     fetched: int,
     harvest_active: str | None,
+    shard_count: int = 0,
 ) -> str:
     total_harvested = sum(r.harvested for r in rows)
     repos_with_data = sum(1 for r in rows if r.harvested > 0)
@@ -382,6 +435,9 @@ def render_markdown(
     n_skipped = sum(1 for r in rows if r.status == "skipped")
     github_known = sum(1 for r in rows if r.github_pre2021 is not None)
     github_sum = sum(r.github_pre2021 or 0 for r in rows if r.github_pre2021 is not None)
+    db_label = str(db_path)
+    if shard_count:
+        db_label = f"{db_path} (+{shard_count} shard{'s' if shard_count != 1 else ''})"
 
     lines: list[str] = [
         "# ACE-Bench corpus status",
@@ -389,7 +445,8 @@ def render_markdown(
         f"_Generated: **{generated_at}** (UTC)_",
         "",
         "Per-repo GitHub Search `total_count` for "
-        f"`is:pr is:merged {CUTOFF_QUERY}` vs rows in `human_patterns`.",
+        f"`is:pr is:merged {CUTOFF_QUERY}` vs rows in `human_patterns` "
+        "(live DB + completed shards when present).",
         "",
         "## Summary",
         "",
@@ -404,7 +461,8 @@ def render_markdown(
         f"| GitHub counts known | {github_known} / {len(rows)} "
         f"(sum of known = {github_sum}) |",
         f"| Active harvest (log) | `{harvest_active or '—'}` |",
-        f"| DB | `{db_path}` |",
+        f"| DB | `{db_label}` |",
+        f"| Completed shards | {shard_count} |",
         f"| Corpus JSON | `{corpus_path}` |",
         f"| Harvest log | `{log_path}` |",
         f"| GitHub Search fetches this run | {fetched} |",
@@ -631,6 +689,7 @@ def main(argv: list[str] | None = None) -> int:
                 break
 
     generated_at = _utc_now()
+    shard_count = len(discover_shard_dbs(db_path))
     md = render_markdown(
         rows,
         generated_at=generated_at,
@@ -639,6 +698,7 @@ def main(argv: list[str] | None = None) -> int:
         log_path=log_path,
         fetched=fetched,
         harvest_active=harvesting,
+        shard_count=shard_count,
     )
     md = append_exclusions(md, data)
 
