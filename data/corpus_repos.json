@@ -353,7 +353,7 @@
       "prs_verified": true,
       "why": "Formatter",
       "notes": "Snapshot/fixture heavy",
-      "harvest_status": "harvesting"
+      "harvest_status": "done"
     },
     {
       "repo": "mochajs/mocha",
@@ -364,7 +364,7 @@
       "prs_verified": true,
       "why": "Classic test runner",
       "notes": "Mid-size",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "jquery/jquery",
@@ -375,7 +375,7 @@
       "prs_verified": true,
       "why": "Long history, pre-AI era",
       "notes": "Legacy + docs",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "webpack/webpack",
@@ -386,7 +386,7 @@
       "prs_verified": true,
       "why": "Bundler",
       "notes": "Complex; upper-B",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "babel/babel",
@@ -397,7 +397,7 @@
       "prs_verified": true,
       "why": "Compiler monorepo",
       "notes": "Monorepo — stricter filters",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "nestjs/nest",
@@ -408,7 +408,7 @@
       "prs_verified": true,
       "why": "Node framework",
       "notes": "TS coverage",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "remix-run/react-router",
@@ -419,7 +419,7 @@
       "prs_verified": true,
       "why": "Routing",
       "notes": "Was ReactTraining/react-router",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "go-chi/chi",
@@ -430,7 +430,7 @@
       "prs_verified": true,
       "why": "Lightweight router",
       "notes": "Complements Gin",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "gorilla/mux",
@@ -441,7 +441,7 @@
       "prs_verified": true,
       "why": "Classic router",
       "notes": "Maintenance-mode era still useful",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "spf13/viper",
@@ -452,7 +452,7 @@
       "prs_verified": true,
       "why": "Config (Cobra sibling)",
       "notes": "After Cobra harvest",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "urfave/cli",
@@ -463,7 +463,7 @@
       "prs_verified": true,
       "why": "Alternate CLI",
       "notes": "Diversity vs Cobra",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "go-gorm/gorm",
@@ -474,7 +474,7 @@
       "prs_verified": true,
       "why": "ORM",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "etcd-io/etcd",
@@ -485,7 +485,7 @@
       "prs_verified": true,
       "why": "Distributed KV",
       "notes": "Large; near Tier C",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "tokio-rs/tokio",
@@ -496,7 +496,7 @@
       "prs_verified": true,
       "why": "Async runtime",
       "notes": "Multi-crate workspace",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "hyperium/hyper",
@@ -507,7 +507,7 @@
       "prs_verified": true,
       "why": "HTTP",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "actix/actix-web",
@@ -518,7 +518,7 @@
       "prs_verified": true,
       "why": "Web framework",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "diesel-rs/diesel",
@@ -529,7 +529,7 @@
       "prs_verified": true,
       "why": "ORM",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "rust-lang/mdBook",
@@ -540,7 +540,7 @@
       "prs_verified": true,
       "why": "Docs tool",
       "notes": "Smaller Rust target",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "rust-lang/rust-clippy",
@@ -551,7 +551,7 @@
       "prs_verified": true,
       "why": "Lints",
       "notes": "Many small lint PRs",
-      "harvest_status": "queued"
+      "harvest_status": "harvesting"
     },
     {
       "repo": "square/retrofit",

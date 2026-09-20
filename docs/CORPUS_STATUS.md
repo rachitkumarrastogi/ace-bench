@@ -1,6 +1,6 @@
 # ACE-Bench corpus status
 
-_Generated: **2026-09-19T13:25:46Z** (UTC)_
+_Generated: **2026-09-20T04:43:47Z** (UTC)_
 
 Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs rows in `human_patterns`.
 
@@ -8,14 +8,14 @@ Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs
 
 | Metric | Value |
 |--------|-------|
-| Total harvested rows | **34813** |
-| Repos with data | **26** / 1000 |
-| Status: done | 25 |
+| Total harvested rows | **61903** |
+| Repos with data | **44** / 1000 |
+| Status: done | 43 |
 | Status: harvesting | 1 |
-| Status: queued / pending | 974 |
+| Status: queued / pending | 956 |
 | Status: skipped | 0 |
 | GitHub counts known | 144 / 1000 (sum of known = 573681) |
-| Active harvest (log) | `prettier/prettier` |
+| Active harvest (log) | `rust-lang/rust-clippy` |
 | DB | `/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite` |
 | Corpus JSON | `/home/arnavrastogi/ace-bench/data/corpus_repos.json` |
 | Harvest log | `/home/arnavrastogi/ace-bench/data/corpus_harvest.log` |
@@ -34,11 +34,11 @@ python3 scripts/refresh_corpus_status.py --fetch-github
 
 | repo | tier | status | github_pre2021 | harvested | coverage % | notes |
 |------|------|--------|----------------|-----------|------------|-------|
-| `django/django` | kickoff | done | 6125 | 6125 | 100.0% | See docs/CORPUS.md (frozen Django); finished_repo in harvest log |
-| `pallets/flask` | kickoff | done | 1054 | 1054 | 100.0% | Harvested into live ace_patterns.sqlite; skip re-queue; finished_repo in harvest log |
-| `expressjs/express` | kickoff | done | 196 | 196 | 100.0% | Harvested into live ace_patterns.sqlite; skip re-queue; finished_repo in harvest log |
-| `spf13/cobra` | kickoff | done | 343 | 343 | 100.0% | Harvested into live ace_patterns.sqlite; skip re-queue; finished_repo in harvest log |
-| `clap-rs/clap` | kickoff | done | 967 | 967 | 100.0% | Harvested into live ace_patterns.sqlite; skip re-queue; finished_repo in harvest log |
+| `django/django` | kickoff | done | 6125 | 6125 | 100.0% | See docs/CORPUS.md (frozen Django); coverage ≥95% of GitHub Search |
+| `pallets/flask` | kickoff | done | 1054 | 1054 | 100.0% | Harvested into live ace_patterns.sqlite; skip re-queue; coverage ≥95% of GitHub Search |
+| `expressjs/express` | kickoff | done | 196 | 196 | 100.0% | Harvested into live ace_patterns.sqlite; skip re-queue; coverage ≥95% of GitHub Search |
+| `spf13/cobra` | kickoff | done | 343 | 343 | 100.0% | Harvested into live ace_patterns.sqlite; skip re-queue; coverage ≥95% of GitHub Search |
+| `clap-rs/clap` | kickoff | done | 967 | 967 | 100.0% | Harvested into live ace_patterns.sqlite; skip re-queue; coverage ≥95% of GitHub Search |
 | `psf/requests` | A | done | 1349 | 1247 | 92.4% | Best first post-batch target; finished_repo in harvest log |
 | `encode/httpx` | A | done | 688 | 688 | 100.0% | Complements Requests; finished_repo in harvest log |
 | `pydantic/pydantic` | A | done | 707 | 707 | 100.0% | v1-era pre-2021 useful; finished_repo in harvest log |
@@ -63,25 +63,25 @@ python3 scripts/refresh_corpus_status.py --fetch-github
 | `HypothesisWorks/hypothesis` | B | done | 1412 | 1412 | 100.0% | Niche but clean; finished_repo in harvest log |
 | `psf/black` | B | done | 462 | 462 | 100.0% | Style-only PRs — filter carefully; finished_repo in harvest log |
 | `eslint/eslint` | B | done | 4609 | 4609 | 100.0% | Rule churn; path filters help; finished_repo in harvest log |
-| `prettier/prettier` | B | harvesting | 4375 | 4017 | 91.8% | Snapshot/fixture heavy; active in corpus_harvest.log |
-| `mochajs/mocha` | B | queued | 1051 | 0 | 0.0% | Mid-size |
-| `jquery/jquery` | B | queued | 496 | 0 | 0.0% | Legacy + docs |
-| `webpack/webpack` | B | queued | 3320 | 0 | 0.0% | Complex; upper-B |
-| `babel/babel` | B | queued | 3798 | 0 | 0.0% | Monorepo — stricter filters |
-| `nestjs/nest` | B | queued | 2339 | 0 | 0.0% | TS coverage |
-| `remix-run/react-router` | B | queued | 1179 | 0 | 0.0% | Was ReactTraining/react-router |
-| `go-chi/chi` | B | queued | 153 | 0 | 0.0% | Complements Gin |
-| `gorilla/mux` | B | queued | 162 | 0 | 0.0% | Maintenance-mode era still useful |
-| `spf13/viper` | B | queued | 151 | 0 | 0.0% | After Cobra harvest |
-| `urfave/cli` | B | queued | 481 | 0 | 0.0% | Diversity vs Cobra |
-| `go-gorm/gorm` | B | queued | 365 | 0 | 0.0% |  |
-| `etcd-io/etcd` | B | queued | 6092 | 0 | 0.0% | Large; near Tier C |
-| `tokio-rs/tokio` | B | queued | 1669 | 0 | 0.0% | Multi-crate workspace |
-| `hyperium/hyper` | B | queued | 913 | 0 | 0.0% |  |
-| `actix/actix-web` | B | queued | 596 | 0 | 0.0% |  |
-| `diesel-rs/diesel` | B | queued | 1096 | 0 | 0.0% |  |
-| `rust-lang/mdBook` | B | queued | 551 | 0 | 0.0% | Smaller Rust target |
-| `rust-lang/rust-clippy` | B | queued | 2825 | 0 | 0.0% | Many small lint PRs |
+| `prettier/prettier` | B | done | 4375 | 4375 | 100.0% | Snapshot/fixture heavy; finished_repo in harvest log |
+| `mochajs/mocha` | B | done | 1051 | 1029 | 97.9% | Mid-size; finished_repo in harvest log |
+| `jquery/jquery` | B | done | 496 | 330 | 66.5% | Legacy + docs; finished_repo in harvest log |
+| `webpack/webpack` | B | done | 3320 | 3320 | 100.0% | Complex; upper-B; finished_repo in harvest log |
+| `babel/babel` | B | done | 3798 | 3798 | 100.0% | Monorepo — stricter filters; finished_repo in harvest log |
+| `nestjs/nest` | B | done | 2339 | 2339 | 100.0% | TS coverage; finished_repo in harvest log |
+| `remix-run/react-router` | B | done | 1179 | 1179 | 100.0% | Was ReactTraining/react-router; finished_repo in harvest log |
+| `go-chi/chi` | B | done | 153 | 153 | 100.0% | Complements Gin; finished_repo in harvest log |
+| `gorilla/mux` | B | done | 162 | 162 | 100.0% | Maintenance-mode era still useful; finished_repo in harvest log |
+| `spf13/viper` | B | done | 151 | 151 | 100.0% | After Cobra harvest; finished_repo in harvest log |
+| `urfave/cli` | B | done | 481 | 481 | 100.0% | Diversity vs Cobra; finished_repo in harvest log |
+| `go-gorm/gorm` | B | done | 365 | 365 | 100.0% | finished_repo in harvest log |
+| `etcd-io/etcd` | B | done | 6092 | 6092 | 100.0% | Large; near Tier C; finished_repo in harvest log |
+| `tokio-rs/tokio` | B | done | 1669 | 1669 | 100.0% | Multi-crate workspace; finished_repo in harvest log |
+| `hyperium/hyper` | B | done | 913 | 913 | 100.0% | finished_repo in harvest log |
+| `actix/actix-web` | B | done | 596 | 596 | 100.0% | finished_repo in harvest log |
+| `diesel-rs/diesel` | B | done | 1096 | 1096 | 100.0% | finished_repo in harvest log |
+| `rust-lang/mdBook` | B | done | 551 | 551 | 100.0% | Smaller Rust target; finished_repo in harvest log |
+| `rust-lang/rust-clippy` | B | harvesting | 2825 | 2508 | 88.8% | Many small lint PRs; active in corpus_harvest.log |
 | `square/retrofit` | B | queued | TBD | 0 | — | Pairs with OkHttp; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https) |
 | `google/gson` | B | queued | 203 | 0 | 0.0% | Focused |
 | `google/guava` | B | queued | 286 | 0 | 0.0% | Large surface |
