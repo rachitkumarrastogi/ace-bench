@@ -1,22 +1,23 @@
 # ACE-Bench corpus status
 
-_Generated: **2026-09-20T04:43:47Z** (UTC)_
+_Generated: **2026-09-21T11:45:00Z** (UTC)_
 
-Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs rows in `human_patterns`.
+Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs rows in `human_patterns` (live DB + completed shards when present).
 
 ## Summary
 
 | Metric | Value |
 |--------|-------|
-| Total harvested rows | **61903** |
-| Repos with data | **44** / 1000 |
-| Status: done | 43 |
+| Total harvested rows | **113728** |
+| Repos with data | **57** / 1000 |
+| Status: done | 57 |
 | Status: harvesting | 1 |
-| Status: queued / pending | 956 |
+| Status: queued / pending | 942 |
 | Status: skipped | 0 |
 | GitHub counts known | 144 / 1000 (sum of known = 573681) |
-| Active harvest (log) | `rust-lang/rust-clippy` |
-| DB | `/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite` |
+| Active harvest (log) | `rust-lang/rust` |
+| DB | `/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite (+1 shard)` |
+| Completed shards | 1 |
 | Corpus JSON | `/home/arnavrastogi/ace-bench/data/corpus_repos.json` |
 | Harvest log | `/home/arnavrastogi/ace-bench/data/corpus_harvest.log` |
 | GitHub Search fetches this run | 0 |
@@ -81,27 +82,27 @@ python3 scripts/refresh_corpus_status.py --fetch-github
 | `actix/actix-web` | B | done | 596 | 596 | 100.0% | finished_repo in harvest log |
 | `diesel-rs/diesel` | B | done | 1096 | 1096 | 100.0% | finished_repo in harvest log |
 | `rust-lang/mdBook` | B | done | 551 | 551 | 100.0% | Smaller Rust target; finished_repo in harvest log |
-| `rust-lang/rust-clippy` | B | harvesting | 2825 | 2508 | 88.8% | Many small lint PRs; active in corpus_harvest.log |
+| `rust-lang/rust-clippy` | B | done | 2825 | 2825 | 100.0% | Many small lint PRs; finished_repo in harvest log |
 | `square/retrofit` | B | queued | TBD | 0 | — | Pairs with OkHttp; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https) |
 | `google/gson` | B | queued | 203 | 0 | 0.0% | Focused |
 | `google/guava` | B | queued | 286 | 0 | 0.0% | Large surface |
-| `junit-team/junit4` | B | queued | 441 | 0 | 0.0% | Prefer junit4 over junit5 volume |
-| `nlohmann/json` | B | queued | 408 | 0 | 0.0% | Header-heavy but GitHub PRs |
-| `catchorg/Catch2` | B | queued | 404 | 0 | 0.0% |  |
-| `protocolbuffers/protobuf` | B | queued | 2761 | 0 | 0.0% | Multi-language monorepo |
-| `Alamofire/Alamofire` | B | queued | 479 | 0 | 0.0% | Swift coverage |
-| `ReactiveX/RxSwift` | B | queued | 690 | 0 | 0.0% |  |
-| `discourse/discourse` | B | queued | 9359 | 0 | 0.0% | App-scale Ruby before Rails |
-| `Homebrew/brew` | B | queued | 5790 | 0 | 0.0% | Formula noise — code PRs only |
-| `hashicorp/consul` | B | queued | 4529 | 0 | 0.0% | Upper-B / near C |
+| `junit-team/junit4` | B | done | 441 | 331 | 75.1% | Prefer junit4 over junit5 volume; finished_repo in harvest log |
+| `nlohmann/json` | B | done | 408 | 408 | 100.0% | Header-heavy but GitHub PRs; finished_repo in harvest log |
+| `catchorg/Catch2` | B | done | 404 | 401 | 99.3% | finished_repo in harvest log |
+| `protocolbuffers/protobuf` | B | done | 2761 | 2761 | 100.0% | Multi-language monorepo; finished_repo in harvest log |
+| `Alamofire/Alamofire` | B | done | 479 | 479 | 100.0% | Swift coverage; finished_repo in harvest log |
+| `ReactiveX/RxSwift` | B | done | 690 | 690 | 100.0% | finished_repo in harvest log |
+| `discourse/discourse` | B | done | 9359 | 6353 | 67.9% | App-scale Ruby before Rails; finished_repo in harvest log |
+| `Homebrew/brew` | B | done | 5790 | 5790 | 100.0% | Formula noise — code PRs only; finished_repo in harvest log |
+| `hashicorp/consul` | B | done | 4529 | 4529 | 100.0% | Upper-B / near C; finished_repo in harvest log |
 | `facebook/react` | C | queued | TBD | 0 | — | Monorepo; exclude bots; cap files/diff; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https) |
 | `microsoft/vscode` | C | queued | 6016 | 0 | 0.0% | Huge volume; rate-limit time; extension noise |
 | `kubernetes/kubernetes` | C | queued | 45430 | 0 | 0.0% | Massive; SIG bots; aggressive filters |
-| `rails/rails` | C | queued | 17522 | 0 | 0.0% | Multi-gem monorepo |
-| `spring-projects/spring-boot` | C | queued | 41 | 0 | 0.0% | After smaller JVM Tier B |
-| `spring-projects/spring-framework` | C | queued | 610 | 0 | 0.0% |  |
-| `golang/go` | C | queued | 0 | 0 | — | Some non-GitHub history |
-| `rust-lang/rust` | C | queued | 31932 | 0 | 0.0% | Enormous; submodule/tooling noise |
+| `rails/rails` | C | done | 17522 | 2496 | 14.2% | Multi-gem monorepo; finished_repo in harvest log |
+| `spring-projects/spring-boot` | C | done | 41 | 41 | 100.0% | After smaller JVM Tier B; finished_repo in harvest log |
+| `spring-projects/spring-framework` | C | done | 610 | 609 | 99.8% | finished_repo in harvest log |
+| `golang/go` | C | done | 0 | 0 | — | Some non-GitHub history; finished_repo in harvest log |
+| `rust-lang/rust` | C | harvesting | 31932 | 26620 | 83.4% | Enormous; submodule/tooling noise; active in corpus_harvest.log |
 | `rust-lang/cargo` | C | queued | 3499 | 0 | 0.0% | More tractable than rustc |
 | `python/cpython` | C | queued | 19117 | 0 | 0.0% | Huge; many misc/doc PRs |
 | `nodejs/node` | C | queued | 2738 | 0 | 0.0% | Core + deps noise |
