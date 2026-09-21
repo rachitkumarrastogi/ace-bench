@@ -1,134 +1,152 @@
-# Eval — score vs human (v0) + future loop
+# Eval — score vs human + agent sandbox (step 3/4 MVP)
 
-Human harvest is live. **Eval v0** (export + score CLI) is usable now; **Docker agent sandbox** stays stubbed. Full dual-execution is future work.
+Human harvest + pattern prior are live. **Step 3 MVP** runs a named model/agent
+in a checkout at ``base_sha``, scores vs the human row, and stores ``model_name``.
 
-## Long-term loop
+## Loop
 
 ```
 ┌─────────────────────┐
-│ 1. Harvest humans   │  merged PRs (pre-AI cutoff) → harvest SQLite
-│    PatternStore     │  files, patch, metrics_json
+│ 1. Harvest humans   │  merged PRs → harvest SQLite
 └─────────┬───────────┘
           ▼
 ┌─────────────────────┐
-│ 2. Pattern prior DB │  cross-repo p50/p90 / % surgical (separate SQLite)
-│    pattern_db.py    │  read-only vs shards; feeds ACE compare
+│ 2. Pattern prior DB │  p50/p90 / % surgical (optional --prior)
 └─────────┬───────────┘
           ▼
 ┌─────────────────────┐
-│ 3. Task + sandbox   │  issue/title/body + base_sha; agent → P_A, F_A
-│    (sandbox stub)   │
+│ 3. Sandbox + agent  │  ISSUE.md @ base_sha → agent.patch (named model)
 └─────────┬───────────┘
           ▼
 ┌─────────────────────┐
-│ 4. ACE compare      │  vs human row + repo/global prior; pass-fail gate
-│    (scoring.py v0)  │
+│ 4. ACE compare      │  vs human + optional prior → eval_runs.sqlite
 └─────────────────────┘
 ```
 
 | Phase | Status |
 |-------|--------|
-| Human PR harvest → SQLite | **Live** |
-| Diff metrics in `metrics_json` | **Live** (AST/GNN later) |
-| Pattern prior DB (step 2) | **Live** — `ace_patterns_prior.sqlite` ([CORPUS.md](CORPUS.md)) |
-| Export + score-vs-human CLI | **Live** (below; per-PR human row) |
-| Agent sandbox / dual execution | Stub — **blocks step 3 agent loop** |
-| tree-sitter metrics | Stub in `ast_metrics.py` — v0 AST proxy = `max(added_lines, 1)` |
-| Public leaderboard | Deferred |
-
-Pattern prior path (DGX): `$HOME/ace-bench/data/patterns/ace_patterns_prior.sqlite`. Mac: `~/ace-bench-data/patterns/`. Build: `./scripts/dgx_build_patterns.sh` (does not stop harvest).
-
-Do not treat pass/fail alone as the score — efficiency vs human structure is the point.
+| Human PR harvest | **Live** |
+| Pattern prior DB | **Live** |
+| Export + score-vs-human CLI | **Live** |
+| Sandbox checkout @ ``base_sha`` | **MVP** — host git (Docker optional later) |
+| Pluggable agents + ``model_name`` | **MVP** — `file` / `stub` / `openai` / `anthropic` |
+| Docker test runner (`--network none`) | Stub |
+| Full-repo LLM context | Deferred (issue text only in v0) |
+| Multi-model leaderboard UI | Deferred |
 
 ---
 
-## Eval v0 — Django ACE score MVP
+## Step 3 — one instance end-to-end
+
+```bash
+cd ~/path/to/ace-bench
+export ACE_DB_PATH=data/frozen/ace_patterns_django_pre2021_6125.sqlite
+
+# Extract human patch once (for file / human-replay smoke)
+python3 scripts/score_against_human.py \
+  --instance django/django#22 --self-smoke --passed-tests true \
+  --agent-patch /tmp/django22_human.patch
+
+# Human-replay offline (ACE ≈ 1.0, model_name=human-replay)
+python3 scripts/run_agent_eval.py \
+  --instance django/django#22 \
+  --model human-replay \
+  --agent file \
+  --agent-patch /tmp/django22_human.patch \
+  --passed-tests true \
+  --skip-sandbox \
+  --db "$ACE_DB_PATH" \
+  --eval-db ~/ace-bench-data/eval_runs.sqlite
+
+# Real checkout (network) then stub agent
+python3 scripts/run_agent_eval.py \
+  --instance django/django#22 \
+  --model stub-default \
+  --agent stub \
+  --passed-tests true \
+  --work-root ~/ace-bench-data/sandboxes \
+  --db "$ACE_DB_PATH"
+```
+
+Checkout only:
+
+```bash
+python3 scripts/run_sandbox_checkout.py \
+  --repo django/django \
+  --base-sha 02a5b41db4ff8544f93a5d9854b346a9aae4f556 \
+  --work-root ~/ace-bench-data/sandboxes \
+  --title "…" --body "…" --json
+```
+
+### Flags
+
+| Flag | Notes |
+|------|--------|
+| `--model` | **Required** — stored as `model_name` (even for `file` / `stub`) |
+| `--agent` | `file` \| `stub` \| `openai` \| `anthropic` |
+| `--agent-patch` | Required for `--agent file` |
+| `--db` | Harvest / frozen SQLite |
+| `--eval-db` | Results store (default `~/ace-bench-data/eval_runs.sqlite`) |
+| `--prior` | Optional pattern prior SQLite (notes only in MVP) |
+| `--passed-tests` | `true` \| `false` \| `unknown` |
+| `--skip-sandbox` | Offline scoring (no git clone) |
+| `--work-root` | Default `~/ace-bench-data/sandboxes` or `/tmp/ace-sandbox` |
+
+### Env (API agents)
+
+| Var | Used by |
+|-----|---------|
+| `OPENAI_API_KEY` | `--agent openai` (e.g. `--model gpt-4o`) |
+| `ANTHROPIC_API_KEY` | `--agent anthropic` (e.g. `--model claude-sonnet-4`) |
+| `ACE_DB_PATH` | Default harvest DB |
+| `ACE_SANDBOX_DOCKER` | Prefer Docker when set (checkout still host-git in MVP) |
+| `ACE_ALLOWED_ROOTS` | Extend path allowlist |
+
+API agents receive **issue title/body only** (+ optional human file-path hints). They do **not** get the full repo in v0. Missing keys → clear error; use `file` / `stub` offline.
+
+### Results store
+
+`src/ace_bench/eval_runs.py` → SQLite (gitignored). Schema in code: `id`, `instance_id`, `model_name`, `agent_name`, timestamps, `passed_tests`, `ace_score`, `file_drift`, `churn_ratio`, file lists (JSON), notes/error, `patch_path` / `patch_hash`. Multiple runs per `(instance, model)` allowed.
+
+### Security
+
+- Clone URLs: **github.com** HTTPS only for `owner/name`
+- Work roots under path allowlist (`paths.py`)
+- No untrusted agent code execution in this MVP
+- Agent patches size-capped (10 MiB) — see [SECURITY.md](SECURITY.md)
+
+---
+
+## Eval v0 — score CLI (no agent)
 
 | Piece | Path |
 |-------|------|
 | Export instances | `scripts/export_eval_instances.py` → `benchmarks/django_eval_v0.jsonl` |
 | Score CLI | `scripts/score_against_human.py` |
-| Helpers | `src/ace_bench/eval_v0.py` |
-| AST interface | `src/ace_bench/ast_metrics.py` (tree-sitter TODO; v0 fallback) |
-| Formula | `src/ace_bench/scoring.py` (`compute_ace_score`) |
+| Orchestrator | `scripts/run_agent_eval.py` |
+| Sandbox | `src/ace_bench/sandbox.py` + `scripts/run_sandbox_checkout.py` |
+| Eval runs | `src/ace_bench/eval_runs.py` |
+| Formula | `src/ace_bench/scoring.py` |
 
-Instance ids must look like **`owner/repo#123`**. Missing human baseline rows fail closed (exit 2). Agent patches are size-capped (10 MiB) and path-checked — see [SECURITY.md](SECURITY.md).
-
-### DB
-
-| Source | Path |
-|--------|------|
-| Env | `ACE_DB_PATH` |
-| Frozen (prefer) | `$HOME/ace-bench/data/frozen/ace_patterns_django_pre2021_6125.sqlite` |
-| Live | `$HOME/ace-bench/data/ace_patterns.sqlite` filtered `repo=django/django` |
-
-Prefer the **frozen** twin so ongoing corpus harvest does not move the goalposts. See [CORPUS.md](CORPUS.md).
+Instance ids: **`owner/repo#123`**. Prefer **frozen** Django DB so harvest does not move goalposts.
 
 ### AST proxy
-
-`compute_ace_score` wants AST node counts. `ace_bench.ast_metrics.ast_nodes_from_patch` is the swap point. Until tree-sitter + a language grammar land:
 
 ```text
 ast_nodes_proxy = max(added_lines, 1)
 ```
 
-(`PatchMetrics.added_lines` = count of `+` lines in the unified diff.) Size proxy only — complete the TODO in `ast_metrics.py` later without changing the ACE formula.
-
-### Export (~50 metadata-only instances)
+### Self-smoke (score CLI)
 
 ```bash
-cd ~/ace-bench
-export ACE_DB_PATH=$HOME/ace-bench/data/frozen/ace_patterns_django_pre2021_6125.sqlite
-
-python3 scripts/export_eval_instances.py --limit 50
-# → benchmarks/django_eval_v0.jsonl
+python3 scripts/score_against_human.py \
+  --instance django/django#22 --self-smoke --passed-tests true
 ```
 
-Filters: `file_count` 1–8, non-empty title+body, non-empty `patch_text`, `additions>0`, `merged_at < 2021-01-01`, prefer test-like paths.
+Expect ACE ≈ **1.0**, drift **0**, churn_ratio **1.0**.
 
-JSONL is **metadata only** (no `patch_text`) so it can live in git. Optional local smoke:
+### Still missing
 
-```bash
-python3 scripts/export_eval_instances.py --limit 50 --write-patches-dir data/eval/patches
-# data/eval/patches is gitignored
-```
-
-### Score an agent patch
-
-```bash
-# Self-smoke (human vs itself)
-python3 scripts/score_against_human.py \
-  --instance django/django#22 \
-  --self-smoke \
-  --passed-tests true
-
-# Real agent unified diff
-python3 scripts/score_against_human.py \
-  --repo django/django --pr 22 \
-  --agent-patch /path/to/agent.diff \
-  --passed-tests false
-
-# Headerless agent patch: supply file list
-python3 scripts/score_against_human.py \
-  --instance django/django#22 \
-  --agent-patch /tmp/hunks.patch \
-  --agent-files tests/regressiontests/admin_views/tests.py \
-  --passed-tests true
-```
-
-Printed signals: **ACE score**, **file boundary drift** (`|F_A Δ F_H|`), **churn ratio**, **surgical / sprawl** (vs Django p50 files=2; sprawl ≥9 ≈ past p90).
-
-Self-smoke expectation: ACE ≈ **1.0**, drift **0**, churn_ratio **1.0**.
-
-### Plugging a real agent tomorrow
-
-1. Load a line from `benchmarks/django_eval_v0.jsonl`.
-2. Checkout `base_sha` in a sandbox (Docker later).
-3. Give the agent **issue text only**; capture unified diff.
-4. Run tests → `--passed-tests true|false`.
-5. `score_against_human.py --instance … --agent-patch … --passed-tests …`
-6. Log ACE + drift + churn — not pass/fail alone.
-
-### Compare inputs (when sandbox exists)
-
-From each `human_patterns` row: task (`title`/`body`), baseline (`files_json`, `patch_text`, `metrics_json`, `base_sha`), agent patch + files + test gate → `ace_bench.scoring.compute_ace_score`.
+1. Real Docker test runner (`docker run --network none` + pytest gate)
+2. Full-repo / file-content context for LLM agents
+3. Multi-model leaderboard over `eval_runs`

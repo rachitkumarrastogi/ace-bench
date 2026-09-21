@@ -14,7 +14,8 @@ floors. **Not** a SOC2 / formal penetration-test certification.
 | GitHub HTTP client | SSRF if a URL were ever user-controlled; Authorization in error text |
 | Shared host | World-readable `~/.config/ace-bench/github_token` |
 
-Out of scope (deferred): Docker agent sandbox isolation, public HTTP API, multi-user authz.
+Out of scope (deferred): Docker test-runner isolation (`--network none`), public HTTP API, multi-user authz.
+Host-git sandbox checkout is allowlisted to `https://github.com/owner/name.git` only.
 
 ## Findings
 
@@ -36,7 +37,7 @@ Out of scope (deferred): Docker agent sandbox isolation, public HTTP API, multi-
 - Path allowlist is a local-operator guard, not a sandbox; extend via `ACE_ALLOWED_ROOTS`.
 - Token still lives in process env after load — avoid `set -x` / debug dumps of the environment.
 - Harvest rate limits are polite floors, not a DoS shield against a malicious local caller.
-- Agent sandbox / untrusted patch execution is **not** built yet — do not run untrusted agent patches outside a future isolation boundary.
+- Checkout sandboxes do not execute agent code; do not apply/run untrusted patches outside a future Docker `--network none` test boundary.
 - Formal SOC2 / WCAG / full red-team: **not claimed**.
 
 ## Operator checklist

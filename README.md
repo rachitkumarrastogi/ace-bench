@@ -7,17 +7,18 @@
 
 ---
 
-## Three-step flow
+## Flow
 
 ```
-[1. Human harvest]  →  [2. Pattern prior]  →  [3. ACE compare]
- merged pre-AI PRs      cross-repo p50/p90      vs human + repo baseline
- → harvest SQLite       → patterns SQLite       (sandbox still stubbed)
+[1. Human harvest]  →  [2. Pattern prior]  →  [3. Sandbox + agent]  →  [4. ACE compare]
+ merged pre-AI PRs      cross-repo p50/p90      checkout @ base_sha      vs human + model_name
+ → harvest SQLite       → patterns SQLite       → agent.patch            → eval_runs.sqlite
 ```
 
 1. **Harvest** — merged PRs before the AI era → harvest SQLite (`human_patterns`).
-2. **Pattern prior** — read-only aggregates → dedicated `ace_patterns_prior.sqlite` (repo + global / by-lang).
-3. **Score** — ACE Index vs human \(P_H\) / \(F_H\) + prior (pass/fail is a gate; agent sandbox next).
+2. **Pattern prior** — read-only aggregates → dedicated `ace_patterns_prior.sqlite`.
+3. **Sandbox + agent** — shallow checkout at `base_sha`, named `--model` / `--agent` → patch.
+4. **Score** — ACE Index vs human \(P_H\) / \(F_H\) (+ optional prior); store `model_name`.
 
 \[
 \text{ACE Score} =
@@ -48,10 +49,14 @@ python3 scripts/run_harvest.py --repos django/django --max-prs 100
 ./scripts/dgx_full_harvest.sh          # monthly windows 2012→2021
 ./scripts/dgx_corpus_harvest.sh        # curated Tier A→D master list (sequential; first wave A–C)
 
-# eval v0 — export instances + score an agent patch vs human
-export ACE_DB_PATH=$HOME/ace-bench/data/frozen/ace_patterns_django_pre2021_6125.sqlite
-python3 scripts/export_eval_instances.py --limit 50
-python3 scripts/score_against_human.py --instance django/django#22 --self-smoke --passed-tests true
+# eval — score + agent sandbox (model_name required)
+export ACE_DB_PATH=data/frozen/ace_patterns_django_pre2021_6125.sqlite
+python3 scripts/score_against_human.py --instance django/django#22 --self-smoke --passed-tests true \
+  --agent-patch /tmp/django22_human.patch
+python3 scripts/run_agent_eval.py \
+  --instance django/django#22 --model human-replay --agent file \
+  --agent-patch /tmp/django22_human.patch \
+  --passed-tests true --skip-sandbox --db "$ACE_DB_PATH"
 ```
 
 DB: `ACE_DB_PATH` or `./data/ace_patterns.sqlite`. Frozen copies under `data/frozen/` (see [docs/CORPUS.md](docs/CORPUS.md)).
@@ -73,7 +78,7 @@ DB: `ACE_DB_PATH` or `./data/ace_patterns.sqlite`. Frozen copies under `data/fro
 |-----|------|
 | [docs/CORPUS.md](docs/CORPUS.md) | Curated repos, Django freeze, human baseline headlines |
 | [docs/CORPUS_STATUS.md](docs/CORPUS_STATUS.md) | Living harvest coverage table (`scripts/refresh_corpus_status.py`) |
-| [docs/EVAL.md](docs/EVAL.md) | Score CLI (v0) + future dual-execution loop |
+| [docs/EVAL.md](docs/EVAL.md) | Sandbox + agent eval (step 3) + score CLI |
 | [docs/OPS.md](docs/OPS.md) | DGX / tmux harvest, tokens, rate limits, DB size |
 | [docs/SECURITY.md](docs/SECURITY.md) | Threat model, hardening findings, residual risks |
 | [AGENTS.md](AGENTS.md) | Commit identity for agents |
@@ -91,8 +96,8 @@ Helpers: `scripts/check_db_size.py` (exit 2 over ~1 GiB), `scripts/rotate_shar
 | Django harvest | **6125** rows frozen |
 | Kickoff multi-repo | Flask / Express / Cobra / Clap done; master list ~1000 (A–C wave in progress; D backlog) |
 | Pattern prior DB | Live — cross-repo baselines from shards ([docs/CORPUS.md](docs/CORPUS.md)) |
-| Eval v0 CLI | Live — [docs/EVAL.md](docs/EVAL.md) |
-| Docker sandbox | Next (blocks full step-3 agent loop) |
+| Eval + agent sandbox MVP | Live — [docs/EVAL.md](docs/EVAL.md) (`model_name` required) |
+| Docker test runner | Next (`--network none` + pytest gate) |
 
 ---
 
@@ -106,9 +111,9 @@ SWE-bench-style evals score task completion; linters score static rules. Neither
 
 1. [x] Schema + Django pilot → SQLite (**6125** frozen)
 2. [ ] Multi-repo pre-AI harvest (Tier A→C in progress)
-3. [ ] Sandbox runner (agent-agnostic)
-4. [ ] tree-sitter AST metrics + ACE Index
-5. [ ] Public leaderboard
+3. [x] Sandbox + pluggable agents MVP (`file`/`stub`/`openai`/`anthropic`)
+4. [ ] Docker test runner + full-repo LLM context
+5. [ ] tree-sitter AST metrics + public leaderboard
 
 ## License
 
