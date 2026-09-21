@@ -10,7 +10,10 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+from ace_bench.agents.base import AgentContext
+from ace_bench.agents.stub import StubAgent, build_bloated_stub_patch
 from ace_bench.eval_runs import EvalRunStore, patch_sha256
+from ace_bench.pr_artifact import write_agent_pr_md
 from ace_bench.sandbox import (
     SandboxError,
     assert_sandbox_path_safe,
@@ -116,6 +119,49 @@ class SandboxPathTests(unittest.TestCase):
             self.assertIn("# T", text)
             self.assertIn("Body text", text)
             self.assertIn("django/django#22", text)
+
+    def test_agent_pr_artifact(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            wt = Path(tmp)
+            path = write_agent_pr_md(
+                wt,
+                title="Fix admin views",
+                model_name="human-replay",
+                instance_id="django/django#22",
+                ace_score=1.0,
+                file_drift=0,
+                human_files=["a.py"],
+                agent_files=["a.py"],
+                agent_name="file",
+                churn_ratio=1.0,
+                patch_path="/tmp/x.patch",
+                base_sha="02a5b41db4ff8544f93a5d9854b346a9aae4f556",
+            )
+            self.assertEqual(path.name, "AGENT_PR.md")
+            text = path.read_text(encoding="utf-8")
+            self.assertIn("model_name", text)
+            self.assertIn("human-replay", text)
+            self.assertIn("ACE score", text)
+            self.assertIn("PR-shaped artifact", text)
+
+    def test_bloated_stub_patch(self) -> None:
+        patch = build_bloated_stub_patch(n_files=4, lines_per=20)
+        self.assertIn("bloated/extra_0.py", patch)
+        self.assertGreater(patch.count("diff --git"), 3)
+        result = StubAgent(bloated=True).run(
+            AgentContext(
+                instance_id="x/y#1",
+                repo="x/y",
+                pr_number=1,
+                title="",
+                body="",
+                model_name="stub-bloated",
+                worktree=None,
+                human_files=[],
+                base_sha=None,
+            )
+        )
+        self.assertIn("bloated/", result.patch_text)
 
     def test_checkout_mocked_git(self) -> None:
         """Checkout path wiring without touching the network."""

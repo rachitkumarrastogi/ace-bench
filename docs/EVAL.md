@@ -20,6 +20,7 @@ in a checkout at ``base_sha``, scores vs the human row, and stores ``model_name`
           ▼
 ┌─────────────────────┐
 │ 4. ACE compare      │  vs human + optional prior → eval_runs.sqlite
+│    + AGENT_PR.md    │  PR-shaped local artifact (no real gh pr)
 └─────────────────────┘
 ```
 
@@ -30,13 +31,16 @@ in a checkout at ``base_sha``, scores vs the human row, and stores ``model_name`
 | Export + score-vs-human CLI | **Live** |
 | Sandbox checkout @ ``base_sha`` | **MVP** — host git (Docker optional later) |
 | Pluggable agents + ``model_name`` | **MVP** — `file` / `stub` / `openai` / `anthropic` |
+| PR-shaped artifact (`AGENT_PR.md`) | **MVP** — local summary only (not `gh pr`) |
 | Docker test runner (`--network none`) | Stub |
 | Full-repo LLM context | Deferred (issue text only in v0) |
 | Multi-model leaderboard UI | Deferred |
 
 ---
 
-## Step 3 — one instance end-to-end
+## Step 3 — one instance end-to-end ($0 offline)
+
+Bill-safe quickstart uses **`file`** / **`stub` only** (no OpenAI/Anthropic keys).
 
 ```bash
 cd ~/path/to/ace-bench
@@ -58,6 +62,25 @@ python3 scripts/run_agent_eval.py \
   --db "$ACE_DB_PATH" \
   --eval-db ~/ace-bench-data/eval_runs.sqlite
 
+# Stub tiny patch (ACE ≫ 1 — over-surgical vs human)
+python3 scripts/run_agent_eval.py \
+  --instance django/django#22 \
+  --model stub-default \
+  --agent stub \
+  --passed-tests true \
+  --skip-sandbox \
+  --db "$ACE_DB_PATH"
+
+# Stub bloated sprawl (ACE ≪ 1)
+python3 scripts/run_agent_eval.py \
+  --instance django/django#22 \
+  --model stub-bloated \
+  --agent stub \
+  --stub-bloated \
+  --passed-tests true \
+  --skip-sandbox \
+  --db "$ACE_DB_PATH"
+
 # Real checkout (network) then stub agent
 python3 scripts/run_agent_eval.py \
   --instance django/django#22 \
@@ -67,6 +90,11 @@ python3 scripts/run_agent_eval.py \
   --work-root ~/ace-bench-data/sandboxes \
   --db "$ACE_DB_PATH"
 ```
+
+After each run, look for **`AGENT_PR.md`** next to the saved patch (or in the
+sandbox worktree). It is a **PR-shaped artifact**: title, `model_name`, ACE
+score, file drift — not a real GitHub PR. Use `--no-pr-artifact` to skip.
+Optional `gh pr` to a fork is **not** required and is out of scope for MVP.
 
 Checkout only:
 
@@ -85,6 +113,8 @@ python3 scripts/run_sandbox_checkout.py \
 | `--model` | **Required** — stored as `model_name` (even for `file` / `stub`) |
 | `--agent` | `file` \| `stub` \| `openai` \| `anthropic` |
 | `--agent-patch` | Required for `--agent file` |
+| `--stub-bloated` | With `--agent stub`: multi-file sprawl (ACE ≪ 1) |
+| `--no-pr-artifact` | Skip writing `AGENT_PR.md` |
 | `--db` | Harvest / frozen SQLite |
 | `--eval-db` | Results store (default `~/ace-bench-data/eval_runs.sqlite`) |
 | `--prior` | Optional pattern prior SQLite (notes only in MVP) |
@@ -126,6 +156,7 @@ API agents receive **issue title/body only** (+ optional human file-path hints).
 | Orchestrator | `scripts/run_agent_eval.py` |
 | Sandbox | `src/ace_bench/sandbox.py` + `scripts/run_sandbox_checkout.py` |
 | Eval runs | `src/ace_bench/eval_runs.py` |
+| PR artifact | `src/ace_bench/pr_artifact.py` → `AGENT_PR.md` |
 | Formula | `src/ace_bench/scoring.py` |
 
 Instance ids: **`owner/repo#123`**. Prefer **frozen** Django DB so harvest does not move goalposts.
@@ -150,3 +181,4 @@ Expect ACE ≈ **1.0**, drift **0**, churn_ratio **1.0**.
 1. Real Docker test runner (`docker run --network none` + pytest gate)
 2. Full-repo / file-content context for LLM agents
 3. Multi-model leaderboard over `eval_runs`
+4. Optional real `gh pr` to a personal fork (explicitly not MVP)

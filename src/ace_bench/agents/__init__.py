@@ -6,7 +6,7 @@ from ace_bench.agents.anthropic_agent import AnthropicAgent
 from ace_bench.agents.base import AgentError, BaseAgent
 from ace_bench.agents.file_agent import FileAgent
 from ace_bench.agents.openai_agent import OpenAIAgent
-from ace_bench.agents.stub import StubAgent
+from ace_bench.agents.stub import StubAgent, build_bloated_stub_patch
 
 AGENT_NAMES = ("file", "stub", "openai", "anthropic")
 
@@ -16,6 +16,7 @@ def build_agent(
     *,
     model_name: str,
     agent_patch: str | None = None,
+    stub_bloated: bool = False,
 ) -> BaseAgent:
     key = (name or "").strip().lower()
     if key == "file":
@@ -23,7 +24,7 @@ def build_agent(
             raise AgentError("--agent file requires --agent-patch PATH")
         return FileAgent(agent_patch)
     if key == "stub":
-        return StubAgent()
+        return StubAgent(bloated=stub_bloated)
     if key == "openai":
         return OpenAIAgent(model_name)
     if key == "anthropic":
@@ -42,4 +43,5 @@ __all__ = [
     "OpenAIAgent",
     "StubAgent",
     "build_agent",
+    "build_bloated_stub_patch",
 ]

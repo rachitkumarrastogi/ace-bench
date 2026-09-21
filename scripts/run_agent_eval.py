@@ -15,7 +15,7 @@ Examples:
     --skip-sandbox \\
     --db data/frozen/ace_patterns_django_pre2021_6125.sqlite
 
-  # Stub plumbing (expects ACE < 1 vs real human):
+  # Stub plumbing (tiny patch → ACE ≫ 1; --stub-bloated → ACE ≪ 1):
   python3 scripts/run_agent_eval.py \\
     --instance django/django#22 --model stub-default --agent stub \\
     --passed-tests true --skip-sandbox
@@ -48,6 +48,7 @@ from ace_bench.eval_v0 import (
     score_agent_vs_human,
 )
 from ace_bench.paths import PathEscapeError, resolve_allowed_path
+from ace_bench.pr_artifact import write_agent_pr_md
 from ace_bench.sandbox import (
     SandboxError,
     checkout_at_base_sha,
@@ -171,6 +172,16 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="write agent.patch under this dir (default: worktree or eval data)",
     )
+    p.add_argument(
+        "--stub-bloated",
+        action="store_true",
+        help="with --agent stub: emit multi-file sprawl (ACE ≪ 1 vs surgical human)",
+    )
+    p.add_argument(
+        "--no-pr-artifact",
+        action="store_true",
+        help="skip writing AGENT_PR.md (PR-shaped local summary)",
+    )
     p.add_argument("--json", action="store_true", help="JSON summary only")
     return p.parse_args(argv)
 
@@ -244,11 +255,19 @@ def main(argv: list[str] | None = None) -> int:
             print(f"error: sandbox: {exc}", file=sys.stderr)
             return 2
 
+        if args.stub_bloated and args.agent != "stub":
+            print(
+                "error: --stub-bloated only applies to --agent stub",
+                file=sys.stderr,
+            )
+            return 2
+
         try:
             agent = build_agent(
                 args.agent,
                 model_name=model_name,
                 agent_patch=args.agent_patch,
+                stub_bloated=args.stub_bloated,
             )
             ctx = AgentContext(
                 instance_id=instance_id,
@@ -318,6 +337,36 @@ def main(argv: list[str] | None = None) -> int:
             notes_parts.append(f"prior={json.dumps(prior, sort_keys=True)}")
         notes = "; ".join(n for n in notes_parts if n)
 
+        pr_path: Path | None = None
+        if not args.no_pr_artifact:
+            try:
+                if worktree is not None:
+                    pr_dir = worktree
+                elif patch_path is not None:
+                    pr_dir = patch_path.parent
+                else:
+                    pr_dir = resolve_allowed_path(
+                        Path("data") / "eval" / "agent_patches",
+                        purpose="default pr artifact dir",
+                    )
+                pr_path = write_agent_pr_md(
+                    pr_dir,
+                    title=human.title or instance_id,
+                    model_name=model_name,
+                    instance_id=instance_id,
+                    ace_score=float(report.ace_score),
+                    file_drift=int(report.boundary["symmetric_diff_size"]),
+                    human_files=list(human.files),
+                    agent_files=list(agent_files),
+                    agent_name=args.agent,
+                    churn_ratio=report.churn_ratio,
+                    patch_path=patch_path,
+                    base_sha=human.base_sha,
+                )
+                notes = f"{notes}; pr_artifact={pr_path}" if notes else f"pr_artifact={pr_path}"
+            except (PathEscapeError, OSError) as exc:
+                notes = f"{notes}; pr_artifact failed: {exc}" if notes else str(exc)
+
         runs.finish_run(
             run_id,
             passed_tests=passed_store,
@@ -348,6 +397,7 @@ def main(argv: list[str] | None = None) -> int:
         "base_sha": human.base_sha,
         "worktree": str(worktree) if worktree else None,
         "patch_path": str(patch_path) if patch_path else None,
+        "pr_artifact": str(pr_path) if pr_path else None,
         "patch_hash": stored.patch_hash if stored else None,
         "eval_db": str(eval_db),
         "harvest_db": str(harvest_db),
@@ -370,6 +420,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"eval_db:      {eval_db}")
         if worktree:
             print(f"worktree:     {worktree}")
+        if pr_path:
+            print(f"pr_artifact:  {pr_path}")
     return 0
 
 
