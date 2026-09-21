@@ -6,22 +6,22 @@ Human harvest is live. **Eval v0** (export + score CLI) is usable now; **Docker 
 
 ```
 ┌─────────────────────┐
-│ 1. Harvest humans   │  merged PRs (pre-AI cutoff) → SQLite
+│ 1. Harvest humans   │  merged PRs (pre-AI cutoff) → harvest SQLite
 │    PatternStore     │  files, patch, metrics_json
 └─────────┬───────────┘
           ▼
 ┌─────────────────────┐
-│ 2. Task instance    │  issue/title/body + base_sha + human F_H / P_H
-│    (from DB row)    │
+│ 2. Pattern prior DB │  cross-repo p50/p90 / % surgical (separate SQLite)
+│    pattern_db.py    │  read-only vs shards; feeds ACE compare
 └─────────┬───────────┘
           ▼
 ┌─────────────────────┐
-│ 3. Agent sandbox    │  checkout base_sha; give issue only; capture P_A, F_A
-│    (NOT built yet)  │
+│ 3. Task + sandbox   │  issue/title/body + base_sha; agent → P_A, F_A
+│    (sandbox stub)   │
 └─────────┬───────────┘
           ▼
 ┌─────────────────────┐
-│ 4. ACE compare      │  AST / file ratios vs human; pass-fail gate → ACE Index
+│ 4. ACE compare      │  vs human row + repo/global prior; pass-fail gate
 │    (scoring.py v0)  │
 └─────────────────────┘
 ```
@@ -30,10 +30,13 @@ Human harvest is live. **Eval v0** (export + score CLI) is usable now; **Docker 
 |-------|--------|
 | Human PR harvest → SQLite | **Live** |
 | Diff metrics in `metrics_json` | **Live** (AST/GNN later) |
-| Export + score-vs-human CLI | **Live** (below) |
-| Agent sandbox / dual execution | Stub |
+| Pattern prior DB (step 2) | **Live** — `ace_patterns_prior.sqlite` ([CORPUS.md](CORPUS.md)) |
+| Export + score-vs-human CLI | **Live** (below; per-PR human row) |
+| Agent sandbox / dual execution | Stub — **blocks step 3 agent loop** |
 | tree-sitter metrics | Stub in `ast_metrics.py` — v0 AST proxy = `max(added_lines, 1)` |
 | Public leaderboard | Deferred |
+
+Pattern prior path (DGX): `$HOME/ace-bench/data/patterns/ace_patterns_prior.sqlite`. Mac: `~/ace-bench-data/patterns/`. Build: `./scripts/dgx_build_patterns.sh` (does not stop harvest).
 
 Do not treat pass/fail alone as the score — efficiency vs human structure is the point.
 

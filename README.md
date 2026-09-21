@@ -10,14 +10,14 @@
 ## Three-step flow
 
 ```
-[1. Human harvest]  →  [2. Agent sandbox]  →  [3. ACE compare]
- merged pre-AI PRs      issue-only prompt       score vs human structure
- → SQLite               (Docker next)           (CLI live; sandbox stubbed)
+[1. Human harvest]  →  [2. Pattern prior]  →  [3. ACE compare]
+ merged pre-AI PRs      cross-repo p50/p90      vs human + repo baseline
+ → harvest SQLite       → patterns SQLite       (sandbox still stubbed)
 ```
 
-1. **Harvest** — merged PRs before the AI era → SQLite (`human_patterns`).
-2. **Sandbox** — checkout `base_sha`, give the agent the issue only, capture \(P_A\).
-3. **Score** — ACE Index vs human \(P_H\) / \(F_H\) (pass/fail is a gate, not the score).
+1. **Harvest** — merged PRs before the AI era → harvest SQLite (`human_patterns`).
+2. **Pattern prior** — read-only aggregates → dedicated `ace_patterns_prior.sqlite` (repo + global / by-lang).
+3. **Score** — ACE Index vs human \(P_H\) / \(F_H\) + prior (pass/fail is a gate; agent sandbox next).
 
 \[
 \text{ACE Score} =
@@ -80,7 +80,7 @@ DB: `ACE_DB_PATH` or `./data/ace_patterns.sqlite`. Frozen copies under `data/fro
 
 Machine source of truth for the **~1000-repo** master list: [`data/corpus_repos.json`](data/corpus_repos.json) (first harvest wave was Tier A–C ~110; Tier D is backlog).
 
-Helpers: `scripts/check_db_size.py` (exit 2 over ~1 GiB), `scripts/rotate_shard_if_needed.py`, `scripts/dgx_shard_watch.sh`, `scripts/dgx_refresh_status.sh`, `REFRESH_STATUS=1 ./scripts/dgx_corpus_harvest.sh`. Mac shard mirror: `~/ace-bench-data/shards/` (see [docs/OPS.md](docs/OPS.md)).
+Helpers: `scripts/check_db_size.py` (exit 2 over ~1 GiB), `scripts/rotate_shard_if_needed.py`, `scripts/dgx_shard_watch.sh`, `scripts/dgx_refresh_status.sh`, `REFRESH_STATUS=1 ./scripts/dgx_corpus_harvest.sh`. Pattern prior (step 2): `scripts/build_pattern_db.py` / `scripts/dgx_build_patterns.sh` → `~/ace-bench/data/patterns/` (Mac: `~/ace-bench-data/patterns/`). Mac shard mirror: `~/ace-bench-data/shards/` (see [docs/OPS.md](docs/OPS.md)).
 
 ---
 
@@ -90,8 +90,9 @@ Helpers: `scripts/check_db_size.py` (exit 2 over ~1 GiB), `scripts/rotate_shar
 |------|--------|
 | Django harvest | **6125** rows frozen |
 | Kickoff multi-repo | Flask / Express / Cobra / Clap done; master list ~1000 (A–C wave in progress; D backlog) |
+| Pattern prior DB | Live — cross-repo baselines from shards ([docs/CORPUS.md](docs/CORPUS.md)) |
 | Eval v0 CLI | Live — [docs/EVAL.md](docs/EVAL.md) |
-| Docker sandbox | Next |
+| Docker sandbox | Next (blocks full step-3 agent loop) |
 
 ---
 

@@ -107,8 +107,20 @@ Prefer storing shard copies **outside** the repo:
 | Role | Path |
 |------|------|
 | Mac shards + snapshots | `~/ace-bench-data/shards/` |
+| Mac pattern prior | `~/ace-bench-data/patterns/` |
 | DGX live + shards | `$HOME/ace-bench/data/ace_patterns.sqlite` + `…/shards/` |
+| DGX pattern prior | `$HOME/ace-bench/data/patterns/ace_patterns_prior.sqlite` |
 | Manifest (DGX) | `$HOME/ace-bench/data/shards_manifest.json` |
+
+Pattern prior (step 2) — safe while harvest runs:
+
+```bash
+./scripts/dgx_build_patterns.sh
+# Mac pull (from laptop):
+mkdir -p ~/ace-bench-data/patterns
+scp LocalModelRunner:~/ace-bench/data/patterns/ace_patterns_prior.sqlite \
+  ~/ace-bench-data/patterns/
+```
 
 Consistent snapshot while harvest runs (preferred over raw `scp` of a live file):
 

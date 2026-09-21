@@ -115,3 +115,27 @@ Human Django PRs are **small and surgical**:
 Scoring idea: agents that routinely land 8–15 files for bugfixes are already past human p90. Prefer **p50/p90**, not means (means are mega-PR skewed). Eval v0 flags surgical ≤2 files and sprawl ≥9.
 
 Compact live harvest coverage stays in [CORPUS_STATUS.md](CORPUS_STATUS.md); do not duplicate huge repo tables here — use the JSON.
+
+---
+
+## Step 2 — pattern prior DB (cross-repo)
+
+Harvest SQLite stays the raw PR store. **Step 2** builds a separate **pattern prior** DB (read-only against harvest; does not stop `ace-harvest`). Analyze frozen `shard_001` (+ optional live via `mode=ro` or `sqlite3 .backup`) while harvest keeps running.
+
+| Piece | Path |
+|-------|------|
+| Schema / API | `src/ace_bench/pattern_db.py` |
+| Builder | `scripts/build_pattern_db.py` |
+| DGX wrapper | `scripts/dgx_build_patterns.sh` |
+| DGX output | `$HOME/ace-bench/data/patterns/ace_patterns_prior.sqlite` |
+| Mac mirror | `~/ace-bench-data/patterns/` (outside git) |
+
+Tables: `pattern_runs`, `repo_baselines`, `global_baselines`, `bucket_stats`. Join language from `data/corpus_repos.json`. Step 3 ACE compare uses these repo/global priors vs agent patch shape ([EVAL.md](EVAL.md)); sandbox is still the blocker for full agent runs.
+
+```bash
+# on DGX (harvest keeps running)
+./scripts/dgx_build_patterns.sh
+# shard only: INCLUDE_LIVE=0 ./scripts/dgx_build_patterns.sh
+```
+
+**Never commit** `*.sqlite`.
