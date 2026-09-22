@@ -40,26 +40,20 @@
 
 ## Quick start
 
+**How to test** (venv, `pytest`, $0 eval smokes): **[docs/TEST.md](docs/TEST.md)**.
+
 ```bash
-export GITHUB_TOKEN=...   # or GH_TOKEN
-pip install -e .
-
-# harvest (pilot or full windowed Django baseline)
-python3 scripts/run_harvest.py --repos django/django --max-prs 100
-./scripts/dgx_full_harvest.sh          # monthly windows 2012→2021
-./scripts/dgx_corpus_harvest.sh        # curated Tier A→D master list (sequential; first wave A–C)
-
-# eval — score + agent sandbox (model_name required)
+cd /path/to/ace-bench
+python3 -m venv .venv && source .venv/bin/activate   # skip create if .venv exists
+pip install -e ".[dev]"
 export ACE_DB_PATH=data/frozen/ace_patterns_django_pre2021_6125.sqlite
-python3 scripts/score_against_human.py --instance django/django#22 --self-smoke --passed-tests true \
-  --agent-patch /tmp/django22_human.patch
-python3 scripts/run_agent_eval.py \
-  --instance django/django#22 --model human-replay --agent file \
-  --agent-patch /tmp/django22_human.patch \
-  --passed-tests true --skip-sandbox --db "$ACE_DB_PATH"
+pytest -q
+# then copy-paste $0 evals from docs/TEST.md
 ```
 
-DB: `ACE_DB_PATH` or `./data/ace_patterns.sqlite`. Frozen copies under `data/frozen/` (see [docs/CORPUS.md](docs/CORPUS.md)).
+Harvest (needs `GITHUB_TOKEN` / `GH_TOKEN`): see [docs/OPS.md](docs/OPS.md).  
+Agent sandbox flags + design: [docs/EVAL.md](docs/EVAL.md).  
+Frozen DBs: [docs/CORPUS.md](docs/CORPUS.md).
 
 ---
 
@@ -76,9 +70,10 @@ DB: `ACE_DB_PATH` or `./data/ace_patterns.sqlite`. Frozen copies under `data/fro
 
 | Doc | Role |
 |-----|------|
+| [docs/TEST.md](docs/TEST.md) | Copy-paste setup, unit tests, $0 eval smokes |
+| [docs/EVAL.md](docs/EVAL.md) | Deeper sandbox + agent eval (step 3) + score CLI |
 | [docs/CORPUS.md](docs/CORPUS.md) | Curated repos, Django freeze, human baseline headlines |
 | [docs/CORPUS_STATUS.md](docs/CORPUS_STATUS.md) | Living harvest coverage table (`scripts/refresh_corpus_status.py`) |
-| [docs/EVAL.md](docs/EVAL.md) | Sandbox + agent eval (step 3) + score CLI |
 | [docs/OPS.md](docs/OPS.md) | DGX / tmux harvest, tokens, rate limits, DB size |
 | [docs/SECURITY.md](docs/SECURITY.md) | Threat model, hardening findings, residual risks |
 | [AGENTS.md](AGENTS.md) | Commit identity for agents |
@@ -96,7 +91,7 @@ Helpers: `scripts/check_db_size.py` (exit 2 over ~1 GiB), `scripts/rotate_shar
 | Django harvest | **6125** rows frozen |
 | Kickoff multi-repo | Flask / Express / Cobra / Clap done; master list ~1000 (A–C wave in progress; D backlog) |
 | Pattern prior DB | Live — cross-repo baselines from shards ([docs/CORPUS.md](docs/CORPUS.md)) |
-| Eval + agent sandbox MVP | Live — [docs/EVAL.md](docs/EVAL.md) (`model_name` required) |
+| Eval + agent sandbox MVP | Live — [docs/TEST.md](docs/TEST.md) / [docs/EVAL.md](docs/EVAL.md) (`model_name` required) |
 | Docker test runner | Next (`--network none` + pytest gate) |
 
 ---

@@ -1,5 +1,7 @@
 # Eval — score vs human + agent sandbox (step 3/4 MVP)
 
+Copy-paste setup + $0 smokes: **[TEST.md](TEST.md)**. This page is the deeper reference.
+
 Human harvest + pattern prior are live. **Step 3 MVP** runs a named model/agent
 in a checkout at ``base_sha``, scores vs the human row, and stores ``model_name``.
 
