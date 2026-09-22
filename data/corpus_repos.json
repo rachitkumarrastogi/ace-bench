@@ -551,7 +551,7 @@
       "prs_verified": true,
       "why": "Lints",
       "notes": "Many small lint PRs",
-      "harvest_status": "harvesting"
+      "harvest_status": "done"
     },
     {
       "repo": "square/retrofit",
@@ -595,7 +595,7 @@
       "prs_verified": true,
       "why": "Classic tests",
       "notes": "Prefer junit4 over junit5 volume",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "nlohmann/json",
@@ -606,7 +606,7 @@
       "prs_verified": true,
       "why": "JSON for Modern C++",
       "notes": "Header-heavy but GitHub PRs",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "catchorg/Catch2",
@@ -617,7 +617,7 @@
       "prs_verified": true,
       "why": "Test framework",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "protocolbuffers/protobuf",
@@ -628,7 +628,7 @@
       "prs_verified": true,
       "why": "IDL + runtimes",
       "notes": "Multi-language monorepo",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "Alamofire/Alamofire",
@@ -639,7 +639,7 @@
       "prs_verified": true,
       "why": "HTTP client",
       "notes": "Swift coverage",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "ReactiveX/RxSwift",
@@ -650,7 +650,7 @@
       "prs_verified": true,
       "why": "Reactive",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "discourse/discourse",
@@ -661,7 +661,7 @@
       "prs_verified": true,
       "why": "Forum app",
       "notes": "App-scale Ruby before Rails",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "Homebrew/brew",
@@ -672,7 +672,7 @@
       "prs_verified": true,
       "why": "Package manager",
       "notes": "Formula noise — code PRs only",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "hashicorp/consul",
@@ -683,7 +683,7 @@
       "prs_verified": true,
       "why": "Service mesh/discovery",
       "notes": "Upper-B / near C",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     }
   ],
   "tier_c": [
@@ -729,7 +729,7 @@
       "prs_verified": true,
       "why": "Framework heavyweight",
       "notes": "Multi-gem monorepo",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "spring-projects/spring-boot",
@@ -740,7 +740,7 @@
       "prs_verified": true,
       "why": "Boot ecosystem",
       "notes": "After smaller JVM Tier B",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "spring-projects/spring-framework",
@@ -751,7 +751,7 @@
       "prs_verified": true,
       "why": "Core Spring",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "golang/go",
@@ -762,7 +762,7 @@
       "prs_verified": true,
       "why": "Language + stdlib",
       "notes": "Some non-GitHub history",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "rust-lang/rust",
@@ -773,7 +773,7 @@
       "prs_verified": true,
       "why": "Compiler",
       "notes": "Enormous; submodule/tooling noise",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "rust-lang/cargo",
@@ -784,7 +784,7 @@
       "prs_verified": true,
       "why": "Package manager",
       "notes": "More tractable than rustc",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "python/cpython",
@@ -795,7 +795,7 @@
       "prs_verified": true,
       "why": "Language",
       "notes": "Huge; many misc/doc PRs",
-      "harvest_status": "queued"
+      "harvest_status": "harvesting"
     },
     {
       "repo": "nodejs/node",

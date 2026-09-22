@@ -1,6 +1,6 @@
 # ACE-Bench corpus status
 
-_Generated: **2026-09-21T11:45:00Z** (UTC)_
+_Generated: **2026-09-22T02:54:44Z** (UTC)_
 
 Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs rows in `human_patterns` (live DB + completed shards when present).
 
@@ -8,14 +8,14 @@ Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs
 
 | Metric | Value |
 |--------|-------|
-| Total harvested rows | **113728** |
-| Repos with data | **57** / 1000 |
-| Status: done | 57 |
+| Total harvested rows | **138738** |
+| Repos with data | **59** / 1000 |
+| Status: done | 59 |
 | Status: harvesting | 1 |
-| Status: queued / pending | 942 |
+| Status: queued / pending | 940 |
 | Status: skipped | 0 |
 | GitHub counts known | 144 / 1000 (sum of known = 573681) |
-| Active harvest (log) | `rust-lang/rust` |
+| Active harvest (log) | `python/cpython` |
 | DB | `/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite (+1 shard)` |
 | Completed shards | 1 |
 | Corpus JSON | `/home/arnavrastogi/ace-bench/data/corpus_repos.json` |
@@ -102,9 +102,9 @@ python3 scripts/refresh_corpus_status.py --fetch-github
 | `spring-projects/spring-boot` | C | done | 41 | 41 | 100.0% | After smaller JVM Tier B; finished_repo in harvest log |
 | `spring-projects/spring-framework` | C | done | 610 | 609 | 99.8% | finished_repo in harvest log |
 | `golang/go` | C | done | 0 | 0 | — | Some non-GitHub history; finished_repo in harvest log |
-| `rust-lang/rust` | C | harvesting | 31932 | 26620 | 83.4% | Enormous; submodule/tooling noise; active in corpus_harvest.log |
-| `rust-lang/cargo` | C | queued | 3499 | 0 | 0.0% | More tractable than rustc |
-| `python/cpython` | C | queued | 19117 | 0 | 0.0% | Huge; many misc/doc PRs |
+| `rust-lang/rust` | C | done | 31932 | 31827 | 99.7% | Enormous; submodule/tooling noise; finished_repo in harvest log |
+| `rust-lang/cargo` | C | done | 3499 | 3499 | 100.0% | More tractable than rustc; finished_repo in harvest log |
+| `python/cpython` | C | harvesting | 19117 | 16304 | 85.3% | Huge; many misc/doc PRs; active in corpus_harvest.log |
 | `nodejs/node` | C | queued | 2738 | 0 | 0.0% | Core + deps noise |
 | `numpy/numpy` | C | queued | 6993 | 0 | 0.0% |  |
 | `scipy/scipy` | C | queued | 4954 | 0 | 0.0% |  |
