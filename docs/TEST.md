@@ -31,11 +31,16 @@ Live harvest DBs and eval SQLite are gitignored; default results path is under `
 pytest -q
 ```
 
+Includes craft helpers (`tests/test_craft.py`) and existing eval/sandbox suites.
+
 ---
 
 ## 3. $0 eval (no API keys, `--skip-sandbox`)
 
 Bill-safe smokes use **`file`** / **`stub` only**.
+
+**Modes:** `--mode immediate` (default) = ACE + drift + churn vs same-PR human.
+`--mode thorough` = same **plus** `craft_score` (path/line/symbol overlap). See [EVAL.md](EVAL.md).
 
 ### Self-smoke + extract human patch
 
@@ -47,7 +52,15 @@ python3 scripts/score_against_human.py \
 
 Expect ACE ≈ **1.0**, drift **0**, churn_ratio **1.0**.
 
-### Human-replay
+Thorough self-smoke (craft ≈ **1.0**):
+
+```bash
+python3 scripts/score_against_human.py \
+  --instance django/django#22 --self-smoke --passed-tests true \
+  --mode thorough --json
+```
+
+### Human-replay (immediate + thorough)
 
 ```bash
 python3 scripts/run_agent_eval.py \
@@ -57,9 +70,23 @@ python3 scripts/run_agent_eval.py \
   --agent-patch /tmp/django22_human.patch \
   --passed-tests true \
   --skip-sandbox \
+  --mode immediate \
+  --db "$ACE_DB_PATH" \
+  --eval-db ~/ace-bench-data/eval_runs.sqlite
+
+python3 scripts/run_agent_eval.py \
+  --instance django/django#22 \
+  --model human-replay \
+  --agent file \
+  --agent-patch /tmp/django22_human.patch \
+  --passed-tests true \
+  --skip-sandbox \
+  --mode thorough \
   --db "$ACE_DB_PATH" \
   --eval-db ~/ace-bench-data/eval_runs.sqlite
 ```
+
+Thorough human-replay: ACE ≈ **1.0**, craft ≈ **1.0**. Immediate: craft `n/a`.
 
 ### Stub (tiny patch — ACE ≫ 1)
 
@@ -73,7 +100,7 @@ python3 scripts/run_agent_eval.py \
   --db "$ACE_DB_PATH"
 ```
 
-### Stub bloated (ACE ≪ 1)
+### Stub bloated (ACE ≪ 1; thorough craft low)
 
 ```bash
 python3 scripts/run_agent_eval.py \
@@ -83,8 +110,11 @@ python3 scripts/run_agent_eval.py \
   --stub-bloated \
   --passed-tests true \
   --skip-sandbox \
+  --mode thorough \
   --db "$ACE_DB_PATH"
 ```
+
+Expect bloated thorough `craft_score` **lower** than human-replay thorough (and typically lower than stub-default thorough).
 
 ---
 
@@ -122,7 +152,7 @@ python3 scripts/run_sandbox_checkout.py \
 | PR-shaped summary | `AGENT_PR.md` next to the saved patch / in the sandbox worktree |
 | Patches | under `--work-root` or repo `data/eval/` (gitignored) |
 
-`AGENT_PR.md` is a **local** title / `model_name` / ACE summary — not a real GitHub PR. Use `--no-pr-artifact` to skip.
+`AGENT_PR.md` is a **local** title / `model_name` / ACE summary — not a real GitHub PR. Use `--no-pr-artifact` to skip. Thorough runs also record `craft_score` / `craft_json` on the eval row.
 
 ---
 

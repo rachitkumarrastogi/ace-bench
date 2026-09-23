@@ -19,6 +19,7 @@
 2. **Pattern prior** — read-only aggregates → dedicated `ace_patterns_prior.sqlite`.
 3. **Sandbox + agent** — shallow checkout at `base_sha`, named `--model` / `--agent` → patch.
 4. **Score** — ACE Index vs human \(P_H\) / \(F_H\) (+ optional prior); store `model_name`.
+   Modes: **immediate** (default: ACE + drift + churn) or **thorough** (+ craft vs same-PR human).
 
 \[
 \text{ACE Score} =
@@ -35,6 +36,8 @@
 | **&lt; 1.0** | Bloat / scope creep |
 | **&gt; 1.0** | More concise than the human baseline |
 | **0.0** | Failed tests |
+
+Thorough mode also stores `craft_score` ∈ [0,1] (mean of path/line/symbol overlap; see [docs/EVAL.md](docs/EVAL.md)).
 
 ---
 
@@ -91,7 +94,7 @@ Helpers: `scripts/check_db_size.py` (exit 2 over ~1 GiB), `scripts/rotate_shar
 | Django harvest | **6125** rows frozen |
 | Kickoff multi-repo | Flask / Express / Cobra / Clap done; master list ~1000 (A–C wave in progress; D backlog) |
 | Pattern prior DB | Live — cross-repo baselines from shards ([docs/CORPUS.md](docs/CORPUS.md)) |
-| Eval + agent sandbox MVP | Live — [docs/TEST.md](docs/TEST.md) / [docs/EVAL.md](docs/EVAL.md) (`model_name` required) |
+| Eval + agent sandbox MVP | Live — [docs/TEST.md](docs/TEST.md) / [docs/EVAL.md](docs/EVAL.md) (`model_name` required; `--mode immediate\|thorough`) |
 | Docker test runner | Next (`--network none` + pytest gate) |
 
 ---

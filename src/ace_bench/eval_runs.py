@@ -2,6 +2,9 @@
 
 Multiple runs per (instance_id, model_name) are allowed — distinguished by
 ``started_at`` / ``id``. Schema lives in code; DB path is gitignored.
+
+``eval_mode``: ``immediate`` (default, no craft) or ``thorough`` (craft filled).
+Craft columns are NULL on immediate runs.
 """
 
 from __future__ import annotations
@@ -31,7 +34,10 @@ CREATE TABLE IF NOT EXISTS eval_runs (
     notes TEXT,
     error TEXT,
     patch_path TEXT,
-    patch_hash TEXT
+    patch_hash TEXT,
+    eval_mode TEXT,
+    craft_score REAL,
+    craft_json TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_eval_runs_instance
@@ -41,6 +47,12 @@ CREATE INDEX IF NOT EXISTS idx_eval_runs_instance_model
 CREATE INDEX IF NOT EXISTS idx_eval_runs_started
     ON eval_runs(started_at);
 """
+
+_MIGRATIONS = (
+    ("eval_mode", "ALTER TABLE eval_runs ADD COLUMN eval_mode TEXT"),
+    ("craft_score", "ALTER TABLE eval_runs ADD COLUMN craft_score REAL"),
+    ("craft_json", "ALTER TABLE eval_runs ADD COLUMN craft_json TEXT"),
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -63,6 +75,9 @@ class EvalRunRecord:
     error: str | None
     patch_path: str | None
     patch_hash: str | None
+    eval_mode: str | None = None
+    craft_score: float | None = None
+    craft: dict[str, Any] | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -96,6 +111,17 @@ def _passed_from_sql(value: Any) -> bool | None:
     return bool(value)
 
 
+def _migrate_schema(conn: sqlite3.Connection) -> None:
+    """Add craft / mode columns to older eval_runs DBs."""
+    cols = {
+        row[1]
+        for row in conn.execute("PRAGMA table_info(eval_runs)").fetchall()
+    }
+    for name, ddl in _MIGRATIONS:
+        if name not in cols:
+            conn.execute(ddl)
+
+
 class EvalRunStore:
     """Persistent store for model/agent eval runs."""
 
@@ -105,6 +131,7 @@ class EvalRunStore:
         self._conn = sqlite3.connect(self.db_path)
         self._conn.row_factory = sqlite3.Row
         self._conn.executescript(SCHEMA)
+        _migrate_schema(self._conn)
         self._conn.commit()
 
     def close(self) -> None:
@@ -151,7 +178,11 @@ class EvalRunStore:
         error: str | None = None,
         patch_path: str | None = None,
         patch_hash: str | None = None,
+        eval_mode: str | None = None,
+        craft_score: float | None = None,
+        craft: dict[str, Any] | None = None,
     ) -> None:
+        craft_json = json.dumps(craft) if craft is not None else None
         self._conn.execute(
             """
             UPDATE eval_runs SET
@@ -165,7 +196,10 @@ class EvalRunStore:
                 notes = ?,
                 error = ?,
                 patch_path = ?,
-                patch_hash = ?
+                patch_hash = ?,
+                eval_mode = ?,
+                craft_score = ?,
+                craft_json = ?
             WHERE id = ?
             """,
             (
@@ -180,6 +214,9 @@ class EvalRunStore:
                 error,
                 patch_path,
                 patch_hash,
+                eval_mode,
+                craft_score,
+                craft_json,
                 run_id,
             ),
         )
@@ -226,11 +263,18 @@ class EvalRunStore:
         return int(row["n"])
 
 
+def _row_keys(row: sqlite3.Row) -> set[str]:
+    return set(row.keys())
+
+
 def _row_to_record(row: sqlite3.Row) -> EvalRunRecord:
+    keys = _row_keys(row)
     human_raw = row["human_files"]
     agent_raw = row["agent_files"]
     human_files = json.loads(human_raw) if human_raw else []
     agent_files = json.loads(agent_raw) if agent_raw else []
+    craft_raw = row["craft_json"] if "craft_json" in keys else None
+    craft = json.loads(craft_raw) if craft_raw else None
     return EvalRunRecord(
         id=int(row["id"]),
         instance_id=row["instance_id"],
@@ -248,4 +292,7 @@ def _row_to_record(row: sqlite3.Row) -> EvalRunRecord:
         error=row["error"],
         patch_path=row["patch_path"],
         patch_hash=row["patch_hash"],
+        eval_mode=row["eval_mode"] if "eval_mode" in keys else None,
+        craft_score=row["craft_score"] if "craft_score" in keys else None,
+        craft=craft,
     )

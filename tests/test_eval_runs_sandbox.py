@@ -46,6 +46,9 @@ class EvalRunStoreTests(unittest.TestCase):
                     notes="smoke",
                     patch_hash=patch_sha256("+x\n"),
                     patch_path="/tmp/x.patch",
+                    eval_mode="thorough",
+                    craft_score=1.0,
+                    craft={"craft_score": 1.0, "path_jaccard": 1.0},
                 )
                 # Second run same instance+model allowed.
                 run_id2 = store.start_run(
@@ -61,6 +64,9 @@ class EvalRunStoreTests(unittest.TestCase):
                 self.assertEqual(row.ace_score, 1.0)
                 self.assertTrue(row.passed_tests)
                 self.assertEqual(row.human_files, ["a.py"])
+                self.assertEqual(row.eval_mode, "thorough")
+                self.assertEqual(row.craft_score, 1.0)
+                self.assertEqual(row.craft, {"craft_score": 1.0, "path_jaccard": 1.0})
                 self.assertEqual(store.count_runs(), 2)
                 listed = store.list_runs(instance_id="django/django#22")
                 self.assertEqual(len(listed), 2)

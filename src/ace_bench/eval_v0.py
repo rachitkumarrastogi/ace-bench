@@ -25,6 +25,7 @@ from ace_bench.ast_metrics import (
     ast_nodes_from_patch,
     ast_nodes_report_note,
 )
+from ace_bench.craft import CraftReport, compute_craft
 from ace_bench.metrics import PatchMetrics, metrics_from_patch
 from ace_bench.scoring import AceScoreInputs, compute_ace_score
 
@@ -32,6 +33,20 @@ from ace_bench.scoring import AceScoreInputs, compute_ace_score
 DJANGO_P50_FILES = 2
 DJANGO_SURGICAL_MAX_FILES = 2  # ≤ p50 → surgical
 DJANGO_SPRAWL_MIN_FILES = 9  # > human p90 (8) → sprawl flag
+
+EVAL_MODE_IMMEDIATE = "immediate"
+EVAL_MODE_THOROUGH = "thorough"
+EVAL_MODES = frozenset({EVAL_MODE_IMMEDIATE, EVAL_MODE_THOROUGH})
+
+
+def normalize_eval_mode(value: str | None) -> str:
+    """Return ``immediate`` (default) or ``thorough``; raise on unknown."""
+    mode = (value or EVAL_MODE_IMMEDIATE).strip().lower()
+    if mode not in EVAL_MODES:
+        raise ValueError(
+            f"eval mode must be one of {sorted(EVAL_MODES)} (got {value!r})"
+        )
+    return mode
 
 _DIFF_GIT_RE = re.compile(r"^diff --git a/(.+?) b/(.+)$", re.MULTILINE)
 _PLUS_PLUS_RE = re.compile(r"^\+\+\+ [ab]/(.+)$", re.MULTILINE)
@@ -168,6 +183,9 @@ class ScoreReport:
     agent_flags: dict[str, bool]
     human_flags: dict[str, bool]
     notes: list[str]
+    eval_mode: str = EVAL_MODE_IMMEDIATE
+    craft_score: float | None = None
+    craft: dict[str, Any] | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -183,12 +201,19 @@ def score_agent_vs_human(
     passed_tests: bool,
     human_metrics: dict[str, Any] | None = None,
     agent_files: list[str] | None = None,
+    mode: str = EVAL_MODE_IMMEDIATE,
 ) -> ScoreReport:
-    """Score an agent unified diff against a human pattern row."""
+    """Score an agent unified diff against a human pattern row.
+
+    ``mode=immediate`` (default): ACE + file_drift + churn only.
+    ``mode=thorough``: same, plus craft signals vs this PR's human patch.
+    """
+    eval_mode = normalize_eval_mode(mode)
     notes: list[str] = [
         ast_nodes_report_note(),
         f"Django baseline p50 files={DJANGO_P50_FILES}; "
         f"surgical≤{DJANGO_SURGICAL_MAX_FILES}; sprawl≥{DJANGO_SPRAWL_MIN_FILES}",
+        f"eval_mode={eval_mode}",
     ]
 
     parsed_agent_files = files_from_patch(agent_patch)
@@ -263,6 +288,23 @@ def score_agent_vs_human(
 
     boundary = file_boundary_drift(human_files, resolved_agent_files)
 
+    craft_score: float | None = None
+    craft_payload: dict[str, Any] | None = None
+    if eval_mode == EVAL_MODE_THOROUGH:
+        craft_report: CraftReport = compute_craft(
+            human_files=list(human_files),
+            agent_files=list(resolved_agent_files),
+            human_patch=human_patch,
+            agent_patch=agent_patch,
+        )
+        craft_score = craft_report.craft_score
+        craft_payload = craft_report.as_dict()
+        notes.append(
+            "craft_score = mean("
+            + ", ".join(craft_report.components_used)
+            + f") = {craft_score:.4f}"
+        )
+
     return ScoreReport(
         instance_id=f"{repo}#{pr_number}",
         repo=repo,
@@ -281,6 +323,9 @@ def score_agent_vs_human(
         agent_flags=surgical_sprawl_flags(a_files_n),
         human_flags=surgical_sprawl_flags(h_files_n),
         notes=notes,
+        eval_mode=eval_mode,
+        craft_score=craft_score,
+        craft=craft_payload,
     )
 
 

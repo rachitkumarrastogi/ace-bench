@@ -29,7 +29,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from ace_bench.db import PatternStore
 from ace_bench.eval_v0 import (
+    EVAL_MODE_IMMEDIATE,
+    EVAL_MODES,
     InstanceIdError,
+    normalize_eval_mode,
     parse_instance_id,
     score_agent_vs_human,
     validate_repo_slug,
@@ -119,6 +122,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=Path,
         default=None,
         help="Write human patch_text from DB to this path",
+    )
+    p.add_argument(
+        "--mode",
+        choices=sorted(EVAL_MODES),
+        default=EVAL_MODE_IMMEDIATE,
+        help=(
+            "immediate (default): ACE + file_drift + churn; "
+            "thorough: plus craft_score vs same-PR human patch"
+        ),
     )
     p.add_argument("--json", action="store_true", help="Emit machine-readable JSON only")
     return p.parse_args(argv)
@@ -214,6 +226,7 @@ def main(argv: list[str] | None = None) -> int:
         passed_tests=args.passed_tests,
         human_metrics=human.metrics,
         agent_files=agent_files,
+        mode=normalize_eval_mode(args.mode),
     )
     payload = report.as_dict()
     payload["db"] = str(db_path)
@@ -227,8 +240,20 @@ def main(argv: list[str] | None = None) -> int:
     drift = payload["boundary"]["symmetric_diff_size"]
     print(f"instance:     {report.instance_id}")
     print(f"title:        {human.title}")
+    print(f"mode:         {report.eval_mode}")
     print(f"passed_tests: {report.passed_tests}")
     print(f"ACE score:    {report.ace_score:.6f}")
+    if report.craft_score is not None:
+        print(f"craft_score:  {report.craft_score:.6f}")
+        craft = report.craft or {}
+        print(
+            f"craft parts:  path={craft.get('path_jaccard')} "
+            f"line={craft.get('line_overlap')} "
+            f"symbol={craft.get('symbol_overlap')} "
+            f"struct={craft.get('structural_sim')}"
+        )
+    else:
+        print("craft_score:  n/a (immediate)")
     print(f"AST proxy:    {report.ast_proxy}  (H={report.human_ast_nodes} A={report.agent_ast_nodes})")
     print(
         f"files:        H={report.human_file_count} A={report.agent_file_count}  "

@@ -25,6 +25,8 @@ def write_agent_pr_md(
     churn_ratio: float | None = None,
     patch_path: str | Path | None = None,
     base_sha: str | None = None,
+    eval_mode: str | None = None,
+    craft_score: float | None = None,
 ) -> Path:
     """Write ``AGENT_PR.md`` under ``dest_dir`` and return its path."""
     dest_dir = Path(dest_dir)
@@ -50,6 +52,8 @@ def write_agent_pr_md(
         lines.append(f"- **agent:** `{agent_name}`")
     if base_sha:
         lines.append(f"- **base_sha:** `{base_sha}`")
+    if eval_mode:
+        lines.append(f"- **eval_mode:** `{eval_mode}`")
     lines.extend(
         [
             f"- **ACE score:** {ace_score:.6f}",
@@ -57,6 +61,8 @@ def write_agent_pr_md(
             f"- **churn_ratio:** {churn}",
         ]
     )
+    if craft_score is not None:
+        lines.append(f"- **craft_score:** {craft_score:.6f}")
     if patch_path:
         lines.append(f"- **patch:** `{patch_path}`")
     lines.extend(

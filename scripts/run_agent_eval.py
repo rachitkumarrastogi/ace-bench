@@ -4,6 +4,10 @@
 Flow:
   load human row → (optional) sandbox @ base_sha → agent → score → eval_runs
 
+Modes:
+  --mode immediate (default): ACE + file_drift + churn vs same-PR human
+  --mode thorough: same plus craft_score (path/line/symbol overlap)
+
 Examples:
   # Offline human-replay (ACE ≈ 1.0) — skip network checkout:
   python3 scripts/run_agent_eval.py \\
@@ -13,6 +17,7 @@ Examples:
     --agent-patch /tmp/human.diff \\
     --passed-tests true \\
     --skip-sandbox \\
+    --mode thorough \\
     --db data/frozen/ace_patterns_django_pre2021_6125.sqlite
 
   # Stub plumbing (tiny patch → ACE ≫ 1; --stub-bloated → ACE ≪ 1):
@@ -42,8 +47,11 @@ from ace_bench.eval_runs import (
     patch_sha256,
 )
 from ace_bench.eval_v0 import (
+    EVAL_MODE_IMMEDIATE,
+    EVAL_MODES,
     InstanceIdError,
     files_from_patch,
+    normalize_eval_mode,
     parse_instance_id,
     score_agent_vs_human,
 )
@@ -182,6 +190,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="skip writing AGENT_PR.md (PR-shaped local summary)",
     )
+    p.add_argument(
+        "--mode",
+        choices=sorted(EVAL_MODES),
+        default=EVAL_MODE_IMMEDIATE,
+        help=(
+            "immediate (default): ACE + file_drift + churn vs same-PR human; "
+            "thorough: same plus craft_score (path/line/symbol overlap)"
+        ),
+    )
     p.add_argument("--json", action="store_true", help="JSON summary only")
     return p.parse_args(argv)
 
@@ -315,6 +332,7 @@ def main(argv: list[str] | None = None) -> int:
         else:
             agent_notes_extra = ""
 
+        eval_mode = normalize_eval_mode(args.mode)
         report = score_agent_vs_human(
             repo=human.repo,
             pr_number=human.pr_number,
@@ -324,6 +342,7 @@ def main(argv: list[str] | None = None) -> int:
             passed_tests=passed_for_score,
             human_metrics=human.metrics,
             agent_files=agent_files,
+            mode=eval_mode,
         )
 
         prior = load_prior_snippet(prior_path, human.repo)
@@ -332,6 +351,7 @@ def main(argv: list[str] | None = None) -> int:
             agent_result.notes,
             agent_notes_extra,
             f"ast_proxy={report.ast_proxy}",
+            f"mode={eval_mode}",
         ]
         if prior:
             notes_parts.append(f"prior={json.dumps(prior, sort_keys=True)}")
@@ -362,6 +382,8 @@ def main(argv: list[str] | None = None) -> int:
                     churn_ratio=report.churn_ratio,
                     patch_path=patch_path,
                     base_sha=human.base_sha,
+                    eval_mode=eval_mode,
+                    craft_score=report.craft_score,
                 )
                 notes = f"{notes}; pr_artifact={pr_path}" if notes else f"pr_artifact={pr_path}"
             except (PathEscapeError, OSError) as exc:
@@ -378,6 +400,9 @@ def main(argv: list[str] | None = None) -> int:
             notes=notes,
             patch_path=str(patch_path) if patch_path else None,
             patch_hash=patch_sha256(agent_patch),
+            eval_mode=eval_mode,
+            craft_score=report.craft_score,
+            craft=report.craft,
         )
         stored = runs.get_run(run_id)
 
@@ -386,7 +411,10 @@ def main(argv: list[str] | None = None) -> int:
         "instance_id": instance_id,
         "model_name": model_name,
         "agent_name": args.agent,
+        "eval_mode": eval_mode,
         "ace_score": report.ace_score,
+        "craft_score": report.craft_score,
+        "craft": report.craft,
         "file_drift": report.boundary["symmetric_diff_size"],
         "churn_ratio": report.churn_ratio,
         "passed_tests": passed_store,
@@ -412,7 +440,12 @@ def main(argv: list[str] | None = None) -> int:
         print(f"instance:     {instance_id}")
         print(f"model_name:   {model_name}")
         print(f"agent:        {args.agent}")
+        print(f"mode:         {eval_mode}")
         print(f"ACE score:    {report.ace_score:.6f}")
+        if report.craft_score is not None:
+            print(f"craft_score:  {report.craft_score:.6f}")
+        else:
+            print("craft_score:  n/a (immediate)")
         print(f"file_drift:   {report.boundary['symmetric_diff_size']}")
         churn = "n/a" if report.churn_ratio is None else f"{report.churn_ratio:.4f}"
         print(f"churn_ratio:  {churn}")
