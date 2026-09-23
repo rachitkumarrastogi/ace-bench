@@ -1,6 +1,6 @@
 # ACE-Bench corpus status
 
-_Generated: **2026-09-22T02:54:44Z** (UTC)_
+_Generated: **2026-09-23T02:51:29Z** (UTC)_
 
 Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs rows in `human_patterns` (live DB + completed shards when present).
 
@@ -8,14 +8,14 @@ Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs
 
 | Metric | Value |
 |--------|-------|
-| Total harvested rows | **138738** |
-| Repos with data | **59** / 1000 |
-| Status: done | 59 |
+| Total harvested rows | **176637** |
+| Repos with data | **66** / 1000 |
+| Status: done | 66 |
 | Status: harvesting | 1 |
-| Status: queued / pending | 940 |
+| Status: queued / pending | 933 |
 | Status: skipped | 0 |
 | GitHub counts known | 144 / 1000 (sum of known = 573681) |
-| Active harvest (log) | `python/cpython` |
+| Active harvest (log) | `ansible/ansible` |
 | DB | `/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite (+1 shard)` |
 | Completed shards | 1 |
 | Corpus JSON | `/home/arnavrastogi/ace-bench/data/corpus_repos.json` |
@@ -104,14 +104,14 @@ python3 scripts/refresh_corpus_status.py --fetch-github
 | `golang/go` | C | done | 0 | 0 | — | Some non-GitHub history; finished_repo in harvest log |
 | `rust-lang/rust` | C | done | 31932 | 31827 | 99.7% | Enormous; submodule/tooling noise; finished_repo in harvest log |
 | `rust-lang/cargo` | C | done | 3499 | 3499 | 100.0% | More tractable than rustc; finished_repo in harvest log |
-| `python/cpython` | C | harvesting | 19117 | 16304 | 85.3% | Huge; many misc/doc PRs; active in corpus_harvest.log |
-| `nodejs/node` | C | queued | 2738 | 0 | 0.0% | Core + deps noise |
-| `numpy/numpy` | C | queued | 6993 | 0 | 0.0% |  |
-| `scipy/scipy` | C | queued | 4954 | 0 | 0.0% |  |
-| `pytorch/pytorch` | C | queued | 4299 | 0 | 0.0% | Monorepo; CUDA/build noise |
-| `tensorflow/tensorflow` | C | queued | 11132 | 0 | 0.0% | Extreme monorepo risk |
-| `huggingface/transformers` | C | queued | 3068 | 0 | 0.0% | Model card / docs heavy |
-| `ansible/ansible` | C | queued | 32367 | 0 | 0.0% | Extreme volume — sample windows |
+| `python/cpython` | C | done | 19117 | 19117 | 100.0% | Huge; many misc/doc PRs; finished_repo in harvest log |
+| `nodejs/node` | C | done | 2738 | 2738 | 100.0% | Core + deps noise; finished_repo in harvest log |
+| `numpy/numpy` | C | done | 6993 | 6961 | 99.5% | finished_repo in harvest log |
+| `scipy/scipy` | C | done | 4954 | 4936 | 99.6% | finished_repo in harvest log |
+| `pytorch/pytorch` | C | done | 4299 | 4299 | 100.0% | Monorepo; CUDA/build noise; finished_repo in harvest log |
+| `tensorflow/tensorflow` | C | done | 11132 | 11132 | 100.0% | Extreme monorepo risk; finished_repo in harvest log |
+| `huggingface/transformers` | C | done | 3068 | 3068 | 100.0% | Model card / docs heavy; finished_repo in harvest log |
+| `ansible/ansible` | C | harvesting | 32367 | 1952 | 6.0% | Extreme volume — sample windows; active in corpus_harvest.log |
 | `home-assistant/core` | C | queued | 21563 | 0 | 0.0% | Integration sprawl |
 | `microsoft/TypeScript` | C | queued | 10230 | 0 | 0.0% | Compiler + tests huge |
 | `angular/angular` | C | queued | 2918 | 0 | 0.0% |  |

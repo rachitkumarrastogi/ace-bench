@@ -795,7 +795,7 @@
       "prs_verified": true,
       "why": "Language",
       "notes": "Huge; many misc/doc PRs",
-      "harvest_status": "harvesting"
+      "harvest_status": "done"
     },
     {
       "repo": "nodejs/node",
@@ -806,7 +806,7 @@
       "prs_verified": true,
       "why": "Runtime",
       "notes": "Core + deps noise",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "numpy/numpy",
@@ -817,7 +817,7 @@
       "prs_verified": true,
       "why": "Array compute",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "scipy/scipy",
@@ -828,7 +828,7 @@
       "prs_verified": true,
       "why": "Scientific",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "pytorch/pytorch",
@@ -839,7 +839,7 @@
       "prs_verified": true,
       "why": "ML framework",
       "notes": "Monorepo; CUDA/build noise",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "tensorflow/tensorflow",
@@ -850,7 +850,7 @@
       "prs_verified": true,
       "why": "ML framework",
       "notes": "Extreme monorepo risk",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "huggingface/transformers",
@@ -861,7 +861,7 @@
       "prs_verified": true,
       "why": "NLP models",
       "notes": "Model card / docs heavy",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "ansible/ansible",
@@ -872,7 +872,7 @@
       "prs_verified": true,
       "why": "Automation",
       "notes": "Extreme volume — sample windows",
-      "harvest_status": "queued"
+      "harvest_status": "harvesting"
     },
     {
       "repo": "home-assistant/core",
