@@ -872,7 +872,7 @@
       "prs_verified": true,
       "why": "Automation",
       "notes": "Extreme volume — sample windows",
-      "harvest_status": "harvesting"
+      "harvest_status": "queued"
     },
     {
       "repo": "home-assistant/core",

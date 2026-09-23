@@ -100,6 +100,10 @@ tmux new -s ace-shard-watch './scripts/dgx_shard_watch.sh'
 # polls every 5m; on ≥1 GiB waits for finished_repo + idle harvest python, then rotates
 ```
 
+**Note:** Rotation moves the **entire** live file into the next shard (it does not split mid-file into 1 GiB pieces). A shard can therefore exceed 1 GiB if a single long repo (e.g. mid-`ansible/ansible`) grew past the soft limit before a safe boundary. After rotate, live is a fresh empty schema under the limit.
+
+**2026-09-23:** Live was ~2.35 GiB while an older (pre-hook) `ace-harvest` bash was still mid-`ansible/ansible`. Operator stopped that writer, `ace-shard-watch` rotated → `ace_patterns_shard_002.sqlite` (~2.35 GiB, ~103.9k rows), and corpus harvest was relaunched with the rotate-hook script (`ansible/ansible` left skipped temporarily so partial ansible rows in shard_002 are not double-counted into a fresh live DB). Resume ansible later with care (or add cross-shard `(repo, pr_number)` dedupe in status).
+
 ### Mac / laptop mirror (outside git)
 
 Prefer storing shard copies **outside** the repo:

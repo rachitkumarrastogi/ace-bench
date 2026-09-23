@@ -1,6 +1,6 @@
 # ACE-Bench corpus status
 
-_Generated: **2026-09-23T02:51:29Z** (UTC)_
+_Generated: **2026-09-23T03:26:16Z** (UTC)_
 
 Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs rows in `human_patterns` (live DB + completed shards when present).
 
@@ -8,16 +8,16 @@ Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs
 
 | Metric | Value |
 |--------|-------|
-| Total harvested rows | **176637** |
+| Total harvested rows | **177520** |
 | Repos with data | **66** / 1000 |
 | Status: done | 66 |
-| Status: harvesting | 1 |
-| Status: queued / pending | 933 |
+| Status: harvesting | 0 |
+| Status: queued / pending | 934 |
 | Status: skipped | 0 |
 | GitHub counts known | 144 / 1000 (sum of known = 573681) |
-| Active harvest (log) | `ansible/ansible` |
-| DB | `/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite (+1 shard)` |
-| Completed shards | 1 |
+| Active harvest (log) | `—` |
+| DB | `/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite (+2 shards)` |
+| Completed shards | 2 |
 | Corpus JSON | `/home/arnavrastogi/ace-bench/data/corpus_repos.json` |
 | Harvest log | `/home/arnavrastogi/ace-bench/data/corpus_harvest.log` |
 | GitHub Search fetches this run | 0 |
@@ -111,7 +111,7 @@ python3 scripts/refresh_corpus_status.py --fetch-github
 | `pytorch/pytorch` | C | done | 4299 | 4299 | 100.0% | Monorepo; CUDA/build noise; finished_repo in harvest log |
 | `tensorflow/tensorflow` | C | done | 11132 | 11132 | 100.0% | Extreme monorepo risk; finished_repo in harvest log |
 | `huggingface/transformers` | C | done | 3068 | 3068 | 100.0% | Model card / docs heavy; finished_repo in harvest log |
-| `ansible/ansible` | C | harvesting | 32367 | 1952 | 6.0% | Extreme volume — sample windows; active in corpus_harvest.log |
+| `ansible/ansible` | C | queued | 32367 | 2835 | 8.8% | Extreme volume — sample windows; partial harvest vs GitHub count (resume) |
 | `home-assistant/core` | C | queued | 21563 | 0 | 0.0% | Integration sprawl |
 | `microsoft/TypeScript` | C | queued | 10230 | 0 | 0.0% | Compiler + tests huge |
 | `angular/angular` | C | queued | 2918 | 0 | 0.0% |  |
