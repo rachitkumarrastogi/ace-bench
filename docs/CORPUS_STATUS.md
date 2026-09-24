@@ -1,6 +1,6 @@
 # ACE-Bench corpus status
 
-_Generated: **2026-09-23T03:26:16Z** (UTC)_
+_Generated: **2026-09-24T22:56:07Z** (UTC)_
 
 Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs rows in `human_patterns` (live DB + completed shards when present).
 
@@ -8,16 +8,16 @@ Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs
 
 | Metric | Value |
 |--------|-------|
-| Total harvested rows | **177520** |
-| Repos with data | **66** / 1000 |
-| Status: done | 66 |
-| Status: harvesting | 0 |
-| Status: queued / pending | 934 |
+| Total harvested rows | **246001** |
+| Repos with data | **72** / 1000 |
+| Status: done | 71 |
+| Status: harvesting | 1 |
+| Status: queued / pending | 928 |
 | Status: skipped | 0 |
 | GitHub counts known | 144 / 1000 (sum of known = 573681) |
-| Active harvest (log) | `—` |
-| DB | `/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite (+2 shards)` |
-| Completed shards | 2 |
+| Active harvest (log) | `home-assistant/core` |
+| DB | `/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite (+3 shards)` |
+| Completed shards | 3 |
 | Corpus JSON | `/home/arnavrastogi/ace-bench/data/corpus_repos.json` |
 | Harvest log | `/home/arnavrastogi/ace-bench/data/corpus_harvest.log` |
 | GitHub Search fetches this run | 0 |
@@ -53,9 +53,9 @@ python3 scripts/refresh_corpus_status.py --fetch-github
 | `BurntSushi/ripgrep` | A | done | 387 | 387 | 100.0% | Single-purpose, testable; finished_repo in harvest log |
 | `sinatra/sinatra` | A | done | 625 | 533 | 85.3% | Ruby without Rails weight; finished_repo in harvest log |
 | `square/okhttp` | A | queued | TBD | 0 | — | JVM + Kotlin mix; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https) |
-| `fmtlib/fmt` | A | queued | 480 | 0 | 0.0% | Prefer over mailing-list C++ |
-| `jekyll/jekyll` | A | queued | 2851 | 0 | 0.0% | Some docs-heavy PRs |
-| `aio-libs/aiohttp` | B | queued | 2354 | 0 | 0.0% | Larger than Tier A HTTP libs |
+| `fmtlib/fmt` | A | done | 480 | 371 | 77.3% | Prefer over mailing-list C++; finished_repo in harvest log |
+| `jekyll/jekyll` | A | done | 2851 | 2825 | 99.1% | Some docs-heavy PRs; finished_repo in harvest log |
+| `aio-libs/aiohttp` | B | done | 2354 | 2354 | 100.0% | Larger than Tier A HTTP libs; finished_repo in harvest log |
 | `scrapy/scrapy` | B | done | 1606 | 473 | 29.5% | Good issue linkage; finished_repo in harvest log |
 | `celery/celery` | B | done | 1398 | 1321 | 94.5% | Multi-package layout; finished_repo in harvest log |
 | `pytest-dev/pytest` | B | done | 3194 | 3194 | 100.0% | Plugin ecosystem noise; finished_repo in harvest log |
@@ -96,8 +96,8 @@ python3 scripts/refresh_corpus_status.py --fetch-github
 | `Homebrew/brew` | B | done | 5790 | 5790 | 100.0% | Formula noise — code PRs only; finished_repo in harvest log |
 | `hashicorp/consul` | B | done | 4529 | 4529 | 100.0% | Upper-B / near C; finished_repo in harvest log |
 | `facebook/react` | C | queued | TBD | 0 | — | Monorepo; exclude bots; cap files/diff; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https) |
-| `microsoft/vscode` | C | queued | 6016 | 0 | 0.0% | Huge volume; rate-limit time; extension noise |
-| `kubernetes/kubernetes` | C | queued | 45430 | 0 | 0.0% | Massive; SIG bots; aggressive filters |
+| `microsoft/vscode` | C | done | 6016 | 6016 | 100.0% | Huge volume; rate-limit time; extension noise; finished_repo in harvest log |
+| `kubernetes/kubernetes` | C | done | 45430 | 45428 | 100.0% | Massive; SIG bots; aggressive filters; finished_repo in harvest log |
 | `rails/rails` | C | done | 17522 | 2496 | 14.2% | Multi-gem monorepo; finished_repo in harvest log |
 | `spring-projects/spring-boot` | C | done | 41 | 41 | 100.0% | After smaller JVM Tier B; finished_repo in harvest log |
 | `spring-projects/spring-framework` | C | done | 610 | 609 | 99.8% | finished_repo in harvest log |
@@ -112,7 +112,7 @@ python3 scripts/refresh_corpus_status.py --fetch-github
 | `tensorflow/tensorflow` | C | done | 11132 | 11132 | 100.0% | Extreme monorepo risk; finished_repo in harvest log |
 | `huggingface/transformers` | C | done | 3068 | 3068 | 100.0% | Model card / docs heavy; finished_repo in harvest log |
 | `ansible/ansible` | C | queued | 32367 | 2835 | 8.8% | Extreme volume — sample windows; partial harvest vs GitHub count (resume) |
-| `home-assistant/core` | C | queued | 21563 | 0 | 0.0% | Integration sprawl |
+| `home-assistant/core` | C | harvesting | 21563 | 11487 | 53.3% | Integration sprawl; active in corpus_harvest.log |
 | `microsoft/TypeScript` | C | queued | 10230 | 0 | 0.0% | Compiler + tests huge |
 | `angular/angular` | C | queued | 2918 | 0 | 0.0% |  |
 | `vuejs/core` | C | queued | 1137 | 0 | 0.0% | Pre-2021 may be thinner |

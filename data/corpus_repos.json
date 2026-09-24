@@ -230,7 +230,7 @@
       "prs_verified": true,
       "why": "Formatting library; GitHub-native",
       "notes": "Prefer over mailing-list C++",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "jekyll/jekyll",
@@ -241,7 +241,7 @@
       "prs_verified": true,
       "why": "SSG; long PR history",
       "notes": "Some docs-heavy PRs",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     }
   ],
   "tier_b": [
@@ -254,7 +254,7 @@
       "prs_verified": true,
       "why": "Async HTTP server/client",
       "notes": "Larger than Tier A HTTP libs",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "scrapy/scrapy",
@@ -707,7 +707,7 @@
       "prs_verified": true,
       "why": "User-requested heavyweight editor",
       "notes": "Huge volume; rate-limit time; extension noise",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "kubernetes/kubernetes",
@@ -718,7 +718,7 @@
       "prs_verified": true,
       "why": "Orchestration standard",
       "notes": "Massive; SIG bots; aggressive filters",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "rails/rails",
@@ -883,7 +883,7 @@
       "prs_verified": true,
       "why": "Home automation",
       "notes": "Integration sprawl",
-      "harvest_status": "queued"
+      "harvest_status": "harvesting"
     },
     {
       "repo": "microsoft/TypeScript",
