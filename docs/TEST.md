@@ -154,6 +154,19 @@ python3 scripts/run_sandbox_checkout.py \
 
 `AGENT_PR.md` is a **local** title / `model_name` / ACE summary — not a real GitHub PR. Use `--no-pr-artifact` to skip. Thorough runs also record `craft_score` / `craft_json` on the eval row.
 
+### Batch ~100 (stub vs human-replay)
+
+For a reusable offline sweep (~100 Django instances × human-replay / stub-default / stub-bloated), see **[EVAL_BATCH_100.md](EVAL_BATCH_100.md)** — summary tables, PR links, where stubs tank vs human ACE=1, and bloat. Re-run with `$0` stubs only:
+
+```bash
+python3 scripts/run_batch_eval.py \
+  --limit 100 --mode thorough --skip-sandbox \
+  --write-report docs/EVAL_BATCH_100.md \
+  --eval-db ~/ace-bench-data/eval_runs.sqlite
+```
+
+Paid OpenAI/Anthropic are off by default; `--allow-paid` caps at 5 instances.
+
 ---
 
 ## 6. Paid agents (optional)
