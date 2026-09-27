@@ -1,6 +1,6 @@
 # ACE-Bench corpus status
 
-_Generated: **2026-09-24T22:56:07Z** (UTC)_
+_Generated: **2026-09-27T02:55:57Z** (UTC)_
 
 Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs rows in `human_patterns` (live DB + completed shards when present).
 
@@ -8,16 +8,16 @@ Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs
 
 | Metric | Value |
 |--------|-------|
-| Total harvested rows | **246001** |
-| Repos with data | **72** / 1000 |
-| Status: done | 71 |
+| Total harvested rows | **334018** |
+| Repos with data | **82** / 1000 |
+| Status: done | 81 |
 | Status: harvesting | 1 |
-| Status: queued / pending | 928 |
+| Status: queued / pending | 918 |
 | Status: skipped | 0 |
 | GitHub counts known | 144 / 1000 (sum of known = 573681) |
-| Active harvest (log) | `home-assistant/core` |
-| DB | `/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite (+3 shards)` |
-| Completed shards | 3 |
+| Active harvest (log) | `apache/kafka` |
+| DB | `/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite (+5 shards)` |
+| Completed shards | 5 |
 | Corpus JSON | `/home/arnavrastogi/ace-bench/data/corpus_repos.json` |
 | Harvest log | `/home/arnavrastogi/ace-bench/data/corpus_harvest.log` |
 | GitHub Search fetches this run | 0 |
@@ -112,17 +112,17 @@ python3 scripts/refresh_corpus_status.py --fetch-github
 | `tensorflow/tensorflow` | C | done | 11132 | 11132 | 100.0% | Extreme monorepo risk; finished_repo in harvest log |
 | `huggingface/transformers` | C | done | 3068 | 3068 | 100.0% | Model card / docs heavy; finished_repo in harvest log |
 | `ansible/ansible` | C | queued | 32367 | 2835 | 8.8% | Extreme volume — sample windows; partial harvest vs GitHub count (resume) |
-| `home-assistant/core` | C | harvesting | 21563 | 11487 | 53.3% | Integration sprawl; active in corpus_harvest.log |
-| `microsoft/TypeScript` | C | queued | 10230 | 0 | 0.0% | Compiler + tests huge |
-| `angular/angular` | C | queued | 2918 | 0 | 0.0% |  |
-| `vuejs/core` | C | queued | 1137 | 0 | 0.0% | Pre-2021 may be thinner |
-| `vuejs/vue` | C | queued | 986 | 0 | 0.0% | Stronger pre-2021 history |
-| `hashicorp/terraform` | C | queued | 8638 | 0 | 0.0% | Provider noise |
-| `hashicorp/vault` | C | queued | 5633 | 0 | 0.0% |  |
-| `prometheus/prometheus` | C | queued | 3460 | 0 | 0.0% |  |
-| `grafana/grafana` | C | queued | 9530 | 0 | 0.0% | Frontend+backend |
-| `elastic/elasticsearch` | C | queued | 34080 | 0 | 0.0% |  |
-| `apache/kafka` | C | queued | 3713 | 0 | 0.0% |  |
+| `home-assistant/core` | C | done | 21563 | 21563 | 100.0% | Integration sprawl; finished_repo in harvest log |
+| `microsoft/TypeScript` | C | done | 10230 | 10230 | 100.0% | Compiler + tests huge; finished_repo in harvest log |
+| `angular/angular` | C | done | 2918 | 2918 | 100.0% | finished_repo in harvest log |
+| `vuejs/core` | C | done | 1137 | 1137 | 100.0% | Pre-2021 may be thinner; finished_repo in harvest log |
+| `vuejs/vue` | C | done | 986 | 986 | 100.0% | Stronger pre-2021 history; finished_repo in harvest log |
+| `hashicorp/terraform` | C | done | 8638 | 8638 | 100.0% | Provider noise; finished_repo in harvest log |
+| `hashicorp/vault` | C | done | 5633 | 5633 | 100.0% | finished_repo in harvest log |
+| `prometheus/prometheus` | C | done | 3460 | 3460 | 100.0% | finished_repo in harvest log |
+| `grafana/grafana` | C | done | 9530 | 9530 | 100.0% | Frontend+backend; finished_repo in harvest log |
+| `elastic/elasticsearch` | C | done | 34080 | 33416 | 98.1% | finished_repo in harvest log |
+| `apache/kafka` | C | harvesting | 3713 | 1993 | 53.7% | active in corpus_harvest.log |
 | `apache/spark` | C | queued | 5 | 0 | 0.0% | Build-heavy |
 | `electron/electron` | C | queued | 10822 | 0 | 0.0% |  |
 | `facebook/react-native` | C | queued | TBD | 0 | — | Multi-platform monorepo; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https) |

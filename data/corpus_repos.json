@@ -883,7 +883,7 @@
       "prs_verified": true,
       "why": "Home automation",
       "notes": "Integration sprawl",
-      "harvest_status": "harvesting"
+      "harvest_status": "done"
     },
     {
       "repo": "microsoft/TypeScript",
@@ -894,7 +894,7 @@
       "prs_verified": true,
       "why": "Language",
       "notes": "Compiler + tests huge",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "angular/angular",
@@ -905,7 +905,7 @@
       "prs_verified": true,
       "why": "Framework monorepo",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "vuejs/core",
@@ -916,7 +916,7 @@
       "prs_verified": true,
       "why": "Vue 3 core",
       "notes": "Pre-2021 may be thinner",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "vuejs/vue",
@@ -927,7 +927,7 @@
       "prs_verified": true,
       "why": "Vue 2",
       "notes": "Stronger pre-2021 history",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "hashicorp/terraform",
@@ -938,7 +938,7 @@
       "prs_verified": true,
       "why": "IaC",
       "notes": "Provider noise",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "hashicorp/vault",
@@ -949,7 +949,7 @@
       "prs_verified": true,
       "why": "Secrets",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "prometheus/prometheus",
@@ -960,7 +960,7 @@
       "prs_verified": true,
       "why": "Metrics",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "grafana/grafana",
@@ -971,7 +971,7 @@
       "prs_verified": true,
       "why": "Observability UI",
       "notes": "Frontend+backend",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "elastic/elasticsearch",
@@ -982,7 +982,7 @@
       "prs_verified": true,
       "why": "Search",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "apache/kafka",
@@ -993,7 +993,7 @@
       "prs_verified": true,
       "why": "Streaming",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "harvesting"
     },
     {
       "repo": "apache/spark",
