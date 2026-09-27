@@ -79,7 +79,7 @@ Immutable first human-pattern harvest.
 
 - **Frozen** = do not write. Prefer for eval ([EVAL.md](EVAL.md)).
 - **Live** = `ace_patterns.sqlite` / `$ACE_DB_PATH` — multi-repo upserts on `UNIQUE(repo, pr_number)`. Django rows remain in live DB alongside new repos.
-- **Shards** — when live DB ≥ **1 GiB**, harvest rotates between repos into `data/shards/ace_patterns_shard_NNN.sqlite` (manifest: `data/shards_manifest.json`). Mac mirror: `~/ace-bench-data/shards/` (outside git; see [OPS.md](OPS.md)). **Never commit** `*.sqlite`.
+- **Shards** — when live DB ≥ **1 GiB**, harvest rotates between repos into `data/shards/ace_patterns_shard_NNN.sqlite` (manifest: `data/shards_manifest.json`). Mac backup: in-repo `data/shards/` (gitignored SQLite; see [OPS.md](OPS.md)). Legacy fallback: `~/ace-bench-data/shards/`. **Never commit** `*.sqlite`.
 
 ### Recreate freeze
 
@@ -93,7 +93,7 @@ python3 scripts/run_harvest.py --db "$OUT" --summary-only
 # expect total: 6125, single django/django under by_repo
 ```
 
-`*.sqlite` under `data/` is gitignored; only this doc + `corpus_repos.json` are the public freeze record. Live shards and Mac copies stay on disk only (DGX `data/shards/`, Mac `~/ace-bench-data/shards/`).
+`*.sqlite` under `data/` is gitignored; only this doc + `corpus_repos.json` (and `data/shards/README.md`) are the public freeze/layout record. Live shards and Mac copies stay on disk only (DGX `data/shards/`, Mac `<repo>/data/shards/`).
 
 ---
 

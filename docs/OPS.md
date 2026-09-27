@@ -104,13 +104,14 @@ tmux new -s ace-shard-watch './scripts/dgx_shard_watch.sh'
 
 **2026-09-23:** Live was ~2.35 GiB while an older (pre-hook) `ace-harvest` bash was still mid-`ansible/ansible`. Operator stopped that writer, `ace-shard-watch` rotated → `ace_patterns_shard_002.sqlite` (~2.35 GiB, ~103.9k rows), and corpus harvest was relaunched with the rotate-hook script (`ansible/ansible` left skipped temporarily so partial ansible rows in shard_002 are not double-counted into a fresh live DB). Resume ansible later with care (or add cross-shard `(repo, pr_number)` dedupe in status).
 
-### Mac / laptop mirror (outside git)
+### Mac / laptop mirror (in-repo `data/shards/`, gitignored)
 
-Prefer storing shard copies **outside** the repo:
+Shard SQLite lives **inside** the checkout under `data/shards/` (gitignored; only `data/shards/README.md` is tracked). Do **not** commit multi-GB DBs. Legacy path `~/ace-bench-data/shards/` still works as a fallback for older scripts.
 
 | Role | Path |
 |------|------|
-| Mac shards + snapshots | `~/ace-bench-data/shards/` |
+| Mac shards + snapshots | `<repo>/data/shards/` (preferred; see `data/shards/README.md`) |
+| Legacy Mac shards | `~/ace-bench-data/shards/` (pointer README only after move) |
 | Mac pattern prior | `~/ace-bench-data/patterns/` |
 | DGX live + shards | `$HOME/ace-bench/data/ace_patterns.sqlite` + `…/shards/` |
 | DGX pattern prior | `$HOME/ace-bench/data/patterns/ace_patterns_prior.sqlite` |
@@ -126,18 +127,20 @@ scp LocalModelRunner:~/ace-bench/data/patterns/ace_patterns_prior.sqlite \
   ~/ace-bench-data/patterns/
 ```
 
-Consistent snapshot while harvest runs (preferred over raw `scp` of a live file):
+Consistent snapshot / shard sync while harvest runs:
 
 ```bash
 # on DGX
 sqlite3 "$ACE_DB_PATH" ".backup '/tmp/ace_patterns_backup.sqlite'"
-# on Mac
-mkdir -p ~/ace-bench-data/shards
+# on Mac (from ace-bench repo root)
+mkdir -p data/shards
 scp LocalModelRunner:/tmp/ace_patterns_backup.sqlite \
-  ~/ace-bench-data/shards/ace_patterns_live_snapshot_YYYYMMDD.sqlite
+  data/shards/ace_patterns_live_snapshot_YYYYMMDD.sqlite
+# or full shard tree:
+rsync -avz --progress LocalModelRunner:~/ace-bench/data/shards/ data/shards/
 ```
 
-See the README in `~/ace-bench-data/shards/` on the Mac. `refresh_corpus_status.py` sums rows across live DB + completed shards.
+See `data/shards/README.md`. `refresh_corpus_status.py` sums rows across live DB + completed shards.
 ---
 
 ## Smoke (laptop)

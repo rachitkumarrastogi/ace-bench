@@ -55,7 +55,11 @@ from ace_bench.eval_v0 import (
     parse_instance_id,
     score_agent_vs_human,
 )
-from ace_bench.paths import PathEscapeError, resolve_allowed_path
+from ace_bench.paths import (
+    PathEscapeError,
+    default_shards_dir,
+    resolve_allowed_path,
+)
 from ace_bench.pr_artifact import write_agent_pr_md
 from ace_bench.sandbox import (
     SandboxError,
@@ -76,6 +80,7 @@ def resolve_harvest_db(cli_db: str | None) -> Path:
     for c in (
         Path("data/frozen") / FROZEN_NAME,
         Path.home() / "ace-bench" / "data" / "frozen" / FROZEN_NAME,
+        default_shards_dir() / "ace_patterns_shard_001.sqlite",
         Path.home() / "ace-bench-data" / "shards" / "ace_patterns_shard_001.sqlite",
         Path("data/ace_patterns.sqlite"),
     ):

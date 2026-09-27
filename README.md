@@ -83,7 +83,7 @@ Frozen DBs: [docs/CORPUS.md](docs/CORPUS.md).
 
 Machine source of truth for the **~1000-repo** master list: [`data/corpus_repos.json`](data/corpus_repos.json) (first harvest wave was Tier A–C ~110; Tier D is backlog).
 
-Helpers: `scripts/check_db_size.py` (exit 2 over ~1 GiB), `scripts/rotate_shard_if_needed.py`, `scripts/dgx_shard_watch.sh`, `scripts/dgx_refresh_status.sh`, `REFRESH_STATUS=1 ./scripts/dgx_corpus_harvest.sh`. Pattern prior (step 2): `scripts/build_pattern_db.py` / `scripts/dgx_build_patterns.sh` → `~/ace-bench/data/patterns/` (Mac: `~/ace-bench-data/patterns/`). Mac shard mirror: `~/ace-bench-data/shards/` (see [docs/OPS.md](docs/OPS.md)).
+Helpers: `scripts/check_db_size.py` (exit 2 over ~1 GiB), `scripts/rotate_shard_if_needed.py`, `scripts/dgx_shard_watch.sh`, `scripts/dgx_refresh_status.sh`, `REFRESH_STATUS=1 ./scripts/dgx_corpus_harvest.sh`. Pattern prior (step 2): `scripts/build_pattern_db.py` / `scripts/dgx_build_patterns.sh` → `~/ace-bench/data/patterns/` (Mac: `~/ace-bench-data/patterns/`). Mac shard backup: `data/shards/` in-repo, gitignored (see [docs/OPS.md](docs/OPS.md) / `data/shards/README.md`).
 
 ---
 

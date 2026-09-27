@@ -20,20 +20,39 @@ class PathEscapeError(ValueError):
     """Raised when a user path resolves outside allowed roots."""
 
 
+def repo_root() -> Path:
+    """ace-bench package checkout root (``src/ace_bench/../..``)."""
+    return Path(__file__).resolve().parents[2]
+
+
+def default_shards_dir() -> Path:
+    """Prefer in-repo ``data/shards/``, fall back to ``~/ace-bench-data/shards``.
+
+    Mac backups live under the checkout (gitignored SQLite). The home path is
+    kept for older layouts / scripts that have not been updated yet.
+    """
+    repo_shards = repo_root() / "data" / "shards"
+    if repo_shards.is_dir():
+        return repo_shards
+    home_shards = Path.home() / "ace-bench-data" / "shards"
+    if home_shards.is_dir():
+        return home_shards
+    return repo_shards
+
+
 def default_allowed_roots() -> list[Path]:
     """Roots that user-controlled file paths may resolve under."""
     roots: list[Path] = [Path.cwd().resolve()]
     home_ace = (Path.home() / "ace-bench").resolve()
     roots.append(home_ace)
-    # Mac / laptop mirror outside the git checkout (see docs/OPS.md).
+    # Legacy Mac mirror (patterns / eval / old shards path; see docs/OPS.md).
     home_ace_data = (Path.home() / "ace-bench-data").resolve()
     roots.append(home_ace_data)
     tmp = Path("/tmp")
     if tmp.exists():
         roots.append(tmp.resolve())
     # Repo checkout when imported from an editable install / scripts/ layout.
-    pkg_root = Path(__file__).resolve().parents[2]
-    roots.append(pkg_root)
+    roots.append(repo_root())
     extra = os.environ.get("ACE_ALLOWED_ROOTS", "")
     for part in extra.split(os.pathsep):
         part = part.strip()

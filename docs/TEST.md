@@ -21,7 +21,7 @@ export ACE_DB_PATH=data/frozen/ace_patterns_django_pre2021_6125.sqlite
 ```
 
 Frozen DB must be present under `data/frozen/` (see [CORPUS.md](CORPUS.md)).  
-Live harvest DBs and eval SQLite are gitignored; default results path is under `~/ace-bench-data/`.
+Live harvest DBs, shard backups under `data/shards/`, and eval SQLite are gitignored; default eval results path is under `~/ace-bench-data/`.
 
 ---
 

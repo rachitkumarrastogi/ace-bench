@@ -46,10 +46,13 @@ data/**/*.sqlite
 data/**/*.sqlite-*
 data/frozen/*.sqlite
 data/frozen/*.sqlite-*
-data/shards/
+# Shard SQLite + manifest live under data/shards/ (never commit multi-GB DBs).
+# Track only the README so the layout is documented in git.
+data/shards/*
+!data/shards/README.md
 data/shards_manifest.json
 data/eval/
 !.gitkeep
 
-# Local Mac mirror of harvest DBs (outside-repo path may also be used)
+# Legacy Mac mirror path (pre-repo data/shards/); may still hold patterns/eval
 ace-bench-data/
