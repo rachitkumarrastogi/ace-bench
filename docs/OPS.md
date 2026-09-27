@@ -108,9 +108,11 @@ tmux new -s ace-shard-watch './scripts/dgx_shard_watch.sh'
 
 Shard SQLite lives **inside** the checkout under `data/shards/` (gitignored; only `data/shards/README.md` is tracked). Do **not** commit multi-GB DBs. Legacy path `~/ace-bench-data/shards/` still works as a fallback for older scripts.
 
+**Keep only** rotated `ace_patterns_shard_*.sqlite`, `shards_manifest.json`, and `README.md` under `data/shards/`; live snapshots and the Django freeze belong elsewhere (`/tmp` / `data/frozen/`).
+
 | Role | Path |
 |------|------|
-| Mac shards + snapshots | `<repo>/data/shards/` (preferred; see `data/shards/README.md`) |
+| Mac rotated shards + manifest | `<repo>/data/shards/` (preferred; see `data/shards/README.md`) |
 | Legacy Mac shards | `~/ace-bench-data/shards/` (pointer README only after move) |
 | Mac pattern prior | `~/ace-bench-data/patterns/` |
 | DGX live + shards | `$HOME/ace-bench/data/ace_patterns.sqlite` + `…/shards/` |

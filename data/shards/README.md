@@ -1,13 +1,19 @@
-# ACE-Bench SQLite shards / snapshots (Mac backup)
+# ACE-Bench rotated SQLite shards (Mac backup)
 
-Local backup of DGX harvest shards. **Gitignored** except this README — do **not** commit `*.sqlite` (multi-GB).
+Local mirror of completed DGX harvest shards. **Gitignored** except this README — do **not** commit `*.sqlite` (multi-GB).
 
-| Kind | Naming | Source |
-|------|--------|--------|
-| Live snapshot | `ace_patterns_live_snapshot_YYYYMMDD.sqlite` | Consistent `sqlite3`/Python `.backup` from DGX, then `scp`/`rsync` |
+## What belongs here
+
+| Keep | Naming | Notes |
+|------|--------|-------|
 | Completed shards | `ace_patterns_shard_NNN.sqlite` | Copied from DGX `$HOME/ace-bench/data/shards/` after rotate |
-| Frozen Django | `ace_patterns_django_pre2021_6125.sqlite` | Eval smoke copy (canonical freeze also under `data/frozen/`) |
-| Manifest | `shards_manifest.json` | DGX `$HOME/ace-bench/data/shards_manifest.json` |
+| Manifest | `shards_manifest.json` | From DGX `$HOME/ace-bench/data/shards_manifest.json` |
+| This file | `README.md` | Tracked in git |
+
+Do **not** keep in this directory:
+
+- `ace_patterns_live_snapshot_*.sqlite` — point-in-time live backups; redundant once shards exist (store elsewhere if needed)
+- Frozen Django eval DB — canonical path is `data/frozen/ace_patterns_django_pre2021_6125.sqlite`
 
 Canonical ops: [docs/OPS.md](../../docs/OPS.md) (sharding at 1 GiB, never commit `*.sqlite`).
 
@@ -19,13 +25,16 @@ mkdir -p data/shards
 rsync -avz --progress \
   LocalModelRunner:~/ace-bench/data/shards/ \
   data/shards/
+```
 
-# live snapshot while harvest runs (preferred over raw scp of live file):
+Optional live snapshot (while harvest runs; prefer not leaving it in `data/shards/` long-term):
+
+```bash
 # on DGX:
 #   sqlite3 "$ACE_DB_PATH" ".backup '/tmp/ace_patterns_backup.sqlite'"
-# on Mac:
+# on Mac (temp location, not as a permanent shards/ resident):
 scp LocalModelRunner:/tmp/ace_patterns_backup.sqlite \
-  data/shards/ace_patterns_live_snapshot_YYYYMMDD.sqlite
+  /tmp/ace_patterns_live_snapshot_YYYYMMDD.sqlite
 ```
 
 DGX live DB: `$HOME/ace-bench/data/ace_patterns.sqlite`  
