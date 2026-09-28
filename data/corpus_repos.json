@@ -993,7 +993,7 @@
       "prs_verified": true,
       "why": "Streaming",
       "notes": "",
-      "harvest_status": "harvesting"
+      "harvest_status": "done"
     },
     {
       "repo": "apache/spark",
@@ -1004,7 +1004,7 @@
       "prs_verified": true,
       "why": "Data",
       "notes": "Build-heavy",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "electron/electron",
@@ -1015,7 +1015,7 @@
       "prs_verified": true,
       "why": "Desktop shell",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "facebook/react-native",
@@ -1059,7 +1059,7 @@
       "prs_verified": true,
       "why": "Vision",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "llvm/llvm-project",
@@ -1070,7 +1070,7 @@
       "prs_verified": true,
       "why": "Compiler infra",
       "notes": "Monorepo extreme",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "dotnet/runtime",
@@ -1081,7 +1081,7 @@
       "prs_verified": true,
       "why": "Runtime",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "dotnet/aspnetcore",
@@ -1092,7 +1092,7 @@
       "prs_verified": true,
       "why": "Web stack",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "JetBrains/kotlin",
@@ -1103,7 +1103,7 @@
       "prs_verified": true,
       "why": "Language",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "apple/swift",
@@ -1125,7 +1125,7 @@
       "prs_verified": true,
       "why": "Datastore",
       "notes": "Historically mixed contribution paths",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "postgresql/postgres",
@@ -1169,7 +1169,7 @@
       "prs_verified": true,
       "why": "Docker CLI",
       "notes": "Smaller than engine",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "helm/helm",
@@ -1180,7 +1180,7 @@
       "prs_verified": true,
       "why": "K8s packaging",
       "notes": "After smaller Go Tier A/B",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "istio/istio",
@@ -1191,7 +1191,7 @@
       "prs_verified": true,
       "why": "Service mesh",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "envoyproxy/envoy",
@@ -1202,7 +1202,7 @@
       "prs_verified": true,
       "why": "Proxy",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "done"
     },
     {
       "repo": "clickhouse/clickhouse",
@@ -1213,7 +1213,7 @@
       "prs_verified": true,
       "why": "OLAP DB",
       "notes": "",
-      "harvest_status": "queued"
+      "harvest_status": "harvesting"
     },
     {
       "repo": "pingcap/tidb",

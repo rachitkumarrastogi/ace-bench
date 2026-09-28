@@ -3,7 +3,7 @@
 Machine-readable master list: [`data/corpus_repos.json`](../data/corpus_repos.json) (**~1000** repos: 5 kickoff + Tier A/B/C + Tier D backlog).  
 Living coverage: [CORPUS_STATUS.md](CORPUS_STATUS.md) (`python3 scripts/refresh_corpus_status.py [--fetch-github]`).
 
-Default cutoff for all harvests: `merged:<2021-01-01` (windowed monthly/quarterly as needed).
+Default cutoff for all harvests: `merged:<2021-01-01` (windowed monthly/quarterly as needed). Worth continuing: even if frontier models may have browsed some of these public PRs, a local pre-2021 human baseline still anchors eval deltas we control.
 
 ---
 

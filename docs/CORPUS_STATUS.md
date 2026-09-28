@@ -1,6 +1,6 @@
 # ACE-Bench corpus status
 
-_Generated: **2026-09-27T02:55:57Z** (UTC)_
+_Generated: **2026-09-28T16:31:08Z** (UTC)_
 
 Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs rows in `human_patterns` (live DB + completed shards when present).
 
@@ -8,16 +8,16 @@ Per-repo GitHub Search `total_count` for `is:pr is:merged merged:<2021-01-01` vs
 
 | Metric | Value |
 |--------|-------|
-| Total harvested rows | **334018** |
-| Repos with data | **82** / 1000 |
-| Status: done | 81 |
+| Total harvested rows | **397497** |
+| Repos with data | **95** / 1000 |
+| Status: done | 94 |
 | Status: harvesting | 1 |
-| Status: queued / pending | 918 |
+| Status: queued / pending | 905 |
 | Status: skipped | 0 |
 | GitHub counts known | 144 / 1000 (sum of known = 573681) |
-| Active harvest (log) | `apache/kafka` |
-| DB | `/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite (+5 shards)` |
-| Completed shards | 5 |
+| Active harvest (log) | `clickhouse/clickhouse` |
+| DB | `/home/arnavrastogi/ace-bench/data/ace_patterns.sqlite (+6 shards)` |
+| Completed shards | 6 |
 | Corpus JSON | `/home/arnavrastogi/ace-bench/data/corpus_repos.json` |
 | Harvest log | `/home/arnavrastogi/ace-bench/data/corpus_harvest.log` |
 | GitHub Search fetches this run | 0 |
@@ -122,27 +122,27 @@ python3 scripts/refresh_corpus_status.py --fetch-github
 | `prometheus/prometheus` | C | done | 3460 | 3460 | 100.0% | finished_repo in harvest log |
 | `grafana/grafana` | C | done | 9530 | 9530 | 100.0% | Frontend+backend; finished_repo in harvest log |
 | `elastic/elasticsearch` | C | done | 34080 | 33416 | 98.1% | finished_repo in harvest log |
-| `apache/kafka` | C | harvesting | 3713 | 1993 | 53.7% | active in corpus_harvest.log |
-| `apache/spark` | C | queued | 5 | 0 | 0.0% | Build-heavy |
-| `electron/electron` | C | queued | 10822 | 0 | 0.0% |  |
+| `apache/kafka` | C | done | 3713 | 3713 | 100.0% | finished_repo in harvest log |
+| `apache/spark` | C | done | 5 | 5 | 100.0% | Build-heavy; finished_repo in harvest log |
+| `electron/electron` | C | done | 10822 | 10822 | 100.0% | finished_repo in harvest log |
 | `facebook/react-native` | C | queued | TBD | 0 | — | Multi-platform monorepo; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https) |
 | `flutter/flutter` | C | queued | 17877 | 0 | 0.0% | Engine + framework |
 | `godotengine/godot` | C | queued | 13698 | 0 | 0.0% |  |
-| `opencv/opencv` | C | queued | 9295 | 0 | 0.0% |  |
-| `llvm/llvm-project` | C | queued | 1 | 0 | 0.0% | Monorepo extreme |
-| `dotnet/runtime` | C | queued | 7360 | 0 | 0.0% |  |
-| `dotnet/aspnetcore` | C | queued | 6700 | 0 | 0.0% |  |
-| `JetBrains/kotlin` | C | queued | 1674 | 0 | 0.0% |  |
+| `opencv/opencv` | C | done | 9295 | 2132 | 22.9% | finished_repo in harvest log |
+| `llvm/llvm-project` | C | done | 1 | 1 | 100.0% | Monorepo extreme; finished_repo in harvest log |
+| `dotnet/runtime` | C | done | 7360 | 7360 | 100.0% | finished_repo in harvest log |
+| `dotnet/aspnetcore` | C | done | 6700 | 6700 | 100.0% | finished_repo in harvest log |
+| `JetBrains/kotlin` | C | done | 1674 | 1674 | 100.0% | finished_repo in harvest log |
 | `apple/swift` | C | queued | TBD | 0 | — | Partial GitHub mirror dynamics; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https) |
-| `redis/redis` | C | queued | 1512 | 0 | 0.0% | Historically mixed contribution paths |
+| `redis/redis` | C | done | 1512 | 201 | 13.3% | Historically mixed contribution paths; finished_repo in harvest log |
 | `postgresql/postgres` | C | queued | TBD | 0 | — | Mailing-list heavy; sample only; Search unavailable (422 / not searchable with token); Search unavailable (GitHub API 422 for https) |
 | `git/git` | C | queued | 2 | 0 | 0.0% | Mailing-list primary — low priority within C |
 | `moby/moby` | C | queued | 16428 | 0 | 0.0% | Renames/history quirks |
-| `docker/cli` | C | queued | 1607 | 0 | 0.0% | Smaller than engine |
-| `helm/helm` | C | queued | 3041 | 0 | 0.0% | After smaller Go Tier A/B |
-| `istio/istio` | C | queued | 13036 | 0 | 0.0% |  |
-| `envoyproxy/envoy` | C | queued | 8088 | 0 | 0.0% |  |
-| `clickhouse/clickhouse` | C | queued | 10490 | 0 | 0.0% |  |
+| `docker/cli` | C | done | 1607 | 587 | 36.5% | Smaller than engine; finished_repo in harvest log |
+| `helm/helm` | C | done | 3041 | 3041 | 100.0% | After smaller Go Tier A/B; finished_repo in harvest log |
+| `istio/istio` | C | done | 13036 | 13036 | 100.0% | finished_repo in harvest log |
+| `envoyproxy/envoy` | C | done | 8088 | 8088 | 100.0% | finished_repo in harvest log |
+| `clickhouse/clickhouse` | C | harvesting | 10490 | 8112 | 77.3% | active in corpus_harvest.log |
 | `pingcap/tidb` | C | queued | 13403 | 0 | 0.0% |  |
 | `cockroachdb/cockroach` | C | queued | 25862 | 0 | 0.0% |  |
 | `urllib3/urllib3` | D | queued | 969 | 0 | 0.0% | Tier D backlog; queued after A–C wave |
